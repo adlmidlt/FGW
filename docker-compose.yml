@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Настройка сервиса для сборки образа докера.
+  webapp:
+    build: .
+    container_name: fgw_webapp
+    env_file:
+      - .env
+    ports:
+      - '7000:7000'
+    volumes:
+      - .:/usr/src/fgw_webapp
+    restart: unless-stopped
+
+  # Настройка сервиса БД.
+  postgresql:
+    image: postgres:latest
+    container_name: db_postgresql
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./pkg/download/postgres-db:/var/lib/postgresql/data
