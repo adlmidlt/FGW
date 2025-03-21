@@ -2,6 +2,7 @@ package wlogger
 
 import (
 	"FGW/pkg"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -198,18 +199,18 @@ type CustomWLogg struct {
 }
 
 // NewCustomWLogger создает и возвращает новый экземпляр структуры CustomWLogg.
-func NewCustomWLogger() *CustomWLogg {
+func NewCustomWLogger() (*CustomWLogg, error) {
 	infoPC := pkg.NewInfoPC()
 	file, err := ensureLogFileExists(pathToLoggFile)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	logI := log.New(file, "", 0)
 	logW := log.New(file, "", 0)
 	logE := log.New(file, "", 0)
 
-	return &CustomWLogg{logI: logI, logW: logW, logE: logE, infoPC: infoPC, logFile: file}
+	return &CustomWLogg{logI: logI, logW: logW, logE: logE, infoPC: infoPC, logFile: file}, nil
 }
 
 // LogI выводит информационное сообщение в консоль и записывает его в файл в формате JSON.
@@ -283,11 +284,15 @@ func (l *CustomWLogg) LogHttpE(statusCode int, methodHttp, url, msg string, err 
 func (l *CustomWLogg) Close() {
 	if l.logFile != nil {
 		if err := l.logFile.Close(); err != nil {
-			log.Fatal(err)
-			return
+			l.LogE("Ошибка при закрытии лог файла", err)
 		}
 	}
-	l.LogI("Ресурсы освобождены")
+
+	if l.logFile != nil {
+		l.LogI("Ресурсы освобождены")
+	} else {
+		l.LogI("Лог файл уже закрыт, запись не возможна")
+	}
 }
 
 // ensureLogFileExists проверяет путь к файлу логирования и открывает его.
@@ -310,8 +315,9 @@ func createLoggFile(pathToLoggFile string) (*os.File, error) {
 
 	if _, err = file.WriteString("[\n"); err != nil {
 		if err = file.Close(); err != nil {
-			return nil, err
+			return nil, errors.New(err.Error())
 		}
+		return nil, err
 	}
 
 	return file, nil

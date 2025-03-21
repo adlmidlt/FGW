@@ -13,7 +13,7 @@ func main() {
 		fmt.Fprintf(w, "Hello, new project \"FGW\"!!!")
 	})
 
-	logger := wlogger.NewCustomWLogger()
+	logger, _ := wlogger.NewCustomWLogger()
 	defer logger.Close()
 	logger.LogI("20001 Сервер запущен!")
 	logger.LogE("30001 Сервер не запущен", errors.New("server not starting"))
