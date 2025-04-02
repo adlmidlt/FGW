@@ -1,0 +1,9 @@
+DROP TABLE dbo.actionTicket;
+DROP TABLE dbo.catalog;
+DROP TABLE dbo.employee;
+DROP TABLE dbo.operation;
+DROP TABLE dbo.operationSpecification;
+DROP TABLE dbo.orderOperation;
+DROP TABLE dbo.packVariant;
+DROP TABLE dbo.role;
+DROP TABLE dbo.ticket;
