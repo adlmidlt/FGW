@@ -2,3 +2,4 @@
 go.mod
 pkg/download
 .env
+internal/config/config.yaml

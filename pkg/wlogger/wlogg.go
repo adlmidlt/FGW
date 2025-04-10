@@ -14,7 +14,7 @@ import (
 
 var (
 	systemDateTime = time.Now().Format(time.DateTime)
-	pathToLoggFile = os.Getenv("GOPATH") + "/fgw.json"
+	pathToLoggFile = os.Getenv("PWD") + "/fgw.json"
 )
 
 const (
@@ -216,30 +216,30 @@ func NewCustomWLogger() (*CustomWLogg, error) {
 // LogI выводит информационное сообщение в консоль и записывает его в файл в формате JSON.
 //
 // Параметры:
-//   - msg (string): Сообщение, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 func (l *CustomWLogg) LogI(msg string) {
-	fmt.Printf(infoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:])
-	l.logI.Printf(infoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:])
+	fmt.Printf(infoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:])
+	l.logI.Printf(infoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:])
 }
 
 // LogW выводит предупреждающие сообщение в консоль и записывает его в файл в формате JSON.
 //
 // Параметры:
-//   - msg (string): Сообщение о предупреждении, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение о предупреждении, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - warn (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogW(msg string, warn error) {
-	fmt.Printf(warningInConsoleInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:], warn)
-	l.logI.Printf(warningInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:], warn)
+	fmt.Printf(warningInConsoleInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], warn)
+	l.logI.Printf(warningInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], warn)
 }
 
 // LogE выводит сообщение об ошибке в консоль и записывает его в файл в формате JSON.
 //
 // Параметры:
-//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - err (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogE(msg string, err error) {
-	fmt.Printf(errorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:], err)
-	l.logI.Printf(errorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:5], msg[6:], err)
+	fmt.Printf(errorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], err)
+	l.logI.Printf(errorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], err)
 }
 
 // LogHttpI выводит информационное сообщение HTTP в консоль и записывает его в файл в формате JSON.
@@ -248,10 +248,10 @@ func (l *CustomWLogg) LogE(msg string, err error) {
 //   - statusCode (int): Код статуса HTTP-ответа, связанного с ошибкой.
 //   - methodHttp (string): Метод HTTP запроса.
 //   - url (string): Ссылка на HTTP.
-//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 func (l *CustomWLogg) LogHttpI(statusCode int, methodHttp, url, msg string) {
-	fmt.Printf(httpInfoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:])
-	l.logI.Printf(httpInfoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:])
+	fmt.Printf(httpInfoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:])
+	l.logI.Printf(httpInfoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:])
 }
 
 // LogHttpW выводит предупреждающие сообщение HTTP в консоль и записывает его в файл в формате JSON.
@@ -260,11 +260,11 @@ func (l *CustomWLogg) LogHttpI(statusCode int, methodHttp, url, msg string) {
 //   - statusCode (int): Код статуса HTTP-ответа, связанного с ошибкой.
 //   - methodHttp (string): Метод HTTP запроса.
 //   - url (string): Ссылка на HTTP.
-//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - warn (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogHttpW(statusCode int, methodHttp, url, msg string, warn error) {
-	fmt.Printf(httpWarningInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:], warn)
-	l.logI.Printf(httpWarningInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:], warn)
+	fmt.Printf(httpWarningInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
+	l.logI.Printf(httpWarningInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
 }
 
 // LogHttpE выводит сообщение об ошибке HTTP в консоль и записывает его в файл в формате JSON.
@@ -272,12 +272,12 @@ func (l *CustomWLogg) LogHttpW(statusCode int, methodHttp, url, msg string, warn
 // Параметры:
 //   - statusCode (int): Код статуса HTTP-ответа, связанного с ошибкой.
 //   - methodHttp (string): Метод HTTP запроса.
-//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:5] и описание msg[6:].
+//   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - url (string): Ссылка на HTTP.
 //   - err (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogHttpE(statusCode int, methodHttp, url, msg string, err error) {
-	fmt.Printf(httpErrorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:], err)
-	l.logI.Printf(httpErrorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:5], msg[6:], err)
+	fmt.Printf(httpErrorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], err)
+	l.logI.Printf(httpErrorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], err)
 }
 
 // Close закрывает файл логирования.
