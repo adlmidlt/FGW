@@ -2,14 +2,19 @@ package main
 
 import (
 	"FGW/internal/config"
+	"FGW/internal/handler/json_api"
+	"FGW/internal/repo"
+	"FGW/internal/service"
 	"FGW/pkg/db"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 	"time"
 )
 
@@ -25,21 +30,29 @@ func main() {
 	}
 	defer logger.Close()
 
+	ctxInit, cancelInit := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancelInit()
+
 	var cfg config.Config
 	if err = cfg.ConfigMSSQL(definitionOfOS()); err != nil {
 		logger.LogE(msg.E3102, err)
 	}
 
-	mssqlDBConn, err := db.MSSQLConn(cfg)
+	mssqlDBConn, err := db.MSSQLConn(ctxInit, cfg)
 	if err != nil {
 		logger.LogE(msg.E3003, err)
 	}
 	defer db.CloseDB(mssqlDBConn)
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	repoRole := repo.NewRoleRepo(mssqlDBConn, logger)
+	serviceRole := service.NewRoleService(repoRole, logger)
+	handlerRole := json_api.NewRoleHandlerJson(serviceRole, logger)
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, new project \"FGW\"!!!")
-	})
+	handlerRole.ServeJsonRouters(mux)
 
 	server := &http.Server{
 		Addr:         ":7777",
@@ -50,18 +63,28 @@ func main() {
 	}
 	logger.LogI(msg.I2003)
 
-	if err = server.ListenAndServe(); err != nil {
-		logger.LogE(msg.E3104, err)
-		os.Exit(1)
+	go func() {
+		if err = server.ListenAndServe(); err != nil {
+			logger.LogE(msg.E3104, err)
+		}
+	}()
+	<-ctx.Done()
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer shutdownCancel()
+
+	if err = server.Shutdown(shutdownCtx); err != nil {
+		logger.LogE(msg.E3106, err)
 	}
 }
 
 // definitionOfOS возвращает путь к конфигурации в зависимости от ОС.
 func definitionOfOS() string {
-	switch runtime.GOOS {
-	case "windows":
+	if runtime.GOOS == "windows" {
 		return pathToConfigWindows
-	case "linux":
+	}
+
+	if runtime.GOOS == "linux" {
 		return pathToConfigLinux
 	}
 

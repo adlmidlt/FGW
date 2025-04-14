@@ -24,7 +24,7 @@ type RoleRepository interface {
 	All(ctx context.Context) ([]*entity.Role, error)
 	FindById(ctx context.Context, idRole uuid.UUID) (*entity.Role, error)
 	Add(ctx context.Context, role *entity.Role) error
-	Update(ctx context.Context, role *entity.Role) error
+	Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error
 	Delete(ctx context.Context, idRole uuid.UUID) error
 }
 
@@ -66,7 +66,7 @@ func (r *RoleRepo) All(ctx context.Context) ([]*entity.Role, error) {
 
 func (r *RoleRepo) FindById(ctx context.Context, idRole uuid.UUID) (*entity.Role, error) {
 	var role entity.Role
-	if err := r.mssql.QueryRowContext(ctx, FGWRoleFindByIdQuery, idRole).Scan(&role.Number, &role.Name); err != nil {
+	if err := r.mssql.QueryRowContext(ctx, FGWRoleFindByIdQuery, idRole).Scan(&role.IdRole, &role.Number, &role.Name); err != nil {
 		r.wLogg.LogE(msg.E3000, err)
 
 		return nil, err
@@ -86,8 +86,8 @@ func (r *RoleRepo) Add(ctx context.Context, role *entity.Role) error {
 	return nil
 }
 
-func (r *RoleRepo) Update(ctx context.Context, role *entity.Role) error {
-	if _, err := r.mssql.ExecContext(ctx, FGWRoleUpdateQuery, role.Number, role.Name); err != nil {
+func (r *RoleRepo) Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error {
+	if _, err := r.mssql.ExecContext(ctx, FGWRoleUpdateQuery, idRole, role.Number, role.Name); err != nil {
 		r.wLogg.LogE(msg.E3000, err)
 
 		return err

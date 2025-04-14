@@ -7,10 +7,10 @@ import (
 
 // Role роль сотрудника.
 type Role struct {
-	IdRole    uuid.UUID `json:"idRole" validate:"required"`
-	Number    int       `json:"number" validate:"required,get>=1"`
-	Name      string    `json:"name" validate:"required,max=55"`
-	IsEditing bool      `json:"isEditing" validate:"required"`
+	IdRole    uuid.UUID `json_api:"idRole"`
+	Number    int       `json_api:"number" validate:"required"`
+	Name      string    `json_api:"name" validate:"required,max=55"`
+	IsEditing bool      `json_api:"isEditing"` // IsEditing флаг для редактирования поля.
 }
 
 var validate = validator.New()

@@ -3,6 +3,7 @@ package db
 import (
 	"FGW/internal/config"
 	"FGW/pkg/wlogger/msg"
+	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/alexbrainman/odbc"
@@ -10,7 +11,7 @@ import (
 )
 
 // MSSQLConn подключение к БД.
-func MSSQLConn(cfg config.Config) (*sql.DB, error) {
+func MSSQLConn(ctx context.Context, cfg config.Config) (*sql.DB, error) {
 	dataSourceName := fmt.Sprintf("Driver=%s; Server=%s,%s; Database=%s; Uid=%s; Pwd=%s; ClientCharset=WINDOWS-1251",
 		cfg.MSSQL.MSSQLDriver,
 		cfg.MSSQL.MSSQLServer,
@@ -25,7 +26,7 @@ func MSSQLConn(cfg config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
-	if err = mssqlConn.Ping(); err != nil {
+	if err = mssqlConn.PingContext(ctx); err != nil {
 		CloseDB(mssqlConn)
 		return nil, err
 	}

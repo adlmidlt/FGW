@@ -10,11 +10,11 @@ import (
 )
 
 type RoleService struct {
-	roleRepo *repo.RoleRepo
+	roleRepo repo.RoleRepository
 	wLogg    *wlogger.CustomWLogg
 }
 
-func NewRoleService(roleRepo *repo.RoleRepo, wLogg *wlogger.CustomWLogg) *RoleService {
+func NewRoleService(roleRepo repo.RoleRepository, wLogg *wlogger.CustomWLogg) *RoleService {
 	return &RoleService{roleRepo: roleRepo, wLogg: wLogg}
 }
 
@@ -22,7 +22,7 @@ type RoleUseCase interface {
 	All(ctx context.Context) ([]*entity.Role, error)
 	FindById(ctx context.Context, idRole uuid.UUID) (*entity.Role, error)
 	Add(ctx context.Context, role *entity.Role) error
-	Update(ctx context.Context, role *entity.Role) error
+	Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error
 	Delete(ctx context.Context, idRole uuid.UUID) error
 }
 
@@ -69,14 +69,14 @@ func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
 	return nil
 }
 
-func (r *RoleService) Update(ctx context.Context, role *entity.Role) error {
+func (r *RoleService) Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error {
 	if err := entity.ValidateRole(role); err != nil {
 		r.wLogg.LogW(msg.W1001, err)
 
 		return err
 	}
 
-	if err := r.roleRepo.Update(ctx, role); err != nil {
+	if err := r.roleRepo.Update(ctx, idRole, role); err != nil {
 		r.wLogg.LogE(msg.E3007, err)
 
 		return err
