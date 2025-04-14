@@ -49,6 +49,12 @@ func (r *RoleService) FindById(ctx context.Context, idRole uuid.UUID) (*entity.R
 }
 
 func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
+	if err := entity.ValidateRole(role); err != nil {
+		r.wLogg.LogW(msg.W1001, err)
+
+		return err
+	}
+
 	if role.IdRole == uuid.Nil {
 		role.IdRole = uuid.New()
 
@@ -64,6 +70,12 @@ func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
 }
 
 func (r *RoleService) Update(ctx context.Context, role *entity.Role) error {
+	if err := entity.ValidateRole(role); err != nil {
+		r.wLogg.LogW(msg.W1001, err)
+
+		return err
+	}
+
 	if err := r.roleRepo.Update(ctx, role); err != nil {
 		r.wLogg.LogE(msg.E3007, err)
 
@@ -75,7 +87,7 @@ func (r *RoleService) Update(ctx context.Context, role *entity.Role) error {
 
 func (r *RoleService) Delete(ctx context.Context, idRole uuid.UUID) error {
 	if err := r.roleRepo.Delete(ctx, idRole); err != nil {
-		r.wLogg.LogE(msg.E3007, err)
+		r.wLogg.LogE(msg.E3008, err)
 
 		return err
 	}
