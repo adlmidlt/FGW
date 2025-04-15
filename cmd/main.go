@@ -2,6 +2,7 @@ package main
 
 import (
 	"FGW/internal/config"
+	"FGW/internal/handler/http_web"
 	"FGW/internal/handler/json_api"
 	"FGW/internal/repo"
 	"FGW/internal/service"
@@ -49,10 +50,17 @@ func main() {
 
 	repoRole := repo.NewRoleRepo(mssqlDBConn, logger)
 	serviceRole := service.NewRoleService(repoRole, logger)
-	handlerRole := json_api.NewRoleHandlerJson(serviceRole, logger)
+	handlerRoleJSON := json_api.NewRoleHandlerJson(serviceRole, logger)
+	handlerRoleHTTP := http_web.NewRoleHandlerHTTP(serviceRole, logger)
 
 	mux := http.NewServeMux()
-	handlerRole.ServeJsonRouters(mux)
+
+	handlerRoleJSON.ServeJSONRouters(mux)
+	handlerRoleHTTP.ServeHTTPRouters(mux)
+
+	// Подключение static (*.html, *.png/jpg *.css файлов, *.js)
+	mux.Handle("/web/",
+		http.StripPrefix("/web/", http.FileServer(http.Dir("../web"))))
 
 	server := &http.Server{
 		Addr:         ":7777",

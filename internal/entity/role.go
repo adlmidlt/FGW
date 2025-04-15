@@ -5,6 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type RoleList struct {
+	Roles []*Role
+}
+
 // Role роль сотрудника.
 type Role struct {
 	IdRole    uuid.UUID `json_api:"idRole"`

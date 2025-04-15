@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <title>Список ролей сотрудника</title>
+</head>
+<body>
+
+<table class="border-table">
+    <thead>
+    <tr>
+        <th class="border-table">ИД</th>
+        <th class="border-table">Номер</th>
+        <th class="border-table">Название</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .Roles}}
+    <tr>
+        <td class="border-table">{{ .IdRole}}</td>
+        <td class="border-table">{{ .Number}}</td>
+        <td class="border-table">{{ .Name}}</td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+
+</body>
+</html>

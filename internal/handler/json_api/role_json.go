@@ -2,6 +2,7 @@ package json_api
 
 import (
 	"FGW/internal/entity"
+	"FGW/internal/handler"
 	"FGW/internal/service"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
@@ -19,7 +20,7 @@ func NewRoleHandlerJson(roleService service.RoleUseCase, wLogg *wlogger.CustomWL
 	return &RoleHandlerJSON{roleService: roleService, wLogg: wLogg}
 }
 
-func (r *RoleHandlerJSON) ServeJsonRouters(mux *http.ServeMux) {
+func (r *RoleHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/api/roles", r.RoleHandlerJSONAll)
 	mux.HandleFunc("/api/find", r.RoleHandlerJSONFindById)
 	mux.HandleFunc("/api/add", r.RoleHandlerJSONAdd)
@@ -28,7 +29,7 @@ func (r *RoleHandlerJSON) ServeJsonRouters(mux *http.ServeMux) {
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
-	if methodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
+	if handler.MethodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
 		return
 	}
 
@@ -48,7 +49,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, request *http.Request) {
-	if methodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
+	if handler.MethodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
 		return
 	}
 
@@ -73,7 +74,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, re
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request *http.Request) {
-	if methodNotAllowed(writer, request, http.MethodPost, r.wLogg) {
+	if handler.MethodNotAllowed(writer, request, http.MethodPost, r.wLogg) {
 		return
 	}
 
@@ -96,7 +97,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, request *http.Request) {
-	if methodNotAllowed(writer, request, http.MethodPut, r.wLogg) {
+	if handler.MethodNotAllowed(writer, request, http.MethodPut, r.wLogg) {
 		return
 	}
 
@@ -128,7 +129,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, requ
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, request *http.Request) {
-	if methodNotAllowed(writer, request, http.MethodDelete, r.wLogg) {
+	if handler.MethodNotAllowed(writer, request, http.MethodDelete, r.wLogg) {
 		return
 	}
 
@@ -149,17 +150,6 @@ func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, requ
 	}
 
 	writeJSON(writer, map[string]string{"message": "Удалено"}, r.wLogg)
-}
-
-func methodNotAllowed(w http.ResponseWriter, r *http.Request, expected string, wLogg *wlogger.CustomWLogg) bool {
-	if r.Method != expected {
-		wLogg.LogHttpE(http.StatusMethodNotAllowed, r.Method, r.URL.Path, msg.H7002, nil)
-		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
-
-		return true
-	}
-
-	return false
 }
 
 func writeJSON(writer http.ResponseWriter, obj interface{}, wLogg *wlogger.CustomWLogg) {
