@@ -4,6 +4,7 @@ import "github.com/google/uuid"
 
 type EmployeeList struct {
 	Employees []*Employee
+	Roles     []*Role
 }
 
 type Employee struct {
