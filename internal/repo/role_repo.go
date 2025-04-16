@@ -35,7 +35,6 @@ func (r *RoleRepo) All(ctx context.Context) ([]*entity.Role, error) {
 
 		return nil, err
 	}
-
 	defer db.CloseRows(rows)
 
 	var roles []*entity.Role

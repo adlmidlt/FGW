@@ -162,7 +162,7 @@ CREATE TABLE dbo.actionTicket
     ticket_id           INT DEFAULT 0 NOT NULL, -- ид этикетки
     action_type         INT DEFAULT 0 NOT NULL, -- catalog.handbook_id == 2 тип действия (1 - печать, 2 - упаковка, 3 - разупаковка, 4 - отгрузка, 5 - оприходование)
     created_by_employee INT           NOT NULL, -- dbo.operation.created_by_employee == operation.created_by_employee табельный номер сотрудника, создавшего операцию
-    order_operation_id            INT DEFAULT 0 NOT NULL, -- ид ордера
+    order_operation_id  INT DEFAULT 0 NOT NULL, -- ид ордера
     last_pack_id        INT DEFAULT 0 NOT NUll  -- на каком участке был упакован
 );
 
@@ -214,5 +214,77 @@ AS
 BEGIN
     SET NOCOUNT ON;
     DELETE role WHERE id_role = @idRole;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_all -- ХП возвращает список сотрудников
+    AS
+BEGIN
+    SET NOCOUNT ON;
+SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id FROM employee;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_find_by_id -- ХП ищет сотрудника по ИД
+    @idEmployee UNIQUEIDENTIFIER -- ид сотрудника
+AS
+BEGIN
+    SET NOCOUNT ON;
+SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id
+FROM employee
+WHERE id_employee = @idEmployee;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_add -- ХП добавляет сотрудника
+    @idEmployee UNIQUEIDENTIFIER, -- ид сотрудника
+    @serviceNumber INT, -- табельный номер сотрудника, в дальнейшем логин для входа
+    @firstName VARCHAR(50), -- имя сотрудника
+    @lastName VARCHAR(50), -- фамилия сотрудника
+    @patronymic VARCHAR(50),-- отчество сотрудника
+    @passwd VARCHAR(255), -- пароль сотрудника
+    @roleId UNIQUEIDENTIFIER -- роль сотрудника
+AS
+BEGIN
+    SET NOCOUNT ON;
+INSERT INTO employee(id_employee, service_number, first_name, last_name, patronymic, passwd, role_id)
+VALUES (@idEmployee,
+        @serviceNumber,
+        @firstName,
+        @lastName,
+        @patronymic,
+        @passwd,
+        @roleId);
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_update -- ХП обновляет сотрудника
+    @idEmployee UNIQUEIDENTIFIER, -- ид сотрудника
+    @serviceNumber INT, -- табельный номер сотрудника, в дальнейшем логин для входа
+    @firstName VARCHAR(50), -- имя сотрудника
+    @lastName VARCHAR(50), -- фамилия сотрудника
+    @patronymic VARCHAR(50),-- отчество сотрудника
+    @passwd VARCHAR(255), -- пароль сотрудника
+    @roleId UNIQUEIDENTIFIER -- роль сотрудника
+AS
+BEGIN
+    SET NOCOUNT ON;
+UPDATE employee
+SET service_number = @serviceNumber,
+    first_name     = @firstName,
+    last_name      = @lastName,
+    patronymic     = @patronymic,
+    passwd         = @passwd,
+    role_id        = @roleId
+WHERE id_employee = @idEmployee;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_delete_by_id -- ХП удаляет сотрудника по ИД
+    @idEmployee UNIQUEIDENTIFIER -- ид сотрудника
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DELETE employee WHERE id_employee = @idEmployee;
 END
 GO
