@@ -6,16 +6,18 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 type RoleService struct {
-	roleRepo repo.RoleRepository
-	wLogg    *wlogger.CustomWLogg
+	roleRepo       repo.RoleRepository
+	wLogg          *wlogger.CustomWLogg
+	validateStruct *validator.Validate
 }
 
-func NewRoleService(roleRepo repo.RoleRepository, wLogg *wlogger.CustomWLogg) *RoleService {
-	return &RoleService{roleRepo: roleRepo, wLogg: wLogg}
+func NewRoleService(roleRepo repo.RoleRepository, wLogg *wlogger.CustomWLogg, validateStruct *validator.Validate) *RoleService {
+	return &RoleService{roleRepo: roleRepo, wLogg: wLogg, validateStruct: validateStruct}
 }
 
 type RoleUseCase interface {
@@ -49,7 +51,7 @@ func (r *RoleService) FindById(ctx context.Context, idRole uuid.UUID) (*entity.R
 }
 
 func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
-	if err := entity.ValidateRole(role); err != nil {
+	if err := r.validateStruct.Struct(role); err != nil {
 		r.wLogg.LogW(msg.W1001, err)
 
 		return err
@@ -69,7 +71,7 @@ func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
 }
 
 func (r *RoleService) Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error {
-	if err := entity.ValidateRole(role); err != nil {
+	if err := r.validateStruct.Struct(role); err != nil {
 		r.wLogg.LogW(msg.W1001, err)
 
 		return err

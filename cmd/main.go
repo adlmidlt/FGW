@@ -10,6 +10,7 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"context"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +32,8 @@ func main() {
 	}
 	defer logger.Close()
 
+	validateStruct := validator.New()
+
 	ctxInit, cancelInit := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancelInit()
 
@@ -49,7 +52,7 @@ func main() {
 	defer stop()
 
 	repoRole := repo.NewRoleRepo(mssqlDBConn, logger)
-	serviceRole := service.NewRoleService(repoRole, logger)
+	serviceRole := service.NewRoleService(repoRole, logger, validateStruct)
 	handlerRoleJSON := json_api.NewRoleHandlerJson(serviceRole, logger)
 	handlerRoleHTTP := http_web.NewRoleHandlerHTTP(serviceRole, logger)
 

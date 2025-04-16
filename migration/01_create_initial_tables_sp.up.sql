@@ -45,7 +45,7 @@ CREATE TABLE dbo.employee
     last_name      VARCHAR(50)             NOT NULL, -- фамилия сотрудника
     patronymic     VARCHAR(50)             NOT NULL, -- отчество сотрудника
     passwd         VARCHAR(255) DEFAULT '' NOT NULL, -- пароль сотрудника
-    role_number    INT          DEFAULT 1  NOT NULL  -- роль сотрудника
+    role_id        UNIQUEIDENTIFIER        NOT NULL  -- роль сотрудника
 );
 
 -- Таблица роли.
