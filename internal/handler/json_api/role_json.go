@@ -22,10 +22,10 @@ func NewRoleHandlerJson(roleService service.RoleUseCase, wLogg *wlogger.CustomWL
 
 func (r *RoleHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/api/roles", r.RoleHandlerJSONAll)
-	mux.HandleFunc("/api/find", r.RoleHandlerJSONFindById)
-	mux.HandleFunc("/api/add", r.RoleHandlerJSONAdd)
-	mux.HandleFunc("/api/update", r.RoleHandlerJSONUpdate)
-	mux.HandleFunc("/api/delete", r.RoleHandlerJSONDelete)
+	mux.HandleFunc("/api/roles/find", r.RoleHandlerJSONFindById)
+	mux.HandleFunc("/api/roles/add", r.RoleHandlerJSONAdd)
+	mux.HandleFunc("/api/roles/update", r.RoleHandlerJSONUpdate)
+	mux.HandleFunc("/api/roles/delete", r.RoleHandlerJSONDelete)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
@@ -124,8 +124,6 @@ func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, requ
 
 		return
 	}
-
-	writeJSON(writer, role, r.wLogg)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, request *http.Request) {

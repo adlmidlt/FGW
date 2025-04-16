@@ -6,6 +6,19 @@
     <title>Список ролей сотрудника</title>
 </head>
 <body>
+<form action="/fgw/roles/add" method="POST">
+    <label>
+        Номер роли:
+        <input type="text" name="number" placeholder="Введите номер роли">
+    </label>
+    <br>
+    <label>
+        Название роли:
+        <input type="text" name="name" placeholder="Введите название роли">
+    </label><br>
+    <input type="submit" value="Добавить">
+</form>
+<br>
 
 <table class="border-table">
     <thead>
@@ -17,11 +30,35 @@
     </thead>
     <tbody>
     {{range .Roles}}
-    <tr>
-        <td class="border-table">{{ .IdRole}}</td>
-        <td class="border-table">{{ .Number}}</td>
-        <td class="border-table">{{ .Name}}</td>
-    </tr>
+        <tr>
+            <td class="border-table">{{ .IdRole}}</td>
+            {{ if .IsEditing}}
+                <form method="POST" action="/fgw/roles/update">
+                    <td><label>
+                            <input type="text" name="number" value="{{ .Number}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="name" value="{{ .Name}}">
+                        </label>
+                    </td>
+                    <td>
+                        <input type="hidden" name="idRole" value="{{ .IdRole}}">
+                        <input type="submit" value="Сохранить">
+                    </td>
+                </form>
+            {{ else}}
+                <td class="border-table">{{ .Number}}</td>
+                <td class="border-table">{{ .Name}}</td>
+                <td>
+                    <a href="/fgw/roles/update?idRole={{ .IdRole}}">Изменить</a>
+                    <form method="POST" action="/fgw/roles/delete" style="display:inline;">
+                        <input type="hidden" name="idRole" value="{{ .IdRole}}">
+                        <input type="submit" value="Удалить">
+                    </form>
+                </td>
+            {{ end}}
+        </tr>
     {{end}}
     </tbody>
 </table>

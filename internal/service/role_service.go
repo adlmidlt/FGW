@@ -57,7 +57,6 @@ func (r *RoleService) Add(ctx context.Context, role *entity.Role) error {
 
 	if role.IdRole == uuid.Nil {
 		role.IdRole = uuid.New()
-
 	}
 
 	if err := r.roleRepo.Add(ctx, role); err != nil {
