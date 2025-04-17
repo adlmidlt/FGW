@@ -29,6 +29,8 @@ func NewEmployeeHandlerHTTP(roleService service.RoleUseCase, employeeService ser
 func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/fgw/employees", e.EmployeeHandlerHTTPAll)
 	mux.HandleFunc("/fgw/employees/update", e.EmployeeHandlerHTTPUpdate)
+	mux.HandleFunc("/fgw/employees/add", e.EmployeeHandlerHTTPAdd)
+	mux.HandleFunc("/fgw/employees/delete", e.EmployeeHandlerHTTPDelete)
 }
 
 func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
@@ -93,6 +95,61 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPUpdate(writer http.ResponseWrit
 	default:
 		http.Error(writer, msg.H7002, http.StatusMethodNotAllowed)
 	}
+}
+
+func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter, request *http.Request) {
+	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
+		return
+	}
+
+	roleIdStr := request.FormValue("roleId")
+	roleId, err := uuid.Parse(roleIdStr)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
+		http.Error(writer, msg.H7004, http.StatusBadRequest)
+
+		return
+	}
+
+	employee := &entity.Employee{
+		ServiceNumber: convert.ConvStrToInt(request.FormValue("serviceNumber")),
+		FirstName:     request.FormValue("firstName"),
+		LastName:      request.FormValue("lastName"),
+		Patronymic:    request.FormValue("patronymic"),
+		Passwd:        request.FormValue("passwd"),
+		RoleId:        roleId,
+	}
+
+	if err = e.employeeService.Add(request.Context(), employee); err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7012, err)
+		http.Error(writer, msg.H7012, http.StatusInternalServerError)
+
+		return
+	}
+	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+}
+
+func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWriter, request *http.Request) {
+	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
+		return
+	}
+
+	idEmployeeStr := request.FormValue("idEmployee")
+	idEmployee, err := uuid.Parse(idEmployeeStr)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
+		http.Error(writer, msg.H7004, http.StatusBadRequest)
+
+		return
+	}
+
+	if err = e.employeeService.Delete(request.Context(), idEmployee); err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7011, err)
+		http.Error(writer, msg.H7011, http.StatusInternalServerError)
+
+		return
+	}
+	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
 func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {

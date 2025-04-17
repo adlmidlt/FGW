@@ -14,5 +14,5 @@ var (
 	FGWEmployeeFindByIdQuery = "exec dbo.fgw_employee_find_by_id ?;"
 	FGWEmployeeAddQuery      = "exec dbo.fgw_employee_add ?, ?, ?, ?, ?, ?, ?;"
 	FGWEmployeeUpdate        = "exec dbo.fgw_employee_update ?, ?, ?, ?, ?, ?, ?"
-	FGWEmployeeDelete        = "exec dbo.fgw_employee_delete ?"
+	FGWEmployeeDelete        = "exec fgw_employee_delete_by_id ?"
 )

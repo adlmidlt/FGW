@@ -6,6 +6,41 @@
     <title>Список сотрудников</title>
 </head>
 <body>
+<h1>Добавить нового сотрудника</h1>
+<form method="POST" action="/fgw/employees/add">
+    <label>
+        Табельный номер:
+        <input type="number" name="serviceNumber" required>
+    </label>
+    <label>
+        Имя:
+        <input type="text" name="firstName" required>
+    </label>
+    <label>
+        Фамилия:
+        <input type="text" name="lastName" required>
+    </label>
+    <label>
+        Отчество:
+        <input type="text" name="patronymic" required>
+    </label>
+    <label>
+        Пароль:
+        <input type="password" name="passwd" required>
+    </label>
+    <label>
+        Роль:
+        <select name="roleId">
+            {{ range .Roles }}
+                <option value="{{ .IdRole }}">{{ .Name }}</option>
+            {{ end }}
+        </select>
+    </label>
+
+    <input type="submit" value="Добавить">
+</form>
+<br>
+
 <table class="border-table">
     <thead>
     <tr>
@@ -35,7 +70,8 @@
                             <select name="roleId">
                                 {{ $employee := . }}
                                 {{ range $.Roles }}
-                                    <option value="{{ .IdRole }}" {{ if eq .IdRole $employee.RoleId }}selected{{ end }}>{{ .Name }}</option>
+                                    <option value="{{ .IdRole }}"
+                                            {{ if eq .IdRole $employee.RoleId }}selected{{ end }}>{{ .Name }}</option>
                                 {{ end }}
                             </select>
                         </label>
@@ -62,6 +98,10 @@
                 </td>
                 <td>
                     <a href="/fgw/employees/update?idEmployee={{ .IdEmployee}}">Изменить</a>
+                    <form method="POST" action="/fgw/employees/delete" style="display:inline;">
+                        <input type="hidden" name="idEmployee" value="{{ .IdEmployee}}">
+                        <input type="submit" value="Удалить">
+                    </form>
                 </td>
             {{ end}}
         </tr>
