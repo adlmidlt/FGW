@@ -26,6 +26,7 @@ type RoleUseCase interface {
 	Add(ctx context.Context, role *entity.Role) error
 	Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error
 	Delete(ctx context.Context, idRole uuid.UUID) error
+	Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error)
 }
 
 func (r *RoleService) All(ctx context.Context) ([]*entity.Role, error) {
@@ -94,4 +95,8 @@ func (r *RoleService) Delete(ctx context.Context, idRole uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (r *RoleService) Exists(ctx context.Context, idRole uuid.UUID) (bool, error) {
+	return r.roleRepo.Exists(ctx, idRole)
 }

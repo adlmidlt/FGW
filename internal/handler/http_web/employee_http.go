@@ -102,7 +102,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter,
 		return
 	}
 
-	roleId, err := ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
+	roleId, err := handler.ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
@@ -130,8 +130,17 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 		return
 	}
 
-	idEmployee, err := ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := handler.ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
 	if err != nil {
+		return
+	}
+
+	_, err = e.employeeService.Exists(request.Context(), idEmployee)
+	if err != nil {
+		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
+
 		return
 	}
 
@@ -157,13 +166,22 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 
-	idEmployee, err := ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := handler.ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	roleId, err := ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
+	roleId, err := handler.ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
 	if err != nil {
+		return
+	}
+
+	_, err = e.employeeService.Exists(request.Context(), idEmployee)
+	if err != nil {
+		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
+
 		return
 	}
 

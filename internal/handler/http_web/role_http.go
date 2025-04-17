@@ -45,6 +45,12 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request
 		return
 	}
 
+	if roles == nil {
+		roles = []*entity.Role{}
+	}
+
+	data := entity.RoleList{Roles: roles}
+
 	if idStr := request.URL.Query().Get("idRole"); idStr != "" {
 		if id, err := uuid.Parse(idStr); err == nil {
 			for _, role := range roles {
@@ -54,12 +60,6 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request
 			}
 		}
 	}
-
-	if roles == nil {
-		roles = []*entity.Role{}
-	}
-
-	data := entity.RoleList{Roles: roles}
 
 	tmpl, err := template.ParseFiles(templateHtmlRoleList)
 	if err != nil {
@@ -93,8 +93,17 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRole, err := ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
+	idRole, err := handler.ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
 	if err != nil {
+		return
+	}
+
+	_, err = r.roleService.Exists(request.Context(), idRole)
+	if err != nil {
+		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
+
 		return
 	}
 
@@ -139,8 +148,17 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRole, err := ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
+	idRole, err := handler.ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
 	if err != nil {
+		return
+	}
+
+	_, err = r.roleService.Exists(request.Context(), idRole)
+	if err != nil {
+		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
+
 		return
 	}
 

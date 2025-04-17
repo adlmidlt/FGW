@@ -7,7 +7,6 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 )
 
@@ -16,16 +15,16 @@ type RoleHandlerJSON struct {
 	wLogg       *wlogger.CustomWLogg
 }
 
-func NewRoleHandlerJson(roleService service.RoleUseCase, wLogg *wlogger.CustomWLogg) *RoleHandlerJSON {
+func NewRoleHandlerJSON(roleService service.RoleUseCase, wLogg *wlogger.CustomWLogg) *RoleHandlerJSON {
 	return &RoleHandlerJSON{roleService: roleService, wLogg: wLogg}
 }
 
 func (r *RoleHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
-	mux.HandleFunc("/api/roles", r.RoleHandlerJSONAll)
-	mux.HandleFunc("/api/roles/find", r.RoleHandlerJSONFindById)
-	mux.HandleFunc("/api/roles/add", r.RoleHandlerJSONAdd)
-	mux.HandleFunc("/api/roles/update", r.RoleHandlerJSONUpdate)
-	mux.HandleFunc("/api/roles/delete", r.RoleHandlerJSONDelete)
+	mux.HandleFunc("/api/fgw/roles", r.RoleHandlerJSONAll)
+	mux.HandleFunc("/api/fgw/roles/find", r.RoleHandlerJSONFindById)
+	mux.HandleFunc("/api/fgw/roles/add", r.RoleHandlerJSONAdd)
+	mux.HandleFunc("/api/fgw/roles/update", r.RoleHandlerJSONUpdate)
+	mux.HandleFunc("/api/fgw/roles/delete", r.RoleHandlerJSONDelete)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
@@ -45,7 +44,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request
 		roles = []*entity.Role{}
 	}
 
-	writeJSON(writer, roles, r.wLogg)
+	handler.WriteJSON(writer, roles, r.wLogg)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, request *http.Request) {
@@ -53,11 +52,16 @@ func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, re
 		return
 	}
 
-	idRoleStr := request.URL.Query().Get("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
+	idRole, err := handler.ParseStrToUUID(request.URL.Query().Get("idRole"), writer, request, r.wLogg)
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, http.MethodGet, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
+		return
+	}
+
+	_, err = r.roleService.Exists(request.Context(), idRole)
+	if err != nil {
+		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
 
 		return
 	}
@@ -70,7 +74,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, re
 		return
 	}
 
-	writeJSON(writer, role, r.wLogg)
+	handler.WriteJSON(writer, role, r.wLogg)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request *http.Request) {
@@ -93,7 +97,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request
 		return
 	}
 
-	writeJSON(writer, role, r.wLogg)
+	handler.WriteJSON(writer, role, r.wLogg)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, request *http.Request) {
@@ -101,11 +105,16 @@ func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRoleStr := request.URL.Query().Get("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
+	idRole, err := handler.ParseStrToUUID(request.URL.Query().Get("idRole"), writer, request, r.wLogg)
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, http.MethodGet, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
+		return
+	}
+
+	_, err = r.roleService.Exists(request.Context(), idRole)
+	if err != nil {
+		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
 
 		return
 	}
@@ -124,6 +133,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, requ
 
 		return
 	}
+	handler.WriteJSON(writer, map[string]string{"message": msg.I2005}, r.wLogg)
 }
 
 func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, request *http.Request) {
@@ -131,11 +141,16 @@ func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRoleStr := request.URL.Query().Get("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
+	idRole, err := handler.ParseStrToUUID(request.URL.Query().Get("idRole"), writer, request, r.wLogg)
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, http.MethodGet, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
+		return
+	}
+
+	_, err = r.roleService.Exists(request.Context(), idRole)
+	if err != nil {
+		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
+		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
 
 		return
 	}
@@ -147,15 +162,5 @@ func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	writeJSON(writer, map[string]string{"message": "Удалено"}, r.wLogg)
-}
-
-func writeJSON(writer http.ResponseWriter, obj interface{}, wLogg *wlogger.CustomWLogg) {
-	writer.Header().Set("Content-Type", "application/json_api; charset=UTF-8")
-	if err := json.NewEncoder(writer).Encode(obj); err != nil {
-		wLogg.LogE(msg.E3105, err)
-		http.Error(writer, msg.E3105, http.StatusInternalServerError)
-
-		return
-	}
+	handler.WriteJSON(writer, map[string]string{"message": msg.I2004}, r.wLogg)
 }

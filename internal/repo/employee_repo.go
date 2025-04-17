@@ -8,6 +8,7 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -26,6 +27,7 @@ type EmployeeRepository interface {
 	Add(ctx context.Context, employee *entity.Employee) error
 	Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error
 	Delete(ctx context.Context, idEmployee uuid.UUID) error
+	Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error)
 }
 
 func (e *EmployeeRepo) All(ctx context.Context) ([]*entity.Employee, error) {
@@ -137,4 +139,20 @@ func (e *EmployeeRepo) Delete(ctx context.Context, idEmployee uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (e *EmployeeRepo) Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
+	row := e.mssql.QueryRowContext(ctx, FGWEmployeeExist, idEmployee)
+
+	var exists int
+	err := row.Scan(&exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, err
+	}
+
+	if err != nil {
+		return false, nil
+	}
+
+	return true, nil
 }

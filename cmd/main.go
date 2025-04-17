@@ -53,11 +53,12 @@ func main() {
 
 	repoRole := repo.NewRoleRepo(mssqlDBConn, logger)
 	serviceRole := service.NewRoleService(repoRole, logger, validateStruct)
-	handlerRoleJSON := json_api.NewRoleHandlerJson(serviceRole, logger)
+	handlerRoleJSON := json_api.NewRoleHandlerJSON(serviceRole, logger)
 	handlerRoleHTTP := http_web.NewRoleHandlerHTTP(serviceRole, logger)
 
 	repoEmployee := repo.NewEmployeeRepo(mssqlDBConn, logger)
 	serviceEmployee := service.NewEmployeeService(repoEmployee, logger, validateStruct)
+	handlerEmployeeJSON := json_api.NewEmployeeHandlerJSON(serviceRole, serviceEmployee, logger)
 	handlerEmployeeHTTP := http_web.NewEmployeeHandlerHTTP(serviceRole, serviceEmployee, logger)
 
 	mux := http.NewServeMux()
@@ -65,6 +66,7 @@ func main() {
 	handlerRoleJSON.ServeJSONRouters(mux)
 	handlerRoleHTTP.ServeHTTPRouters(mux)
 
+	handlerEmployeeJSON.ServeJSONRouters(mux)
 	handlerEmployeeHTTP.ServeHTTPRouters(mux)
 
 	// Подключение static (*.html, *.png/jpg *.css файлов, *.js)
