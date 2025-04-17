@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <title>Список сотрудников</title>
+</head>
+<body>
+<table class="border-table">
+    <thead>
+    <tr>
+        <th class="border-table">ИД</th>
+        <th class="border-table">Табельный номер</th>
+        <th class="border-table">Имя</th>
+        <th class="border-table">Фамилия</th>
+        <th class="border-table">Отчество</th>
+        <th class="border-table">Пароль</th>
+        <th class="border-table">Роль</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ range .Employees}}
+        <tr>
+            <td class="border-table">{{ .IdEmployee}}</td>
+            {{if .IsEditing}}
+                <form method="POST" action="/fgw/employees/update">
+                    <td><input type="text" name="serviceNumber" value="{{ .ServiceNumber}}"></td>
+                    <td><input type="text" name="firstName" value="{{ .FirstName}}"></td>
+                    <td><input type="text" name="lastName" value="{{ .LastName}}"></td>
+                    <td><input type="text" name="patronymic" value="{{ .Patronymic}}"></td>
+                    <td><input type="text" name="passwd" value="{{ .Passwd}}"></td>
+
+                    <td>
+                        <label>
+                            <select name="roleId">
+                                {{ $employee := . }}
+                                {{ range $.Roles }}
+                                    <option value="{{ .IdRole }}" {{ if eq .IdRole $employee.RoleId }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </label>
+                    </td>
+
+                    <td>
+                        <input type="hidden" name="idEmployee" value="{{ .IdEmployee}}">
+                        <input type="submit" value="Сохранить">
+                    </td>
+                </form>
+            {{ else}}
+                <td class="border-table">{{ .ServiceNumber}}</td>
+                <td class="border-table">{{ .FirstName}}</td>
+                <td class="border-table">{{ .LastName}}</td>
+                <td class="border-table">{{ .Patronymic}}</td>
+                <td class="border-table">{{ .Passwd}}</td>
+                <td class="border-table">
+                    {{ $employee := . }}
+                    {{ range $.Roles }}
+                        {{ if eq .IdRole $employee.RoleId }}
+                            {{ .Name }}
+                        {{ end }}
+                    {{ end }}
+                </td>
+                <td>
+                    <a href="/fgw/employees/update?idEmployee={{ .IdEmployee}}">Изменить</a>
+                </td>
+            {{ end}}
+        </tr>
+    {{ end}}
+    </tbody>
+</table>
+</body>
+</html>

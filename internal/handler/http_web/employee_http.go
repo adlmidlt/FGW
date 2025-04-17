@@ -1,0 +1,152 @@
+package http_web
+
+import (
+	"FGW/internal/entity"
+	"FGW/internal/handler"
+	"FGW/internal/service"
+	"FGW/pkg/convert"
+	"FGW/pkg/wlogger"
+	"FGW/pkg/wlogger/msg"
+	"fmt"
+	"github.com/google/uuid"
+	"html/template"
+	"net/http"
+)
+
+const templateHtmlEmployeeList = "../web/html/employee_list.html"
+const fgwEmployeesStartUrl = "/fgw/employees"
+
+type EmployeeHandlerHTTP struct {
+	roleService     service.RoleUseCase
+	employeeService service.EmployeeUseCase
+	wLogg           *wlogger.CustomWLogg
+}
+
+func NewEmployeeHandlerHTTP(roleService service.RoleUseCase, employeeService service.EmployeeUseCase, wLogg *wlogger.CustomWLogg) *EmployeeHandlerHTTP {
+	return &EmployeeHandlerHTTP{roleService: roleService, employeeService: employeeService, wLogg: wLogg}
+}
+
+func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
+	mux.HandleFunc("/fgw/employees", e.EmployeeHandlerHTTPAll)
+	mux.HandleFunc("/fgw/employees/update", e.EmployeeHandlerHTTPUpdate)
+}
+
+func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
+	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
+		return
+	}
+
+	employees, err := e.employeeService.All(request.Context())
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
+		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+
+		return
+	}
+
+	if employees == nil {
+		employees = []*entity.Employee{}
+	}
+
+	roles, err := e.roleService.All(request.Context())
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
+		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+
+		return
+	}
+
+	data := entity.EmployeeList{Employees: employees, Roles: roles}
+
+	if idEmployeeStr := request.URL.Query().Get("idEmployee"); idEmployeeStr != "" {
+		if idEmployee, err := uuid.Parse(idEmployeeStr); err == nil {
+			for _, employee := range employees {
+				if employee.IdEmployee == idEmployee {
+					employee.IsEditing = true
+				}
+			}
+		}
+	}
+
+	tmpl, err := template.ParseFiles(templateHtmlEmployeeList)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7006, err)
+		http.Error(writer, msg.H7006, http.StatusInternalServerError)
+
+		return
+	}
+
+	if err = tmpl.Execute(writer, data); err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7007, err)
+		http.Error(writer, msg.H7007, http.StatusInternalServerError)
+
+		return
+	}
+}
+
+func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPUpdate(writer http.ResponseWriter, request *http.Request) {
+	switch request.Method {
+	case http.MethodPost:
+		e.processUpdateFormEmployee(writer, request)
+	case http.MethodGet:
+		e.renderUpdateFormEmployee(writer, request)
+	default:
+		http.Error(writer, msg.H7002, http.StatusMethodNotAllowed)
+	}
+}
+
+func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
+	idEmployeeStr := request.URL.Query().Get("idEmployee")
+	idEmployee, err := uuid.Parse(idEmployeeStr)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
+		http.Error(writer, msg.H7004, http.StatusBadRequest)
+
+		return
+	}
+	http.Redirect(writer, request, fmt.Sprintf("%s?idEmployee=%s", fgwEmployeesStartUrl, idEmployee), http.StatusSeeOther)
+}
+
+func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
+	if err := request.ParseForm(); err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7008, err)
+		http.Error(writer, msg.H7008, http.StatusBadRequest)
+
+		return
+	}
+
+	idEmployeeStr := request.FormValue("idEmployee")
+	idEmployee, err := uuid.Parse(idEmployeeStr)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
+		http.Error(writer, msg.H7004, http.StatusBadRequest)
+
+		return
+	}
+
+	roleIdStr := request.FormValue("roleId")
+	roleId, err := uuid.Parse(roleIdStr)
+	if err != nil {
+		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
+		http.Error(writer, msg.H7004, http.StatusBadRequest)
+
+		return
+	}
+
+	employee := &entity.Employee{
+		IdEmployee:    idEmployee,
+		ServiceNumber: convert.ConvStrToInt(request.FormValue("serviceNumber")),
+		FirstName:     request.FormValue("firstName"),
+		LastName:      request.FormValue("lastName"),
+		Patronymic:    request.FormValue("patronymic"),
+		Passwd:        request.FormValue("passwd"),
+		RoleId:        roleId,
+	}
+	if err = e.employeeService.Update(request.Context(), idEmployee, employee); err != nil {
+		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7009, err)
+		http.Error(writer, msg.H7009, http.StatusInternalServerError)
+
+		return
+	}
+	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+}
