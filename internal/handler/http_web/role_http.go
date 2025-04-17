@@ -93,12 +93,8 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRoleStr := request.FormValue("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
+	idRole, err := ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 
@@ -132,14 +128,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAdd(writer http.ResponseWriter, request
 
 func (r *RoleHandlerHTTP) renderUpdateFormRole(writer http.ResponseWriter, request *http.Request) {
 	idRoleStr := request.URL.Query().Get("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
-	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
-		return
-	}
-	http.Redirect(writer, request, fmt.Sprintf("%s?idRole=%s", fgwRolesStartUrl, idRole), http.StatusSeeOther)
+	http.Redirect(writer, request, fmt.Sprintf("%s?idRole=%s", fgwRolesStartUrl, idRoleStr), http.StatusSeeOther)
 }
 
 func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, request *http.Request) {
@@ -150,12 +139,8 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRoleStr := request.FormValue("idRole")
-	idRole, err := uuid.Parse(idRoleStr)
+	idRole, err := ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 

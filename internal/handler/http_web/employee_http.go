@@ -29,8 +29,8 @@ func NewEmployeeHandlerHTTP(roleService service.RoleUseCase, employeeService ser
 func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/fgw/employees", e.EmployeeHandlerHTTPAll)
 	mux.HandleFunc("/fgw/employees/update", e.EmployeeHandlerHTTPUpdate)
-	mux.HandleFunc("/fgw/employees/add", e.EmployeeHandlerHTTPAdd)
 	mux.HandleFunc("/fgw/employees/delete", e.EmployeeHandlerHTTPDelete)
+	mux.HandleFunc("/fgw/employees/add", e.EmployeeHandlerHTTPAdd)
 }
 
 func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
@@ -102,12 +102,8 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter,
 		return
 	}
 
-	roleIdStr := request.FormValue("roleId")
-	roleId, err := uuid.Parse(roleIdStr)
+	roleId, err := ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 
@@ -134,12 +130,8 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 		return
 	}
 
-	idEmployeeStr := request.FormValue("idEmployee")
-	idEmployee, err := uuid.Parse(idEmployeeStr)
+	idEmployee, err := ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 
@@ -154,14 +146,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 
 func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
 	idEmployeeStr := request.URL.Query().Get("idEmployee")
-	idEmployee, err := uuid.Parse(idEmployeeStr)
-	if err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
-		return
-	}
-	http.Redirect(writer, request, fmt.Sprintf("%s?idEmployee=%s", fgwEmployeesStartUrl, idEmployee), http.StatusSeeOther)
+	http.Redirect(writer, request, fmt.Sprintf("%s?idEmployee=%s", fgwEmployeesStartUrl, idEmployeeStr), http.StatusSeeOther)
 }
 
 func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
@@ -172,21 +157,13 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 
-	idEmployeeStr := request.FormValue("idEmployee")
-	idEmployee, err := uuid.Parse(idEmployeeStr)
+	idEmployee, err := ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 
-	roleIdStr := request.FormValue("roleId")
-	roleId, err := uuid.Parse(roleIdStr)
+	roleId, err := ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
-
 		return
 	}
 
@@ -199,6 +176,7 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		Passwd:        request.FormValue("passwd"),
 		RoleId:        roleId,
 	}
+
 	if err = e.employeeService.Update(request.Context(), idEmployee, employee); err != nil {
 		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7009, err)
 		http.Error(writer, msg.H7009, http.StatusInternalServerError)
