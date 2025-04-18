@@ -22,3 +22,7 @@ var (
 var (
 	FGWPackVariantAllQuery = "exec dbo.fgw_pack_variant_all;"
 )
+
+var (
+	FGWCatalogAllQuery = "exec dbo.fgw_catalog_all;"
+)

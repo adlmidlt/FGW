@@ -19,7 +19,7 @@ func NewPackVariantService(packVariantRepo repo.PackVariantRepository, wLogg *wl
 	return &PackVariantService{packVariantRepo: packVariantRepo, wLogg: wLogg, validateStruct: validateStruct}
 }
 
-type PackVariantUserCase interface {
+type PackVariantUseCase interface {
 	All(ctx context.Context) ([]*entity.PackVariant, error)
 }
 
