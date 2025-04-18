@@ -169,8 +169,10 @@ CREATE TABLE dbo.actionTicket
 CREATE PROCEDURE dbo.fgw_role_all -- ХП возвращает список ролей
     AS
 BEGIN
-    SET NOCOUNT ON;
-SELECT id_role, number, name FROM role;
+    SET
+NOCOUNT ON;
+SELECT id_role, number, name
+FROM role;
 END
 GO
 
@@ -178,8 +180,11 @@ CREATE PROCEDURE dbo.fgw_role_find_by_id -- ХП ищет роль по ИД
     @idRole UNIQUEIDENTIFIER -- ид роль
 AS
 BEGIN
-    SET NOCOUNT ON;
-SELECT id_role, number, name FROM role WHERE id_role = @idRole;
+    SET
+NOCOUNT ON;
+SELECT id_role, number, name
+FROM role
+WHERE id_role = @idRole;
 END
 GO
 
@@ -189,8 +194,10 @@ CREATE PROCEDURE dbo.fgw_role_add -- ХП добавляет роль
     @name VARCHAR(55) -- наименование роли
 AS
 BEGIN
-    SET NOCOUNT ON;
-INSERT INTO role(id_role, number, name) VALUES (@idRole, @number, @name);
+    SET
+NOCOUNT ON;
+INSERT INTO role(id_role, number, name)
+VALUES (@idRole, @number, @name);
 END
 GO
 
@@ -200,7 +207,8 @@ CREATE PROCEDURE dbo.fgw_role_update -- ХП обновляет роль
     @name VARCHAR(55) -- наименование роли
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET
+NOCOUNT ON;
 UPDATE role
 SET number = @number,
     name   = @name
@@ -212,16 +220,30 @@ CREATE PROCEDURE dbo.fgw_role_delete_by_id -- ХП удаляет роль по 
     @idRole UNIQUEIDENTIFIER -- ид роль
 AS
 BEGIN
-    SET NOCOUNT ON;
-    DELETE role WHERE id_role = @idRole;
+    SET
+NOCOUNT ON;
+    DELETE
+role WHERE id_role = @idRole;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_role_exist -- ХП проверяет на существование роли
+    @idRole UNIQUEIDENTIFIER
+AS
+BEGIN
+SELECT 1
+FROM role
+WHERE id_role = @idRole;
 END
 GO
 
 CREATE PROCEDURE dbo.fgw_employee_all -- ХП возвращает список сотрудников
     AS
 BEGIN
-    SET NOCOUNT ON;
-SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id FROM employee;
+    SET
+NOCOUNT ON;
+SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id
+FROM employee;
 END
 GO
 
@@ -229,7 +251,8 @@ CREATE PROCEDURE dbo.fgw_employee_find_by_id -- ХП ищет сотрудник
     @idEmployee UNIQUEIDENTIFIER -- ид сотрудника
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET
+NOCOUNT ON;
 SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id
 FROM employee
 WHERE id_employee = @idEmployee;
@@ -246,7 +269,8 @@ CREATE PROCEDURE dbo.fgw_employee_add -- ХП добавляет сотрудн�
     @roleId UNIQUEIDENTIFIER -- роль сотрудника
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET
+NOCOUNT ON;
 INSERT INTO employee(id_employee, service_number, first_name, last_name, patronymic, passwd, role_id)
 VALUES (@idEmployee,
         @serviceNumber,
@@ -268,7 +292,8 @@ CREATE PROCEDURE dbo.fgw_employee_update -- ХП обновляет сотруд
     @roleId UNIQUEIDENTIFIER -- роль сотрудника
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET
+NOCOUNT ON;
 UPDATE employee
 SET service_number = @serviceNumber,
     first_name     = @firstName,
@@ -284,7 +309,19 @@ CREATE PROCEDURE dbo.fgw_employee_delete_by_id -- ХП удаляет сотру
     @idEmployee UNIQUEIDENTIFIER -- ид сотрудника
 AS
 BEGIN
-    SET NOCOUNT ON;
-    DELETE employee WHERE id_employee = @idEmployee;
+    SET
+NOCOUNT ON;
+    DELETE
+employee WHERE id_employee = @idEmployee;
+END
+GO
+
+CREATE PROCEDURE dbo.fgw_employee_exist -- ХП проверяет на существование сотрудника
+    @idEmployee UNIQUEIDENTIFIER
+AS
+BEGIN
+SELECT 1
+FROM employee
+WHERE id_employee = @idEmployee;
 END
 GO
