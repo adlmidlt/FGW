@@ -22,14 +22,14 @@ func NewRoleHandlerJSON(roleService service.RoleUseCase, wLogg *wlogger.CustomWL
 }
 
 func (r *RoleHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
-	mux.HandleFunc(fgwRolesStartUrl, r.RoleHandlerJSONAll)
-	mux.HandleFunc(fgwRolesStartUrl+"/find", r.RoleHandlerJSONFindById)
-	mux.HandleFunc(fgwRolesStartUrl+"/add", r.RoleHandlerJSONAdd)
-	mux.HandleFunc(fgwRolesStartUrl+"/update", r.RoleHandlerJSONUpdate)
-	mux.HandleFunc(fgwRolesStartUrl+"/delete", r.RoleHandlerJSONDelete)
+	mux.HandleFunc(fgwRolesStartUrl, r.JSONAll)
+	mux.HandleFunc(fgwRolesStartUrl+"/find", r.JSONFindById)
+	mux.HandleFunc(fgwRolesStartUrl+"/add", r.JSONAdd)
+	mux.HandleFunc(fgwRolesStartUrl+"/update", r.JSONUpdate)
+	mux.HandleFunc(fgwRolesStartUrl+"/delete", r.JSONDelete)
 }
 
-func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerJSON) JSONAll(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
 		return
 	}
@@ -49,7 +49,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAll(writer http.ResponseWriter, request
 	handler.WriteJSON(writer, roles, r.wLogg)
 }
 
-func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerJSON) JSONFindById(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
 		return
 	}
@@ -74,7 +74,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONFindById(writer http.ResponseWriter, re
 	handler.WriteJSON(writer, role, r.wLogg)
 }
 
-func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerJSON) JSONAdd(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, r.wLogg) {
 		return
 	}
@@ -97,7 +97,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONAdd(writer http.ResponseWriter, request
 	handler.WriteJSON(writer, role, r.wLogg)
 }
 
-func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerJSON) JSONUpdate(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPut, r.wLogg) {
 		return
 	}
@@ -128,7 +128,7 @@ func (r *RoleHandlerJSON) RoleHandlerJSONUpdate(writer http.ResponseWriter, requ
 	handler.WriteJSON(writer, map[string]string{"message": msg.I2005}, r.wLogg)
 }
 
-func (r *RoleHandlerJSON) RoleHandlerJSONDelete(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerJSON) JSONDelete(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodDelete, r.wLogg) {
 		return
 	}

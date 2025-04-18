@@ -30,13 +30,13 @@ func NewEmployeeHandlerHTTP(roleService service.RoleUseCase, employeeService ser
 }
 
 func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
-	mux.HandleFunc(fgwEmployeesStartUrl, e.EmployeeHandlerHTTPAll)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.EmployeeHandlerHTTPUpdate)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.EmployeeHandlerHTTPDelete)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.EmployeeHandlerHTTPAdd)
+	mux.HandleFunc(fgwEmployeesStartUrl, e.All)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.Update)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.Delete)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.Add)
 }
 
-func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(w http.ResponseWriter, r *http.Request) {
+func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 	if handler.MethodNotAllowed(w, r, http.MethodGet, e.wLogg) {
 		return
 	}
@@ -77,7 +77,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(w http.ResponseWriter, r *h
 	}
 }
 
-func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPUpdate(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerHTTP) Update(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodPost:
 		e.processUpdateFormEmployee(writer, request)
@@ -88,7 +88,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPUpdate(writer http.ResponseWrit
 	}
 }
 
-func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
 		return
 	}
@@ -116,7 +116,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter,
 	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
-func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
 		return
 	}

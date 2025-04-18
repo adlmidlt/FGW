@@ -28,13 +28,13 @@ func NewRoleHandlerHTTP(roleService service.RoleUseCase, wLogg *wlogger.CustomWL
 }
 
 func (r *RoleHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
-	mux.HandleFunc(fgwRolesStartUrl, r.RoleHandlerHTTPAll)
-	mux.HandleFunc(fgwRolesStartUrl+"/update", r.RoleHandlerHTTPUpdate)
-	mux.HandleFunc(fgwRolesStartUrl+"/delete", r.RoleHandlerHTTPDelete)
-	mux.HandleFunc(fgwRolesStartUrl+"/add", r.RoleHandlerHTTPAdd)
+	mux.HandleFunc(fgwRolesStartUrl, r.All)
+	mux.HandleFunc(fgwRolesStartUrl+"/update", r.Update)
+	mux.HandleFunc(fgwRolesStartUrl+"/delete", r.Delete)
+	mux.HandleFunc(fgwRolesStartUrl+"/add", r.Add)
 }
 
-func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerHTTP) All(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodGet, r.wLogg) {
 		return
 	}
@@ -67,7 +67,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request
 	}
 }
 
-func (r *RoleHandlerHTTP) RoleHandlerHTTPUpdate(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerHTTP) Update(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodPost:
 		r.processUpdateFormRole(writer, request)
@@ -78,7 +78,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPUpdate(writer http.ResponseWriter, requ
 	}
 }
 
-func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, r.wLogg) {
 		return
 	}
@@ -101,7 +101,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, requ
 	http.Redirect(writer, request, fgwRolesStartUrl, http.StatusSeeOther)
 }
 
-func (r *RoleHandlerHTTP) RoleHandlerHTTPAdd(writer http.ResponseWriter, request *http.Request) {
+func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, r.wLogg) {
 		return
 	}

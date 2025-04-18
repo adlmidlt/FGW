@@ -23,14 +23,14 @@ func NewEmployeeHandlerJSON(roleService service.RoleUseCase, employeeService ser
 }
 
 func (e *EmployeeHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
-	mux.HandleFunc(fgwEmployeesStartUrl, e.EmployeeHandlerJSONAll)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/find", e.EmployeeHandlerJSONFindById)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.EmployeeHandlerJSONAdd)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.EmployeeHandlerJSONUpdate)
-	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.EmployeeHandlerJSONDelete)
+	mux.HandleFunc(fgwEmployeesStartUrl, e.JSONAll)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/find", e.JSONFindById)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.JSONAdd)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.JSONUpdate)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.JSONDelete)
 }
 
-func (e *EmployeeHandlerJSON) EmployeeHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerJSON) JSONAll(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
 		return
 	}
@@ -60,7 +60,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONAll(writer http.ResponseWriter,
 	handler.WriteJSON(writer, data, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) EmployeeHandlerJSONFindById(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerJSON) JSONFindById(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
 		return
 	}
@@ -85,7 +85,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONFindById(writer http.ResponseWr
 	handler.WriteJSON(writer, employee, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) EmployeeHandlerJSONAdd(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerJSON) JSONAdd(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
 		return
 	}
@@ -108,7 +108,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONAdd(writer http.ResponseWriter,
 	handler.WriteJSON(writer, employee, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) EmployeeHandlerJSONUpdate(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerJSON) JSONUpdate(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodPut, e.wLogg) {
 		return
 	}
@@ -139,7 +139,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONUpdate(writer http.ResponseWrit
 	handler.WriteJSON(writer, map[string]string{"message": msg.I2005}, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) EmployeeHandlerJSONDelete(writer http.ResponseWriter, request *http.Request) {
+func (e *EmployeeHandlerJSON) JSONDelete(writer http.ResponseWriter, request *http.Request) {
 	if handler.MethodNotAllowed(writer, request, http.MethodDelete, e.wLogg) {
 		return
 	}
