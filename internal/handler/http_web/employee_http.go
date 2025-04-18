@@ -9,12 +9,15 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"fmt"
 	"github.com/google/uuid"
-	"html/template"
 	"net/http"
 )
 
-const templateHtmlEmployeeList = "../web/html/employee_list.html"
-const fgwEmployeesStartUrl = "/fgw/employees"
+const (
+	templateHtmlEmployeeList = "../web/html/employee_list.html"
+	fgwEmployeesStartUrl     = "/fgw/employees"
+	paramIdEmployee          = "idEmployee"
+	paramRoleId              = "roleId"
+)
 
 type EmployeeHandlerHTTP struct {
 	roleService     service.RoleUseCase
@@ -33,15 +36,15 @@ func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.EmployeeHandlerHTTPAdd)
 }
 
-func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
+func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodGet, e.wLogg) {
 		return
 	}
 
-	employees, err := e.employeeService.All(request.Context())
+	employees, err := e.employeeService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+		e.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
+		http.Error(w, msg.H7003, http.StatusInternalServerError)
 
 		return
 	}
@@ -50,43 +53,27 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter,
 		employees = []*entity.Employee{}
 	}
 
-	roles, err := e.roleService.All(request.Context())
+	roles, err := e.roleService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+		e.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
+		http.Error(w, msg.H7003, http.StatusInternalServerError)
 
 		return
 	}
 
 	data := entity.EmployeeList{Employees: employees, Roles: roles}
 
-	if idEmployeeStr := request.URL.Query().Get("idEmployee"); idEmployeeStr != "" {
+	if idEmployeeStr := r.URL.Query().Get(paramIdEmployee); idEmployeeStr != "" {
 		e.markEditingEmployee(idEmployeeStr, employees)
 	}
 
-	tmpl, err := template.ParseFiles(templateHtmlEmployeeList)
-	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7006, err)
-		http.Error(writer, msg.H7006, http.StatusInternalServerError)
-
+	tmpl, ok := handler.ParseTemplateHTML(templateHtmlEmployeeList, w, r, e.wLogg)
+	if !ok {
 		return
 	}
 
-	if err = tmpl.Execute(writer, data); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7007, err)
-		http.Error(writer, msg.H7007, http.StatusInternalServerError)
-
+	if !handler.ExecuteTemplate(tmpl, data, w, r, e.wLogg) {
 		return
-	}
-}
-
-func (e *EmployeeHandlerHTTP) markEditingEmployee(idEmployeeStr string, employees []*entity.Employee) {
-	if idEmployee, err := uuid.Parse(idEmployeeStr); err == nil {
-		for _, employee := range employees {
-			if employee.IdEmployee == idEmployee {
-				employee.IsEditing = true
-			}
-		}
 	}
 }
 
@@ -106,7 +93,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAdd(writer http.ResponseWriter,
 		return
 	}
 
-	roleId, err := handler.ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
+	roleId, err := handler.ParseStrToUUID(request.FormValue(paramRoleId), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
@@ -134,12 +121,12 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := handler.ParseStrToUUID(request.FormValue(paramIdEmployee), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.ValidateRoleExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -153,8 +140,8 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 }
 
 func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
-	idEmployeeStr := request.URL.Query().Get("idEmployee")
-	http.Redirect(writer, request, fmt.Sprintf("%s?idEmployee=%s", fgwEmployeesStartUrl, idEmployeeStr), http.StatusSeeOther)
+	idEmployeeStr := request.URL.Query().Get(paramIdEmployee)
+	http.Redirect(writer, request, fmt.Sprintf("%s?%s=%s", fgwEmployeesStartUrl, paramIdEmployee, idEmployeeStr), http.StatusSeeOther)
 }
 
 func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
@@ -165,17 +152,17 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.FormValue("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := handler.ParseStrToUUID(request.FormValue(paramIdEmployee), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	roleId, err := handler.ParseStrToUUID(request.FormValue("roleId"), writer, request, e.wLogg)
+	roleId, err := handler.ParseStrToUUID(request.FormValue(paramRoleId), writer, request, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.ValidateRoleExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -196,4 +183,15 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+}
+
+// markEditingRole помечает сотрудника как редактируемую по её UUID в строковом формате.
+func (e *EmployeeHandlerHTTP) markEditingEmployee(idEmployeeStr string, employees []*entity.Employee) {
+	if idEmployee, err := uuid.Parse(idEmployeeStr); err == nil {
+		for _, employee := range employees {
+			if employee.IdEmployee == idEmployee {
+				employee.IsEditing = true
+			}
+		}
+	}
 }

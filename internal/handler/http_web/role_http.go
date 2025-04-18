@@ -9,12 +9,14 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"fmt"
 	"github.com/google/uuid"
-	"html/template"
 	"net/http"
 )
 
-const templateHtmlRoleList = "../web/html/role_list.html"
-const fgwRolesStartUrl = "/fgw/roles"
+const (
+	templateHtmlRoleList = "../web/html/role_list.html"
+	fgwRolesStartUrl     = "/fgw/roles"
+	paramIdRole          = "idRole"
+)
 
 type RoleHandlerHTTP struct {
 	roleService service.RoleUseCase
@@ -51,22 +53,16 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request
 
 	data := entity.RoleList{Roles: roles}
 
-	if idStr := request.URL.Query().Get("idRole"); idStr != "" {
+	if idStr := request.URL.Query().Get(paramIdRole); idStr != "" {
 		r.markEditingRole(idStr, roles)
 	}
 
-	tmpl, err := template.ParseFiles(templateHtmlRoleList)
-	if err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7006, err)
-		http.Error(writer, msg.H7006, http.StatusInternalServerError)
-
+	tmpl, ok := handler.ParseTemplateHTML(templateHtmlRoleList, writer, request, r.wLogg)
+	if !ok {
 		return
 	}
 
-	if err = tmpl.Execute(writer, data); err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7007, err)
-		http.Error(writer, msg.H7007, http.StatusInternalServerError)
-
+	if !handler.ExecuteTemplate(tmpl, data, writer, request, r.wLogg) {
 		return
 	}
 }
@@ -87,12 +83,12 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRole, err := handler.ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
+	idRole, err := handler.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.ValidateRoleExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -125,8 +121,8 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAdd(writer http.ResponseWriter, request
 }
 
 func (r *RoleHandlerHTTP) renderUpdateFormRole(writer http.ResponseWriter, request *http.Request) {
-	idRoleStr := request.URL.Query().Get("idRole")
-	http.Redirect(writer, request, fmt.Sprintf("%s?idRole=%s", fgwRolesStartUrl, idRoleStr), http.StatusSeeOther)
+	idRoleStr := request.URL.Query().Get(paramIdRole)
+	http.Redirect(writer, request, fmt.Sprintf("%s?%s=%s", fgwRolesStartUrl, paramIdRole, idRoleStr), http.StatusSeeOther)
 }
 
 func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, request *http.Request) {
@@ -137,12 +133,12 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	idRole, err := handler.ParseStrToUUID(request.FormValue("idRole"), writer, request, r.wLogg)
+	idRole, err := handler.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.ValidateRoleExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -161,6 +157,7 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 	http.Redirect(writer, request, fgwRolesStartUrl, http.StatusSeeOther)
 }
 
+// markEditingRole помечает роль как редактируемую по её UUID в строковом формате.
 func (r *RoleHandlerHTTP) markEditingRole(idStr string, roles []*entity.Role) {
 	if id, err := uuid.Parse(idStr); err == nil {
 		for _, role := range roles {
