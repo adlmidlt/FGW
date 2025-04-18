@@ -18,3 +18,7 @@ var (
 	FGWEmployeeDelete        = "exec fgw_employee_delete_by_id ?"
 	FGWEmployeeExist         = "exec fgw_employee_exist ?"
 )
+
+var (
+	FGWPackVariantAllQuery = "exec dbo.fgw_pack_variant_all;"
+)
