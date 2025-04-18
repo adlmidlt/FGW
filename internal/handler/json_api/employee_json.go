@@ -10,6 +10,8 @@ import (
 	"net/http"
 )
 
+const fgwEmployeesStartUrl = "/api/fgw/employees"
+
 type EmployeeHandlerJSON struct {
 	roleService     service.RoleUseCase
 	employeeService service.EmployeeUseCase
@@ -21,11 +23,11 @@ func NewEmployeeHandlerJSON(roleService service.RoleUseCase, employeeService ser
 }
 
 func (e *EmployeeHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
-	mux.HandleFunc("/api/fgw/employees", e.EmployeeHandlerJSONAll)
-	mux.HandleFunc("/api/fgw/employees/find", e.EmployeeHandlerJSONFindById)
-	mux.HandleFunc("/api/fgw/employees/add", e.EmployeeHandlerJSONAdd)
-	mux.HandleFunc("/api/fgw/employees/update", e.EmployeeHandlerJSONUpdate)
-	mux.HandleFunc("/api/fgw/employees/delete", e.EmployeeHandlerJSONDelete)
+	mux.HandleFunc(fgwEmployeesStartUrl, e.EmployeeHandlerJSONAll)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/find", e.EmployeeHandlerJSONFindById)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.EmployeeHandlerJSONAdd)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.EmployeeHandlerJSONUpdate)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.EmployeeHandlerJSONDelete)
 }
 
 func (e *EmployeeHandlerJSON) EmployeeHandlerJSONAll(writer http.ResponseWriter, request *http.Request) {
@@ -68,12 +70,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONFindById(writer http.ResponseWr
 		return
 	}
 
-	_, err = e.employeeService.Exists(request.Context(), idEmployee)
-	if err != nil {
-		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
-
+	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -129,12 +126,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONUpdate(writer http.ResponseWrit
 		return
 	}
 
-	_, err = e.employeeService.Exists(request.Context(), idEmployee)
-	if err != nil {
-		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
-
+	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -157,12 +149,7 @@ func (e *EmployeeHandlerJSON) EmployeeHandlerJSONDelete(writer http.ResponseWrit
 		return
 	}
 
-	_, err = e.employeeService.Exists(request.Context(), idEmployee)
-	if err != nil {
-		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
-
+	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
