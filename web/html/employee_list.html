@@ -59,12 +59,26 @@
             <td class="border-table">{{ .IdEmployee}}</td>
             {{if .IsEditing}}
                 <form method="POST" action="/fgw/employees/update">
-                    <td><input type="text" name="serviceNumber" value="{{ .ServiceNumber}}"></td>
-                    <td><input type="text" name="firstName" value="{{ .FirstName}}"></td>
-                    <td><input type="text" name="lastName" value="{{ .LastName}}"></td>
-                    <td><input type="text" name="patronymic" value="{{ .Patronymic}}"></td>
-                    <td><input type="text" name="passwd" value="{{ .Passwd}}"></td>
-
+                    <td><label>
+                            <input type="text" name="serviceNumber" value="{{ .ServiceNumber}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="firstName" value="{{ .FirstName}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="lastName" value="{{ .LastName}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="patronymic" value="{{ .Patronymic}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="passwd" value="{{ .Passwd}}">
+                        </label>
+                    </td>
                     <td>
                         <label>
                             <select name="roleId">
@@ -76,7 +90,6 @@
                             </select>
                         </label>
                     </td>
-
                     <td>
                         <input type="hidden" name="idEmployee" value="{{ .IdEmployee}}">
                         <input type="submit" value="Сохранить">

@@ -27,10 +27,10 @@ func NewEmployeeHandlerHTTP(roleService service.RoleUseCase, employeeService ser
 }
 
 func (e *EmployeeHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
-	mux.HandleFunc("/fgw/employees", e.EmployeeHandlerHTTPAll)
-	mux.HandleFunc("/fgw/employees/update", e.EmployeeHandlerHTTPUpdate)
-	mux.HandleFunc("/fgw/employees/delete", e.EmployeeHandlerHTTPDelete)
-	mux.HandleFunc("/fgw/employees/add", e.EmployeeHandlerHTTPAdd)
+	mux.HandleFunc(fgwEmployeesStartUrl, e.EmployeeHandlerHTTPAll)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/update", e.EmployeeHandlerHTTPUpdate)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.EmployeeHandlerHTTPDelete)
+	mux.HandleFunc(fgwEmployeesStartUrl+"/add", e.EmployeeHandlerHTTPAdd)
 }
 
 func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
@@ -61,13 +61,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter,
 	data := entity.EmployeeList{Employees: employees, Roles: roles}
 
 	if idEmployeeStr := request.URL.Query().Get("idEmployee"); idEmployeeStr != "" {
-		if idEmployee, err := uuid.Parse(idEmployeeStr); err == nil {
-			for _, employee := range employees {
-				if employee.IdEmployee == idEmployee {
-					employee.IsEditing = true
-				}
-			}
-		}
+		e.markEditingEmployee(idEmployeeStr, employees)
 	}
 
 	tmpl, err := template.ParseFiles(templateHtmlEmployeeList)
@@ -83,6 +77,16 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPAll(writer http.ResponseWriter,
 		http.Error(writer, msg.H7007, http.StatusInternalServerError)
 
 		return
+	}
+}
+
+func (e *EmployeeHandlerHTTP) markEditingEmployee(idEmployeeStr string, employees []*entity.Employee) {
+	if idEmployee, err := uuid.Parse(idEmployeeStr); err == nil {
+		for _, employee := range employees {
+			if employee.IdEmployee == idEmployee {
+				employee.IsEditing = true
+			}
+		}
 	}
 }
 
@@ -135,12 +139,7 @@ func (e *EmployeeHandlerHTTP) EmployeeHandlerHTTPDelete(writer http.ResponseWrit
 		return
 	}
 
-	_, err = e.employeeService.Exists(request.Context(), idEmployee)
-	if err != nil {
-		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
-
+	if !handler.ValidateRoleExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -176,12 +175,7 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 
-	_, err = e.employeeService.Exists(request.Context(), idEmployee)
-	if err != nil {
-		e.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, e.wLogg)
-
+	if !handler.ValidateRoleExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 

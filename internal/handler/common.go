@@ -3,6 +3,7 @@ package handler
 import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
+	"context"
 	"encoding/json"
 	"github.com/google/uuid"
 	"net/http"
@@ -40,4 +41,21 @@ func WriteJSON(writer http.ResponseWriter, obj interface{}, wLogg *wlogger.Custo
 
 		return
 	}
+}
+
+type EntityExistChecker interface {
+	Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error)
+}
+
+func ValidateRoleExists(ctx context.Context, idObj uuid.UUID, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, existObj EntityExistChecker) bool {
+	_, err := existObj.Exists(ctx, idObj)
+	if err != nil {
+		wLogg.LogHttpW(http.StatusNotFound, r.Method, r.URL.Path, msg.H7005, err)
+		http.Error(w, msg.H7005, http.StatusNotFound)
+		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+
+		return false
+	}
+
+	return true
 }

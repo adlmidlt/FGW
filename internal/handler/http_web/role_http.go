@@ -26,10 +26,10 @@ func NewRoleHandlerHTTP(roleService service.RoleUseCase, wLogg *wlogger.CustomWL
 }
 
 func (r *RoleHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
-	mux.HandleFunc("/fgw/roles", r.RoleHandlerHTTPAll)
-	mux.HandleFunc("/fgw/roles/update", r.RoleHandlerHTTPUpdate)
-	mux.HandleFunc("/fgw/roles/delete", r.RoleHandlerHTTPDelete)
-	mux.HandleFunc("/fgw/roles/add", r.RoleHandlerHTTPAdd)
+	mux.HandleFunc(fgwRolesStartUrl, r.RoleHandlerHTTPAll)
+	mux.HandleFunc(fgwRolesStartUrl+"/update", r.RoleHandlerHTTPUpdate)
+	mux.HandleFunc(fgwRolesStartUrl+"/delete", r.RoleHandlerHTTPDelete)
+	mux.HandleFunc(fgwRolesStartUrl+"/add", r.RoleHandlerHTTPAdd)
 }
 
 func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request *http.Request) {
@@ -52,13 +52,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPAll(writer http.ResponseWriter, request
 	data := entity.RoleList{Roles: roles}
 
 	if idStr := request.URL.Query().Get("idRole"); idStr != "" {
-		if id, err := uuid.Parse(idStr); err == nil {
-			for _, role := range roles {
-				if role.IdRole == id {
-					role.IsEditing = true
-				}
-			}
-		}
+		r.markEditingRole(idStr, roles)
 	}
 
 	tmpl, err := template.ParseFiles(templateHtmlRoleList)
@@ -98,12 +92,7 @@ func (r *RoleHandlerHTTP) RoleHandlerHTTPDelete(writer http.ResponseWriter, requ
 		return
 	}
 
-	_, err = r.roleService.Exists(request.Context(), idRole)
-	if err != nil {
-		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
-
+	if !handler.ValidateRoleExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -153,12 +142,7 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	_, err = r.roleService.Exists(request.Context(), idRole)
-	if err != nil {
-		r.wLogg.LogHttpW(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
-		handler.WriteJSON(writer, map[string]string{"message": msg.W1002}, r.wLogg)
-
+	if !handler.ValidateRoleExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -175,4 +159,14 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 	http.Redirect(writer, request, fgwRolesStartUrl, http.StatusSeeOther)
+}
+
+func (r *RoleHandlerHTTP) markEditingRole(idStr string, roles []*entity.Role) {
+	if id, err := uuid.Parse(idStr); err == nil {
+		for _, role := range roles {
+			if role.IdRole == id {
+				role.IsEditing = true
+			}
+		}
+	}
 }
