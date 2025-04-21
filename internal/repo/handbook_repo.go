@@ -26,7 +26,7 @@ type HandbookRepository interface {
 	Add(ctx context.Context, handbook *entity.Handbook) error
 	Update(ctx context.Context, idHandbook int, handbook *entity.Handbook) error
 	Delete(ctx context.Context, idHandbook int) error
-	Exists(ctx context.Context, idHandbook int) (bool, error)
+	ExistsByID(ctx context.Context, idHandbook int) (bool, error)
 }
 
 func (h *HandbookRepo) All(ctx context.Context) ([]*entity.Handbook, error) {
@@ -83,7 +83,7 @@ func (h *HandbookRepo) FindById(ctx context.Context, idHandbook int) (*entity.Ha
 }
 
 func (h *HandbookRepo) Add(ctx context.Context, handbook *entity.Handbook) error {
-	if _, err := h.mssql.ExecContext(ctx, FGWHandbookAddQuery, handbook.IdHandbook, handbook.Name); err != nil {
+	if _, err := h.mssql.ExecContext(ctx, FGWHandbookAddQuery, handbook.Name); err != nil {
 		h.wLogg.LogE(msg.E3000, err)
 
 		return err
@@ -112,7 +112,7 @@ func (h *HandbookRepo) Delete(ctx context.Context, idHandbook int) error {
 	return nil
 }
 
-func (h *HandbookRepo) Exists(ctx context.Context, idHandbook int) (bool, error) {
+func (h *HandbookRepo) ExistsByID(ctx context.Context, idHandbook int) (bool, error) {
 	row := h.mssql.QueryRowContext(ctx, FGWHandbookExistsQuery, idHandbook)
 
 	var exists int

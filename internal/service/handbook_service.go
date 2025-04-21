@@ -25,7 +25,7 @@ type HandbookUseCase interface {
 	Add(ctx context.Context, handbook *entity.Handbook) error
 	Update(ctx context.Context, idHandbook int, handbook *entity.Handbook) error
 	Delete(ctx context.Context, idHandbook int) error
-	Exists(ctx context.Context, idHandbook int) (bool, error)
+	ExistsByID(ctx context.Context, idHandbook int) (bool, error)
 }
 
 func (h *HandbookService) All(ctx context.Context) ([]*entity.Handbook, error) {
@@ -92,6 +92,6 @@ func (h *HandbookService) Delete(ctx context.Context, idHandbook int) error {
 	return nil
 }
 
-func (h *HandbookService) Exists(ctx context.Context, idHandbook int) (bool, error) {
-	return h.handbookRepo.Exists(ctx, idHandbook)
+func (h *HandbookService) ExistsByID(ctx context.Context, idHandbook int) (bool, error) {
+	return h.handbookRepo.ExistsByID(ctx, idHandbook)
 }

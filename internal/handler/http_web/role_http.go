@@ -88,7 +88,7 @@ func (r *RoleHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExistsByUUID(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -138,7 +138,7 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExistsByUUID(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 

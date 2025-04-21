@@ -26,7 +26,7 @@ type EmployeeUseCase interface {
 	Add(ctx context.Context, employee *entity.Employee) error
 	Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error
 	Delete(ctx context.Context, idEmployee uuid.UUID) error
-	Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error)
+	ExistsByUUID(ctx context.Context, idEmployee uuid.UUID) (bool, error)
 }
 
 func (e *EmployeeService) All(ctx context.Context) ([]*entity.Employee, error) {
@@ -97,6 +97,6 @@ func (e *EmployeeService) Delete(ctx context.Context, idEmployee uuid.UUID) erro
 	return nil
 }
 
-func (e *EmployeeService) Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
-	return e.employeeRepo.Exists(ctx, idEmployee)
+func (e *EmployeeService) ExistsByUUID(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
+	return e.employeeRepo.ExistsByUUID(ctx, idEmployee)
 }

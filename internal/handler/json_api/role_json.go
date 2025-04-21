@@ -59,7 +59,7 @@ func (r *RoleHandlerJSON) JSONFindById(writer http.ResponseWriter, request *http
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExistsByUUID(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -107,7 +107,7 @@ func (r *RoleHandlerJSON) JSONUpdate(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExistsByUUID(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 
@@ -138,7 +138,7 @@ func (r *RoleHandlerJSON) JSONDelete(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
+	if !handler.EntityExistsByUUID(request.Context(), idRole, writer, request, r.wLogg, r.roleService) {
 		return
 	}
 

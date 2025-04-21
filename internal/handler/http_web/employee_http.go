@@ -126,7 +126,7 @@ func (e *EmployeeHandlerHTTP) Delete(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -162,7 +162,7 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWrit
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 

@@ -46,15 +46,34 @@ func WriteJSON(w http.ResponseWriter, entity interface{}, wLogg *wlogger.CustomW
 	}
 }
 
-// EntityExistChecker — универсальный интерфейс для проверки существования сущности по её UUID.
-type EntityExistChecker interface {
-	Exists(ctx context.Context, idEntity uuid.UUID) (bool, error)
+// EntityExistByUUIDChecker — универсальный интерфейс для проверки существования сущности по её UUID.
+type EntityExistByUUIDChecker interface {
+	ExistsByUUID(ctx context.Context, idEntity uuid.UUID) (bool, error)
 }
 
-// EntityExists проверяет на существование сущности по её UUID.
-// Использует интерфейс EntityExistChecker, реализующий метод Exists.
-func EntityExists(ctx context.Context, idEntity uuid.UUID, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistChecker) bool {
-	_, err := entityChecker.Exists(ctx, idEntity)
+type EntityExistByIDChecker interface {
+	ExistsByID(ctx context.Context, idEntity int) (bool, error)
+}
+
+// EntityExistsByUUID проверяет на существование сущности по её UUID.
+// Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByID.
+func EntityExistsByUUID(ctx context.Context, idEntity uuid.UUID, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByUUIDChecker) bool {
+	_, err := entityChecker.ExistsByUUID(ctx, idEntity)
+	if err != nil {
+		wLogg.LogHttpW(http.StatusNotFound, r.Method, r.URL.Path, msg.H7005, err)
+		http.Error(w, msg.H7005, http.StatusNotFound)
+		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+
+		return false
+	}
+
+	return true
+}
+
+// EntityExistsById проверяет на существование сущности по её ID.
+// Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByID.
+func EntityExistsById(ctx context.Context, idEntity int, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByIDChecker) bool {
+	_, err := entityChecker.ExistsByID(ctx, idEntity)
 	if err != nil {
 		wLogg.LogHttpW(http.StatusNotFound, r.Method, r.URL.Path, msg.H7005, err)
 		http.Error(w, msg.H7005, http.StatusNotFound)

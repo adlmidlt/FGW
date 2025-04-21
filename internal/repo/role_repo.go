@@ -27,7 +27,7 @@ type RoleRepository interface {
 	Add(ctx context.Context, role *entity.Role) error
 	Update(ctx context.Context, idRole uuid.UUID, role *entity.Role) error
 	Delete(ctx context.Context, idRole uuid.UUID) error
-	Exists(ctx context.Context, idRole uuid.UUID) (bool, error)
+	ExistsByUUID(ctx context.Context, idRole uuid.UUID) (bool, error)
 }
 
 func (r *RoleRepo) All(ctx context.Context) ([]*entity.Role, error) {
@@ -107,7 +107,7 @@ func (r *RoleRepo) Delete(ctx context.Context, idRole uuid.UUID) error {
 	return nil
 }
 
-func (r *RoleRepo) Exists(ctx context.Context, idRole uuid.UUID) (bool, error) {
+func (r *RoleRepo) ExistsByUUID(ctx context.Context, idRole uuid.UUID) (bool, error) {
 	row := r.mssql.QueryRowContext(ctx, FGWRoleExistsQuery, idRole)
 
 	var exists int

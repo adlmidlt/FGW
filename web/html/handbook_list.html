@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <title>Список справочников</title>
+</head>
+<body>
+<h1>Добавить справочник</h1>
+<form action="/fgw/handbooks/add" method="POST">
+    <label>
+        Название справочника:
+        <input type="text" name="name" placeholder="Введите название справочника">
+    </label>
+    <input type="submit" value="Добавить">
+</form>
+<br>
+<table class="border-table">
+    <thead>
+    <tr>
+        <th class="border-table">ИД</th>
+        <th class="border-table">Название</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .Handbooks}}
+        <tr>
+            <td class="border-table">{{ .IdHandbook}}</td>
+            {{ if .IsEditing}}
+                <form method="POST" action="/fgw/handbooks/update">
+                    <td><label>
+                            <input type="text" name="name" value="{{ .Name}}">
+                        </label>
+                    </td>
+                    <td>
+                        <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
+                        <input type="submit" value="Сохранить">
+                    </td>
+                </form>
+            {{ else}}
+                <td class="border-table">{{ .Name}}</td>
+                <td>
+                    <a href="/fgw/handbooks/update?idHandbook={{ .IdHandbook}}">Изменить</a>
+                    <form method="POST" action="/fgw/handbooks/delete" style="display:inline;">
+                        <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
+                        <input type="submit" value="Удалить">
+                    </form>
+                </td>
+            {{ end}}
+        </tr>
+    {{end}}
+    </tbody>
+</table>
+</body>
+</html>

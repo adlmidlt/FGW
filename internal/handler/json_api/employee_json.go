@@ -70,7 +70,7 @@ func (e *EmployeeHandlerJSON) JSONFindById(writer http.ResponseWriter, request *
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -126,7 +126,7 @@ func (e *EmployeeHandlerJSON) JSONUpdate(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 
@@ -149,7 +149,7 @@ func (e *EmployeeHandlerJSON) JSONDelete(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	if !handler.EntityExists(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
 		return
 	}
 

@@ -27,7 +27,7 @@ type EmployeeRepository interface {
 	Add(ctx context.Context, employee *entity.Employee) error
 	Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error
 	Delete(ctx context.Context, idEmployee uuid.UUID) error
-	Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error)
+	ExistsByUUID(ctx context.Context, idEmployee uuid.UUID) (bool, error)
 }
 
 func (e *EmployeeRepo) All(ctx context.Context) ([]*entity.Employee, error) {
@@ -141,7 +141,7 @@ func (e *EmployeeRepo) Delete(ctx context.Context, idEmployee uuid.UUID) error {
 	return nil
 }
 
-func (e *EmployeeRepo) Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
+func (e *EmployeeRepo) ExistsByUUID(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
 	row := e.mssql.QueryRowContext(ctx, FGWEmployeeExistQuery, idEmployee)
 
 	var exists int
