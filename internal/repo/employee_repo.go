@@ -142,7 +142,7 @@ func (e *EmployeeRepo) Delete(ctx context.Context, idEmployee uuid.UUID) error {
 }
 
 func (e *EmployeeRepo) Exists(ctx context.Context, idEmployee uuid.UUID) (bool, error) {
-	row := e.mssql.QueryRowContext(ctx, FGWEmployeeExist, idEmployee)
+	row := e.mssql.QueryRowContext(ctx, FGWEmployeeExistQuery, idEmployee)
 
 	var exists int
 	err := row.Scan(&exists)

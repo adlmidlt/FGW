@@ -14,9 +14,9 @@ var (
 	FGWEmployeeAllQuery      = "exec dbo.fgw_employee_all;"
 	FGWEmployeeFindByIdQuery = "exec dbo.fgw_employee_find_by_id ?;"
 	FGWEmployeeAddQuery      = "exec dbo.fgw_employee_add ?, ?, ?, ?, ?, ?, ?;"
-	FGWEmployeeUpdate        = "exec dbo.fgw_employee_update ?, ?, ?, ?, ?, ?, ?"
-	FGWEmployeeDelete        = "exec fgw_employee_delete_by_id ?"
-	FGWEmployeeExist         = "exec fgw_employee_exist ?"
+	FGWEmployeeUpdate        = "exec dbo.fgw_employee_update ?, ?, ?, ?, ?, ?, ?;"
+	FGWEmployeeDelete        = "exec fgw_employee_delete_by_id ?;"
+	FGWEmployeeExistQuery    = "exec fgw_employee_exist ?;"
 )
 
 var (
@@ -25,4 +25,13 @@ var (
 
 var (
 	FGWCatalogAllQuery = "exec dbo.fgw_catalog_all;"
+)
+
+var (
+	FGWHandbookAllQuery      = "exec dbo.fgw_handbook_all;"
+	FGWHandbookFindByIdQuery = "exec dbo.fgw_handbook_find_by_id ?;"
+	FGWHandbookAddQuery      = "exec dbo.fgw_handbook_add ?, ?;"
+	FGWHandbookUpdateQuery   = "exec dbo.fgw_handbook_update ?, ?;"
+	FGWHandbookDeleteQuery   = "exec dbo.fgw_handbook_delete_by_id ?;"
+	FGWHandbookExistsQuery   = "exec dbo.fgw_handbook_exists ?;"
 )
