@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 	"io"
@@ -51,4 +52,15 @@ func ConvStrToBool(str string) bool {
 	}
 
 	return res
+}
+
+func ParseStrToUUID(str string) uuid.UUID {
+	UUID, err := uuid.Parse(str)
+	if err != nil {
+		fmt.Println(err.Error())
+
+		return uuid.Nil
+	}
+
+	return UUID
 }

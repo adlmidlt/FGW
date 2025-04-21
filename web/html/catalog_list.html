@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <title>Список каталогов</title>
+</head>
+<body>
+
+<h3>Пояснение к таблице: [Номер справочника] </h3>
+<h4> 0 - конструкторское наименование продукции (0 - срок годности в месяцах, 1 - объект учета, 3, 4, 9, 10)</h4>
+<h4> 1 - действия над объектами учета</h4>
+<h4> 2 - действия над этикеткой</h4>
+<h4> 3 - цвет продукции</h4>
+<h4> 4 - принтеры</h4>
+<h4> 5 - действия для заявок</h4>
+<h4> 6 - приоритеты</h4>
+<h4> 7 - статусы заявок</h4>
+<h4> 8 - компьютеры</h4>
+<h4> 9 - участки упаковки</h4>
+<h4>10 - участки хранения (10 - возможный процент использования/10 - вместимость, S, V (склад); 9 - переупаковка да/нет,
+    10 - наличие ЖД путей да/нет (продукция))</h4>
+<h4>11 - объекты учёта</h4>
+<h4>12 - назначение при списании</h4>
+<h4>13 - комментарии к пакет-поддонам</h4>
+<h4>14 - размеры этикеток</h4>
+<h4>15 - типы документов</h4>
+
+<table class="border-table">
+    <thead>
+    <tr>
+        <th class="border-table">ИД</th>
+        <th class="border-table">ИД родительской записи</th>
+        <th class="border-table">Номер справочника</th>
+        <th class="border-table">Индекс записи</th>
+        <th class="border-table">Название</th>
+        <th class="border-table">Комментарий</th>
+        <th class="border-table">Доп. поле справочника (0, 1, 3, 4, 9, 10)</th>
+        <th class="border-table">Доп. поле справочника</th>
+        <th class="border-table">Доп. поле справочника (10)</th>
+        <th class="border-table">Доп. поле справочника (10)</th>
+        <th class="border-table">Доп. поле справочника (9, 10)</th>
+        <th class="border-table">Доп. поле справочника (10)</th>
+        <th class="border-table">Архивная запись</th>
+        <th class="border-table">Код владельца записи</th>
+        <th class="border-table">Дата модификации</th>
+        <th class="border-table">Код пользователя</th>
+        <th class="border-table">Дата последней модификации</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ range .Catalogs}}
+        <td class="border-table">{{ .IdCatalog}}</td>
+        <td class="border-table">{{ .ParentId}}</td>
+        <td class="border-table">{{ .HandbookId}}</td>
+        <td class="border-table">{{ .RecordIndex}}</td>
+        <td class="border-table">{{ .Name}}</td>
+        <td class="border-table">{{ .Comment}}</td>
+        <td class="border-table">{{ .HandbookValueInt1}}</td>
+        <td class="border-table">{{ .HandbookValueInt2}}</td>
+        <td class="border-table">{{ .HandbookValueDecimal1}}</td>
+        <td class="border-table">{{ .HandbookValueDecimal2}}</td>
+        <td class="border-table">{{ .HandbookValueBool1}}</td>
+        <td class="border-table">{{ .HandbookValueBool2}}</td>
+        <td class="border-table">{{ .IsArchive}}</td>
+        <td class="border-table">{{ .OwnerUser}}</td>
+        <td class="border-table">{{ .OwnerUserDateTime}}</td>
+        <td class="border-table">{{ .LastUser}}</td>
+        <td class="border-table">{{ .LastUserDateTime}}</td>
+    {{ end}}
+    </tbody>
+</table>
+
+</body>
+</html>
