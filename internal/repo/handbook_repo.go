@@ -8,7 +8,6 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"context"
 	"database/sql"
-	"errors"
 )
 
 type HandbookRepo struct {
@@ -113,17 +112,12 @@ func (h *HandbookRepo) Delete(ctx context.Context, idHandbook int) error {
 }
 
 func (h *HandbookRepo) ExistsByID(ctx context.Context, idHandbook int) (bool, error) {
+	var exists bool
 	row := h.mssql.QueryRowContext(ctx, FGWHandbookExistsQuery, idHandbook)
-
-	var exists int
 	err := row.Scan(&exists)
-	if errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		return false, err
 	}
 
-	if err != nil {
-		return false, nil
-	}
-
-	return true, nil
+	return exists, nil
 }

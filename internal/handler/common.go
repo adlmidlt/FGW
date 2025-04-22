@@ -75,7 +75,7 @@ func EntityExistsByUUID(ctx context.Context, idEntity uuid.UUID, w http.Response
 	if err != nil {
 		wLogg.LogHttpW(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7005, err)
 		http.Error(w, msg.H7005, http.StatusInternalServerError)
-		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+		WriteJSON(w, map[string]string{"message": msg.H7003}, wLogg)
 
 		return false
 	}
@@ -98,7 +98,7 @@ func EntityExistsByID(ctx context.Context, idEntity int, w http.ResponseWriter, 
 	if err != nil {
 		wLogg.LogHttpW(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7005, err)
 		http.Error(w, msg.H7005, http.StatusInternalServerError)
-		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+		WriteJSON(w, map[string]string{"message": msg.H7003}, wLogg)
 
 		return false
 	}

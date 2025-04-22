@@ -8,7 +8,6 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"context"
 	"database/sql"
-	"errors"
 	"github.com/google/uuid"
 )
 
@@ -108,17 +107,12 @@ func (r *RoleRepo) Delete(ctx context.Context, idRole uuid.UUID) error {
 }
 
 func (r *RoleRepo) ExistsByUUID(ctx context.Context, idRole uuid.UUID) (bool, error) {
+	var exists bool
 	row := r.mssql.QueryRowContext(ctx, FGWRoleExistsQuery, idRole)
-
-	var exists int
 	err := row.Scan(&exists)
-	if errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		return false, err
 	}
 
-	if err != nil {
-		return false, nil
-	}
-
-	return true, nil
+	return exists, nil
 }

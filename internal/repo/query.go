@@ -33,5 +33,5 @@ var (
 	FGWHandbookAddQuery      = "exec dbo.fgw_handbook_add ?;"
 	FGWHandbookUpdateQuery   = "exec dbo.fgw_handbook_update ?, ?;"
 	FGWHandbookDeleteQuery   = "exec dbo.fgw_handbook_delete_by_id ?;"
-	FGWHandbookExistsQuery   = "exec dbo.fgw_handbook_exists ?;"
+	FGWHandbookExistsQuery   = "exec dbo.fgw_handbook_exist ?;"
 )
