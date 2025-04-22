@@ -97,7 +97,7 @@ func (h *HandbookHandlerHTTP) processUpdateFormHandbook(w http.ResponseWriter, r
 
 	idHandbook := convert.ConvStrToInt(r.FormValue(paramIdHandbook))
 
-	if !handler.EntityExistsById(r.Context(), idHandbook, w, r, h.wLogg, h.handbookService) {
+	if !handler.EntityExistsByID(r.Context(), idHandbook, w, r, h.wLogg, h.handbookService) {
 		return
 	}
 
@@ -140,7 +140,7 @@ func (h *HandbookHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
 
 	idHandbook := convert.ConvStrToInt(r.FormValue(paramIdHandbook))
 
-	if !handler.EntityExistsById(r.Context(), idHandbook, w, r, h.wLogg, h.handbookService) {
+	if !handler.EntityExistsByID(r.Context(), idHandbook, w, r, h.wLogg, h.handbookService) {
 		return
 	}
 

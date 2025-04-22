@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"html/template"
 	"net/http"
+	"strconv"
 )
 
 // MethodNotAllowed проверяет, соответствует ли HTTP-метод запроса ожидаемому.
@@ -35,6 +36,18 @@ func ParseStrToUUID(formValue string, w http.ResponseWriter, r *http.Request, wL
 	return idUUID, nil
 }
 
+// ParseStrToID парсит строку в UUID и пишет ошибку в HTTP-ответ при неудаче.
+func ParseStrToID(formValue string, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg) (int, error) {
+	id, err := strconv.Atoi(formValue)
+	if err != nil {
+		wLogg.LogHttpE(http.StatusBadRequest, r.Method, r.URL.Path, msg.H7004, err)
+		http.Error(w, msg.H7004, http.StatusBadRequest)
+
+		return 0, err
+	}
+	return id, nil
+}
+
 // WriteJSON сериализует переданный объект в JSON и отправляет его в HTTP-ответ.
 func WriteJSON(w http.ResponseWriter, entity interface{}, wLogg *wlogger.CustomWLogg) {
 	w.Header().Set("Content-Type", "application/json_api; charset=UTF-8")
@@ -56,10 +69,18 @@ type EntityExistByIDChecker interface {
 }
 
 // EntityExistsByUUID проверяет на существование сущности по её UUID.
-// Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByID.
+// Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByUUID.
 func EntityExistsByUUID(ctx context.Context, idEntity uuid.UUID, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByUUIDChecker) bool {
-	_, err := entityChecker.ExistsByUUID(ctx, idEntity)
+	exist, err := entityChecker.ExistsByUUID(ctx, idEntity)
 	if err != nil {
+		wLogg.LogHttpW(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7005, err)
+		http.Error(w, msg.H7005, http.StatusInternalServerError)
+		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+
+		return false
+	}
+
+	if !exist {
 		wLogg.LogHttpW(http.StatusNotFound, r.Method, r.URL.Path, msg.H7005, err)
 		http.Error(w, msg.H7005, http.StatusNotFound)
 		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
@@ -70,11 +91,19 @@ func EntityExistsByUUID(ctx context.Context, idEntity uuid.UUID, w http.Response
 	return true
 }
 
-// EntityExistsById проверяет на существование сущности по её ID.
+// EntityExistsByID проверяет на существование сущности по её ID.
 // Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByID.
-func EntityExistsById(ctx context.Context, idEntity int, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByIDChecker) bool {
-	_, err := entityChecker.ExistsByID(ctx, idEntity)
+func EntityExistsByID(ctx context.Context, idEntity int, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByIDChecker) bool {
+	exist, err := entityChecker.ExistsByID(ctx, idEntity)
 	if err != nil {
+		wLogg.LogHttpW(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7005, err)
+		http.Error(w, msg.H7005, http.StatusInternalServerError)
+		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
+
+		return false
+	}
+
+	if !exist {
 		wLogg.LogHttpW(http.StatusNotFound, r.Method, r.URL.Path, msg.H7005, err)
 		http.Error(w, msg.H7005, http.StatusNotFound)
 		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)

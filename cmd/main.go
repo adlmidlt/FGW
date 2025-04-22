@@ -73,6 +73,7 @@ func main() {
 	repoHandbook := repo.NewHandbookRepo(mssqlDBConn, logger)
 	serviceHandbook := service.NewHandbookService(repoHandbook, logger, validateStruct)
 	handlerHandbookHTTP := http_web.NewHandbookHandlerHTTP(serviceHandbook, logger)
+	handlerHandbookJSON := json_api.NewHandbookHandlerJSON(serviceHandbook, logger)
 
 	mux := http.NewServeMux()
 
@@ -88,6 +89,7 @@ func main() {
 	handlerCatalogHTTP.ServeHTTPRouters(mux)
 
 	handlerHandbookHTTP.ServeHTTPRouters(mux)
+	handlerHandbookJSON.ServeJSONRouters(mux)
 
 	// Подключение static (*.html, *.png/jpg *.css файлов, *.js)
 	mux.Handle("/web/",
