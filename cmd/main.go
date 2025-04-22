@@ -65,15 +65,15 @@ func main() {
 	servicePackVariant := service.NewPackVariantService(repoPackVariant, logger, validateStruct)
 	handlerPackVariantJSON := json_api.NewPackVariantHandlerJSON(servicePackVariant, logger)
 
-	repoCatalog := repo.NewCatalogRepo(mssqlDBConn, logger)
-	serviceCatalog := service.NewCatalogService(repoCatalog, logger, validateStruct)
-	handlerCatalogJSON := json_api.NewCatalogHandlerJSON(serviceCatalog, logger)
-	handlerCatalogHTTP := http_web.NewCatalogHandlerHTTP(serviceCatalog, servicePackVariant, logger)
-
 	repoHandbook := repo.NewHandbookRepo(mssqlDBConn, logger)
 	serviceHandbook := service.NewHandbookService(repoHandbook, logger, validateStruct)
 	handlerHandbookHTTP := http_web.NewHandbookHandlerHTTP(serviceHandbook, logger)
 	handlerHandbookJSON := json_api.NewHandbookHandlerJSON(serviceHandbook, logger)
+
+	repoCatalog := repo.NewCatalogRepo(mssqlDBConn, logger)
+	serviceCatalog := service.NewCatalogService(repoCatalog, logger, validateStruct)
+	handlerCatalogJSON := json_api.NewCatalogHandlerJSON(serviceCatalog, logger)
+	handlerCatalogHTTP := http_web.NewCatalogHandlerHTTP(serviceCatalog, serviceHandbook, logger)
 
 	mux := http.NewServeMux()
 
@@ -85,11 +85,11 @@ func main() {
 
 	handlerPackVariantJSON.ServeJSONRouters(mux)
 
-	handlerCatalogJSON.ServeJSONRouters(mux)
-	handlerCatalogHTTP.ServeHTTPRouters(mux)
-
 	handlerHandbookHTTP.ServeHTTPRouters(mux)
 	handlerHandbookJSON.ServeJSONRouters(mux)
+
+	handlerCatalogJSON.ServeJSONRouters(mux)
+	handlerCatalogHTTP.ServeHTTPRouters(mux)
 
 	// Подключение static (*.html, *.png/jpg *.css файлов, *.js)
 	mux.Handle("/web/",

@@ -117,7 +117,6 @@ func (c *CatalogRepo) FindById(ctx context.Context, idCatalog int) (*entity.Cata
 
 func (c *CatalogRepo) Add(ctx context.Context, catalog *entity.Catalog) error {
 	if _, err := c.mssql.ExecContext(ctx, FGWCatalogAddQuery,
-		catalog.IdCatalog,
 		catalog.ParentId,
 		catalog.HandbookId,
 		catalog.RecordIndex,

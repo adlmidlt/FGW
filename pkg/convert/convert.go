@@ -45,13 +45,9 @@ func ConvStrToFloat(str string) float64 {
 
 // ConvStrToBool конвертировать строку в bool.
 func ConvStrToBool(str string) bool {
-	res, err := strconv.ParseBool(str)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
+	str = strings.ToLower(strings.TrimSpace(str))
 
-	return res
+	return str == "true" || str == "on" || str == "1"
 }
 
 func ParseStrToUUID(str string) uuid.UUID {

@@ -7,24 +7,71 @@
 </head>
 <body>
 
-<h3>Пояснение к таблице: [Номер справочника] </h3>
-<h4> 0 - конструкторское наименование продукции (0 - срок годности в месяцах, 1 - объект учета, 3, 4, 9, 10)</h4>
-<h4> 1 - действия над объектами учета</h4>
-<h4> 2 - действия над этикеткой</h4>
-<h4> 3 - цвет продукции</h4>
-<h4> 4 - принтеры</h4>
-<h4> 5 - действия для заявок</h4>
-<h4> 6 - приоритеты</h4>
-<h4> 7 - статусы заявок</h4>
-<h4> 8 - компьютеры</h4>
-<h4> 9 - участки упаковки</h4>
-<h4>10 - участки хранения (10 - возможный процент использования/10 - вместимость, S, V (склад); 9 - переупаковка да/нет,
-    10 - наличие ЖД путей да/нет (продукция))</h4>
-<h4>11 - объекты учёта</h4>
-<h4>12 - назначение при списании</h4>
-<h4>13 - комментарии к пакет-поддонам</h4>
-<h4>14 - размеры этикеток</h4>
-<h4>15 - типы документов</h4>
+<h1>Добавить информацию в каталог</h1>
+<form method="POST" action="/fgw/catalogs/add">
+    <label>
+        ИД родительской записи:
+        <input type="number" name="parentId" placeholder="0">
+        (заполняется для справочника (10) строчки при наличии склада)
+    </label>
+    <br>
+    <label>
+        Номер справочника:
+        <select name="handbookId">
+            {{ range .Handbooks}}
+                <option value="{{ .IdHandbook}}">{{ .IdHandbook}} - {{ .Name}}</option>
+            {{ end}}
+        </select>
+    </label>
+    <br>
+    <label>
+        Название:
+        <input type="text" name="name">
+    </label>
+    <br>
+    <label>
+        Комментарий:
+        <input type="text" name="comment">
+    </label>
+    <br>
+    <label>
+        Поле справочника (0, 1, 3, 4, 9, 10):
+        <input type="number" name="handbookValueInt1" placeholder="0">
+    </label>
+    <br>
+    <label>
+        Доп. поле справочника (0, 1, 3, 4, 9, 10):
+        <input type="number" name="handbookValueInt2" placeholder="0">
+    </label>
+    <br>
+    <label>
+        Поле справочника (10) возможный процент использования:
+        <input type="number" name="handbookValueDecimal1" step="0.01" placeholder="0.00">
+    </label>
+    <br>
+    <label>
+        Доп. поле справочника (10) вместимость, S, V:
+        <input type="number" name="handbookValueDecimal2" step="0.01" placeholder="0.00">
+    </label>
+    <br>
+    <label>
+        Поле справочника (9) переупаковка да/нет:
+        <input type="checkbox" name="handbookValueBool1">
+    </label>
+    <br>
+    <label>
+        Доп. поле справочника (10) наличие ЖД путей да/нет:
+        <input type="checkbox" name="handbookValueBool2">
+    </label>
+    <br>
+    <label>
+        Архивная запись:
+        <input type="checkbox" name="isArchive">
+    </label>
+    <br>
+    <input type="submit" value="Добавить">
+</form>
+<br>
 
 <table class="border-table">
     <thead>
@@ -35,12 +82,12 @@
         <th class="border-table">Индекс записи</th>
         <th class="border-table">Название</th>
         <th class="border-table">Комментарий</th>
+        <th class="border-table">Поле справочника (0, 1, 3, 4, 9, 10)</th>
         <th class="border-table">Доп. поле справочника (0, 1, 3, 4, 9, 10)</th>
-        <th class="border-table">Доп. поле справочника</th>
-        <th class="border-table">Доп. поле справочника (10)</th>
-        <th class="border-table">Доп. поле справочника (10)</th>
-        <th class="border-table">Доп. поле справочника (9, 10)</th>
-        <th class="border-table">Доп. поле справочника (10)</th>
+        <th class="border-table">Поле справочника (10) возможный процент использования</th>
+        <th class="border-table">Доп. поле справочника (10) вместимость, S, V</th>
+        <th class="border-table">Поле справочника (9) переупаковка да/нет</th>
+        <th class="border-table">Доп. поле справочника (10) наличие ЖД путей да/нет</th>
         <th class="border-table">Архивная запись</th>
         <th class="border-table">Код владельца записи</th>
         <th class="border-table">Дата модификации</th>
@@ -50,23 +97,25 @@
     </thead>
     <tbody>
     {{ range .Catalogs}}
-        <td class="border-table">{{ .IdCatalog}}</td>
-        <td class="border-table">{{ .ParentId}}</td>
-        <td class="border-table">{{ .HandbookId}}</td>
-        <td class="border-table">{{ .RecordIndex}}</td>
-        <td class="border-table">{{ .Name}}</td>
-        <td class="border-table">{{ .Comment}}</td>
-        <td class="border-table">{{ .HandbookValueInt1}}</td>
-        <td class="border-table">{{ .HandbookValueInt2}}</td>
-        <td class="border-table">{{ .HandbookValueDecimal1}}</td>
-        <td class="border-table">{{ .HandbookValueDecimal2}}</td>
-        <td class="border-table">{{ .HandbookValueBool1}}</td>
-        <td class="border-table">{{ .HandbookValueBool2}}</td>
-        <td class="border-table">{{ .IsArchive}}</td>
-        <td class="border-table">{{ .OwnerUser}}</td>
-        <td class="border-table">{{ .OwnerUserDateTime}}</td>
-        <td class="border-table">{{ .LastUser}}</td>
-        <td class="border-table">{{ .LastUserDateTime}}</td>
+        <tr>
+            <td class="border-table">{{ .IdCatalog}}</td>
+            <td class="border-table">{{ .ParentId}}</td>
+            <td class="border-table">{{ .HandbookId}}</td>
+            <td class="border-table">{{ .RecordIndex}}</td>
+            <td class="border-table">{{ .Name}}</td>
+            <td class="border-table">{{ .Comment}}</td>
+            <td class="border-table">{{ .HandbookValueInt1}}</td>
+            <td class="border-table">{{ .HandbookValueInt2}}</td>
+            <td class="border-table">{{ .HandbookValueDecimal1}}</td>
+            <td class="border-table">{{ .HandbookValueDecimal2}}</td>
+            <td class="border-table">{{ .HandbookValueBool1}}</td>
+            <td class="border-table">{{ .HandbookValueBool2}}</td>
+            <td class="border-table">{{ .IsArchive}}</td>
+            <td class="border-table">{{ .OwnerUser}}</td>
+            <td class="border-table">{{ .OwnerUserDateTime}}</td>
+            <td class="border-table">{{ .LastUser}}</td>
+            <td class="border-table">{{ .LastUserDateTime}}</td>
+        </tr>
     {{ end}}
     </tbody>
 </table>

@@ -9,21 +9,21 @@ type CatalogList struct {
 
 type Catalog struct {
 	IdCatalog             int       `json:"idCatalog"`
-	ParentId              int       `json:"parentId" validate:"required"`
-	HandbookId            int       `json:"handbookId" validate:"required"`
-	RecordIndex           int       `json:"recordIndex" validate:"required"`
-	Name                  string    `json:"name" validate:"required,max=255"`
-	Comment               string    `json:"comment" validate:"required,max=5000"`
-	HandbookValueInt1     int       `json:"handbookValueInt1" validate:"required"`
-	HandbookValueInt2     int       `json:"handbookValueInt2" validate:"required"`
-	HandbookValueDecimal1 float64   `json:"HandbookValueDecimal1" validate:"required"`
-	HandbookValueDecimal2 float64   `json:"HandbookValueDecimal2" validate:"required"`
-	HandbookValueBool1    bool      `json:"HandbookValueBool1" validate:"required"`
-	HandbookValueBool2    bool      `json:"HandbookValueBool2" validate:"required"`
-	IsArchive             bool      `json:"isArchive" validate:"required"`
-	OwnerUser             uuid.UUID `json:"ownerUser" validate:"required"`
-	OwnerUserDateTime     string    `json:"ownerUserDateTime" validate:"required"`
-	LastUser              uuid.UUID `json:"lastUser" validate:"required"`
-	LastUserDateTime      string    `json:"lastUserDateTime" validate:"required"`
+	ParentId              int       `json:"parentId"`
+	HandbookId            int       `json:"handbookId"`
+	RecordIndex           int       `json:"recordIndex" `
+	Name                  string    `json:"name" `
+	Comment               string    `json:"comment"`
+	HandbookValueInt1     int       `json:"handbookValueInt1"`
+	HandbookValueInt2     int       `json:"handbookValueInt2" `
+	HandbookValueDecimal1 float64   `json:"HandbookValueDecimal1" `
+	HandbookValueDecimal2 float64   `json:"HandbookValueDecimal2" `
+	HandbookValueBool1    bool      `json:"HandbookValueBool1" `
+	HandbookValueBool2    bool      `json:"HandbookValueBool2" `
+	IsArchive             bool      `json:"isArchive"`
+	OwnerUser             uuid.UUID `json:"ownerUser" `
+	OwnerUserDateTime     string    `json:"ownerUserDateTime"`
+	LastUser              uuid.UUID `json:"lastUser"`
+	LastUserDateTime      string    `json:"lastUserDateTime"`
 	IsEditing             bool      `json:"isEditing"`
 }
