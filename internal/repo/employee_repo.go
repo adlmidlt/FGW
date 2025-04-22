@@ -115,7 +115,7 @@ func (e *EmployeeRepo) Add(ctx context.Context, employee *entity.Employee) error
 }
 
 func (e *EmployeeRepo) Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error {
-	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeUpdate, idEmployee, employee.ServiceNumber,
+	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeUpdateQuery, idEmployee, employee.ServiceNumber,
 		employee.FirstName,
 		employee.LastName,
 		employee.Patronymic,
@@ -131,7 +131,7 @@ func (e *EmployeeRepo) Update(ctx context.Context, idEmployee uuid.UUID, employe
 }
 
 func (e *EmployeeRepo) Delete(ctx context.Context, idEmployee uuid.UUID) error {
-	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeDelete, idEmployee); err != nil {
+	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeDeleteQuery, idEmployee); err != nil {
 		e.wLogg.LogE(msg.E3000, err)
 
 		return err

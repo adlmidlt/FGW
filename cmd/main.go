@@ -65,7 +65,7 @@ func main() {
 	servicePackVariant := service.NewPackVariantService(repoPackVariant, logger, validateStruct)
 	handlerPackVariantJSON := json_api.NewPackVariantHandlerJSON(servicePackVariant, logger)
 
-	repoCatalog := repo.NewCatalog(mssqlDBConn, logger)
+	repoCatalog := repo.NewCatalogRepo(mssqlDBConn, logger)
 	serviceCatalog := service.NewCatalogService(repoCatalog, logger, validateStruct)
 	handlerCatalogJSON := json_api.NewCatalogHandlerJSON(serviceCatalog, logger)
 	handlerCatalogHTTP := http_web.NewCatalogHandlerHTTP(serviceCatalog, servicePackVariant, logger)

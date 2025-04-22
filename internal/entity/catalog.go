@@ -3,7 +3,8 @@ package entity
 import "github.com/google/uuid"
 
 type CatalogList struct {
-	Catalogs []*Catalog
+	Catalogs  []*Catalog
+	Handbooks []*Handbook
 }
 
 type Catalog struct {
@@ -24,4 +25,5 @@ type Catalog struct {
 	OwnerUserDateTime     string    `json:"ownerUserDateTime" validate:"required"`
 	LastUser              uuid.UUID `json:"lastUser" validate:"required"`
 	LastUserDateTime      string    `json:"lastUserDateTime" validate:"required"`
+	IsEditing             bool      `json:"isEditing"`
 }
