@@ -7,6 +7,7 @@ import (
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
+	"fmt"
 	"github.com/google/uuid"
 	"net/http"
 	"time"
@@ -15,6 +16,7 @@ import (
 const (
 	templateHtmlCatalogList = "../web/html/catalog_list.html"
 	fgwCatalogStartUrl      = "/fgw/catalogs"
+	paramIdCatalog          = "idCatalog"
 )
 
 type CatalogHandlerHTTP struct {
@@ -30,6 +32,8 @@ func NewCatalogHandlerHTTP(catalogService service.CatalogUseCase, handbookServic
 func (c *CatalogHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc(fgwCatalogStartUrl, c.All)
 	mux.HandleFunc(fgwCatalogStartUrl+"/add", c.Add)
+	mux.HandleFunc(fgwCatalogStartUrl+"/update", c.Update)
+	mux.HandleFunc(fgwCatalogStartUrl+"/delete", c.Delete)
 }
 
 func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
@@ -141,8 +145,10 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		handbookValueBool2 = false
 	}
 
-	isArchiveStr := r.FormValue("isArchive")
-	isArchive := isArchiveStr == "on" || isArchiveStr == "true"
+	isArchive := convert.ConvStrToBool(r.FormValue("isArchive"))
+	if isArchive == false {
+		isArchive = false
+	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
 	ownerUser := convert.ParseStrToUUID(r.FormValue("ownerUser"))
@@ -186,6 +192,89 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	if err = c.catalogService.Add(r.Context(), catalog); err != nil {
 		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7012, err)
 		http.Error(w, msg.H7012, http.StatusInternalServerError)
+
+		return
+	}
+	http.Redirect(w, r, fgwCatalogStartUrl, http.StatusSeeOther)
+}
+
+func (c *CatalogHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		c.processUpdateFormEmployee(w, r)
+	case http.MethodGet:
+		c.renderUpdateFormEmployee(w, r)
+	default:
+		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+	}
+}
+
+func (c *CatalogHandlerHTTP) renderUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
+	idCatalogStr := r.URL.Query().Get(paramIdCatalog)
+	http.Redirect(w, r, fmt.Sprintf("%s?%s=%s", fgwCatalogStartUrl, paramIdCatalog, idCatalogStr), http.StatusSeeOther)
+}
+
+func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		c.wLogg.LogHttpE(http.StatusBadRequest, r.Method, r.URL.Path, msg.H7008, err)
+		http.Error(w, msg.H7008, http.StatusBadRequest)
+
+		return
+	}
+
+	idCatalog := convert.ConvStrToInt(r.FormValue(paramIdCatalog))
+
+	if !handler.EntityExistsByID(r.Context(), idCatalog, w, r, c.wLogg, c.catalogService) {
+		return
+	}
+
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
+	lastUser := uuid.MustParse("10000000-0000-0000-0000-000000000000")
+
+	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
+	catalog := &entity.Catalog{
+		ParentId:              convert.ConvStrToInt(r.FormValue("parentId")),
+		HandbookId:            convert.ConvStrToInt(r.FormValue("handbookId")),
+		RecordIndex:           convert.ConvStrToInt(r.FormValue("recordIndex")),
+		Name:                  r.FormValue("name"),
+		Comment:               r.FormValue("comment"),
+		HandbookValueInt1:     convert.ConvStrToInt(r.FormValue("handbookValueInt1")),
+		HandbookValueInt2:     convert.ConvStrToInt(r.FormValue("handbookValueInt2")),
+		HandbookValueDecimal1: convert.ConvStrToFloat(r.FormValue("handbookValueDecimal1")),
+		HandbookValueDecimal2: convert.ConvStrToFloat(r.FormValue("handbookValueDecimal2")),
+		HandbookValueBool1:    convert.ConvStrToBool(r.FormValue("handbookValueBool1")),
+		HandbookValueBool2:    convert.ConvStrToBool(r.FormValue("handbookValueBool2")),
+		IsArchive:             convert.ConvStrToBool(r.FormValue("isArchive")),
+		OwnerUser:             convert.ParseStrToUUID(r.FormValue("ownerUser")),
+		OwnerUserDateTime:     r.FormValue("ownerUserDateTime"),
+		LastUser:              lastUser,
+		LastUserDateTime:      lastUserDateTime,
+	}
+
+	if err := c.catalogService.Update(r.Context(), idCatalog, catalog); err != nil {
+		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7012, err)
+		http.Error(w, msg.H7012, http.StatusInternalServerError)
+
+		return
+	}
+	http.Redirect(w, r, fgwCatalogStartUrl, http.StatusSeeOther)
+}
+
+func (c *CatalogHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, c.wLogg) {
+		return
+	}
+
+	idCatalog := convert.ConvStrToInt(r.FormValue(paramIdCatalog))
+
+	if !handler.EntityExistsByID(r.Context(), idCatalog, w, r, c.wLogg, c.catalogService) {
+		return
+	}
+
+	if err := c.catalogService.Delete(r.Context(), idCatalog); err != nil {
+		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7011, err)
+		http.Error(w, msg.H7011, http.StatusInternalServerError)
 
 		return
 	}

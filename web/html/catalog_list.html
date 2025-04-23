@@ -98,23 +98,104 @@
     <tbody>
     {{ range .Catalogs}}
         <tr>
-            <td class="border-table">{{ .IdCatalog}}</td>
-            <td class="border-table">{{ .ParentId}}</td>
-            <td class="border-table">{{ .HandbookId}}</td>
-            <td class="border-table">{{ .RecordIndex}}</td>
-            <td class="border-table">{{ .Name}}</td>
-            <td class="border-table">{{ .Comment}}</td>
-            <td class="border-table">{{ .HandbookValueInt1}}</td>
-            <td class="border-table">{{ .HandbookValueInt2}}</td>
-            <td class="border-table">{{ .HandbookValueDecimal1}}</td>
-            <td class="border-table">{{ .HandbookValueDecimal2}}</td>
-            <td class="border-table">{{ .HandbookValueBool1}}</td>
-            <td class="border-table">{{ .HandbookValueBool2}}</td>
-            <td class="border-table">{{ .IsArchive}}</td>
-            <td class="border-table">{{ .OwnerUser}}</td>
-            <td class="border-table">{{ .OwnerUserDateTime}}</td>
-            <td class="border-table">{{ .LastUser}}</td>
-            <td class="border-table">{{ .LastUserDateTime}}</td>
+            {{if .IsEditing}}
+                <form method="POST" action="/fgw/catalogs/update">
+                    <td class="border-table">{{ .IdCatalog}}</td>
+                    <td><label>
+                            <input type="number" name="parentId" value="{{ .ParentId}}">
+                        </label>
+                    </td>
+
+                    <td>
+                        <label>
+                            <select name="handbookId">
+                                {{ $catalog := . }}
+                                {{ range $.Handbooks }}
+                                    <option value="{{ .IdHandbook}}"
+                                            {{ if eq .IdHandbook $catalog.HandbookId }}selected{{ end}}>{{ .IdHandbook}}
+                                        - {{ .Name}}</option>
+                                {{ end}}
+                            </select>
+                        </label>
+                    </td>
+
+                    <td><label>
+                            <input type="number" name="recordIndex" value="{{ .RecordIndex}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="name" value="{{ .Name}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="text" name="comment" value="{{ .Comment}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="number" name="handbookValueInt1" value="{{ .HandbookValueInt1}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="number" name="handbookValueInt2" value="{{ .HandbookValueInt2}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="number" name="handbookValueDecimal1" step="0.01"
+                                   value="{{ .HandbookValueDecimal1}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="number" name="handbookValueDecimal2" step="0.01"
+                                   value="{{ .HandbookValueDecimal2}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="checkbox" name="handbookValueBool1" value="{{ .HandbookValueBool1}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="checkbox" name="handbookValueBool2" value="{{ .HandbookValueBool2}}">
+                        </label>
+                    </td>
+                    <td><label>
+                            <input type="checkbox" name="isArchive" value="{{ .IsArchive}}">
+                        </label>
+                    </td>
+                    <td class="border-table">{{ .OwnerUser}}</td>
+                    <td class="border-table">{{ .OwnerUserDateTime}}</td>
+                    <td class="border-table">{{ .LastUser}}</td>
+                    <td class="border-table">{{ .LastUserDateTime}}</td>
+                    <td>
+                        <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
+                        <input type="submit" value="Сохранить">
+                    </td>
+                </form>
+            {{else}}
+                <td class="border-table">{{ .IdCatalog}}</td>
+                <td class="border-table">{{ .ParentId}}</td>
+                <td class="border-table">{{ .HandbookId}}</td>
+                <td class="border-table">{{ .RecordIndex}}</td>
+                <td class="border-table">{{ .Name}}</td>
+                <td class="border-table">{{ .Comment}}</td>
+                <td class="border-table">{{ .HandbookValueInt1}}</td>
+                <td class="border-table">{{ .HandbookValueInt2}}</td>
+                <td class="border-table">{{ .HandbookValueDecimal1}}</td>
+                <td class="border-table">{{ .HandbookValueDecimal2}}</td>
+                <td class="border-table">{{ .HandbookValueBool1}}</td>
+                <td class="border-table">{{ .HandbookValueBool2}}</td>
+                <td class="border-table">{{ .IsArchive}}</td>
+                <td class="border-table">{{ .OwnerUser}}</td>
+                <td class="border-table">{{ .OwnerUserDateTime}}</td>
+                <td class="border-table">{{ .LastUser}}</td>
+                <td class="border-table">{{ .LastUserDateTime}}</td>
+                <td>
+                    <a href="/fgw/catalogs/update?idCatalog={{ .IdCatalog}}">Изменить</a>
+                    <form method="POST" action="/fgw/catalogs/delete" style="display:inline;">
+                        <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
+                        <input type="submit" value="Удалить">
+                    </form>
+                </td>
+            {{end}}
         </tr>
     {{ end}}
     </tbody>
