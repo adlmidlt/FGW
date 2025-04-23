@@ -31,8 +31,7 @@ func (p *PackVariantHandlerJSON) JSONAll(w http.ResponseWriter, r *http.Request)
 
 	packVariants, err := p.packVariantService.All(r.Context())
 	if err != nil {
-		p.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, p.wLogg, msg.H7003, err)
 
 		return
 	}

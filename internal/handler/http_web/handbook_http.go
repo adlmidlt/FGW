@@ -40,8 +40,7 @@ func (h *HandbookHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	handbooks, err := h.handbookService.All(r.Context())
 	if err != nil {
-		h.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, h.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -89,8 +88,7 @@ func (h *HandbookHandlerHTTP) renderUpdateFormHandbook(w http.ResponseWriter, r 
 
 func (h *HandbookHandlerHTTP) processUpdateFormHandbook(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		h.wLogg.LogHttpE(http.StatusBadRequest, r.Method, r.URL.Path, msg.H7008, err)
-		http.Error(w, msg.H7008, http.StatusBadRequest)
+		handler.WriteBadRequest(w, r, h.wLogg, msg.H7008, err)
 
 		return
 	}
@@ -107,8 +105,7 @@ func (h *HandbookHandlerHTTP) processUpdateFormHandbook(w http.ResponseWriter, r
 	}
 
 	if err := h.handbookService.Update(r.Context(), idHandbook, handbook); err != nil {
-		h.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7009, err)
-		http.Error(w, msg.H7009, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, h.wLogg, msg.H7009, err)
 
 		return
 	}
@@ -125,8 +122,7 @@ func (h *HandbookHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.handbookService.Add(r.Context(), handbook); err != nil {
-		h.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7012, err)
-		http.Error(w, msg.H7012, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, h.wLogg, msg.H7012, err)
 
 		return
 	}
@@ -145,8 +141,7 @@ func (h *HandbookHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.handbookService.Delete(r.Context(), idHandbook); err != nil {
-		h.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7011, err)
-		http.Error(w, msg.H7011, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, h.wLogg, msg.H7011, err)
 
 		return
 	}

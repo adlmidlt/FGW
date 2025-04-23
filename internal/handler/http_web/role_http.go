@@ -41,8 +41,7 @@ func (r *RoleHandlerHTTP) All(writer http.ResponseWriter, request *http.Request)
 
 	roles, err := r.roleService.All(request.Context())
 	if err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(writer, request, r.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -83,7 +82,7 @@ func (r *RoleHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	idRole, err := handler.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
+	idRole, err := convert.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
 	if err != nil {
 		return
 	}
@@ -93,8 +92,7 @@ func (r *RoleHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Reque
 	}
 
 	if err = r.roleService.Delete(request.Context(), idRole); err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7011, err)
-		http.Error(writer, msg.H7011, http.StatusInternalServerError)
+		handler.WriteServerError(writer, request, r.wLogg, msg.H7011, err)
 
 		return
 	}
@@ -112,8 +110,7 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 	}
 
 	if err := r.roleService.Add(request.Context(), role); err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7012, err)
-		http.Error(writer, msg.H7012, http.StatusInternalServerError)
+		handler.WriteServerError(writer, request, r.wLogg, msg.H7012, err)
 
 		return
 	}
@@ -127,13 +124,12 @@ func (r *RoleHandlerHTTP) renderUpdateFormRole(writer http.ResponseWriter, reque
 
 func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, request *http.Request) {
 	if err := request.ParseForm(); err != nil {
-		r.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7008, err)
-		http.Error(writer, msg.H7008, http.StatusBadRequest)
+		handler.WriteBadRequest(writer, request, r.wLogg, msg.H7008, err)
 
 		return
 	}
 
-	idRole, err := handler.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
+	idRole, err := convert.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
 	if err != nil {
 		return
 	}
@@ -149,8 +145,7 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 	}
 
 	if err = r.roleService.Update(request.Context(), idRole, role); err != nil {
-		r.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7009, err)
-		http.Error(writer, msg.H7009, http.StatusInternalServerError)
+		handler.WriteServerError(writer, request, r.wLogg, msg.H7009, err)
 
 		return
 	}

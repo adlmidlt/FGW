@@ -43,8 +43,7 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	catalogs, err := c.catalogService.All(r.Context())
 	if err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -55,8 +54,7 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	handbooks, err := c.handbookService.All(r.Context())
 	if err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -89,8 +87,7 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 
 	catalogs, err := c.catalogService.All(r.Context())
 	if err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -151,7 +148,7 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	ownerUser := convert.ParseStrToUUID(r.FormValue("ownerUser"))
+	ownerUser := convert.ParseUUIDUnsafe(r.FormValue("ownerUser"))
 	if ownerUser == uuid.Nil {
 		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	}
@@ -161,7 +158,7 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	lastUser := convert.ParseStrToUUID(r.FormValue("lastUser"))
+	lastUser := convert.ParseUUIDUnsafe(r.FormValue("lastUser"))
 	if lastUser == uuid.Nil {
 		lastUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	}
@@ -190,8 +187,7 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		LastUserDateTime:      lastUserDateTime,
 	}
 	if err = c.catalogService.Add(r.Context(), catalog); err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7012, err)
-		http.Error(w, msg.H7012, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7012, err)
 
 		return
 	}
@@ -216,8 +212,7 @@ func (c *CatalogHandlerHTTP) renderUpdateFormEmployee(w http.ResponseWriter, r *
 
 func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		c.wLogg.LogHttpE(http.StatusBadRequest, r.Method, r.URL.Path, msg.H7008, err)
-		http.Error(w, msg.H7008, http.StatusBadRequest)
+		handler.WriteBadRequest(w, r, c.wLogg, msg.H7008, err)
 
 		return
 	}
@@ -246,15 +241,14 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		HandbookValueBool1:    convert.ConvStrToBool(r.FormValue("handbookValueBool1")),
 		HandbookValueBool2:    convert.ConvStrToBool(r.FormValue("handbookValueBool2")),
 		IsArchive:             convert.ConvStrToBool(r.FormValue("isArchive")),
-		OwnerUser:             convert.ParseStrToUUID(r.FormValue("ownerUser")),
+		OwnerUser:             convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
 		OwnerUserDateTime:     r.FormValue("ownerUserDateTime"),
 		LastUser:              lastUser,
 		LastUserDateTime:      lastUserDateTime,
 	}
 
 	if err := c.catalogService.Update(r.Context(), idCatalog, catalog); err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7012, err)
-		http.Error(w, msg.H7012, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7012, err)
 
 		return
 	}
@@ -273,8 +267,7 @@ func (c *CatalogHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.catalogService.Delete(r.Context(), idCatalog); err != nil {
-		c.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7011, err)
-		http.Error(w, msg.H7011, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, c.wLogg, msg.H7011, err)
 
 		return
 	}

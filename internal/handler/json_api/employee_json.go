@@ -4,6 +4,7 @@ import (
 	"FGW/internal/entity"
 	"FGW/internal/handler"
 	"FGW/internal/service"
+	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"encoding/json"
@@ -30,15 +31,14 @@ func (e *EmployeeHandlerJSON) ServeJSONRouters(mux *http.ServeMux) {
 	mux.HandleFunc(fgwEmployeesStartUrl+"/delete", e.JSONDelete)
 }
 
-func (e *EmployeeHandlerJSON) JSONAll(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
+func (e *EmployeeHandlerJSON) JSONAll(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodGet, e.wLogg) {
 		return
 	}
 
-	employees, err := e.employeeService.All(request.Context())
+	employees, err := e.employeeService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -47,118 +47,111 @@ func (e *EmployeeHandlerJSON) JSONAll(writer http.ResponseWriter, request *http.
 		employees = []*entity.Employee{}
 	}
 
-	roles, err := e.roleService.All(request.Context())
+	roles, err := e.roleService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
 
 	data := entity.EmployeeList{Employees: employees, Roles: roles}
 
-	handler.WriteJSON(writer, data, e.wLogg)
+	handler.WriteJSON(w, data, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) JSONFindById(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodGet, e.wLogg) {
+func (e *EmployeeHandlerJSON) JSONFindById(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodGet, e.wLogg) {
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.URL.Query().Get("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := convert.ParseStrToUUID(r.URL.Query().Get("idEmployee"), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(r.Context(), idEmployee, w, r, e.wLogg, e.employeeService) {
 		return
 	}
 
-	employee, err := e.employeeService.FindById(request.Context(), idEmployee)
+	employee, err := e.employeeService.FindById(r.Context(), idEmployee)
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusNotFound, request.Method, request.URL.Path, msg.H7005, err)
-		http.Error(writer, msg.H7005, http.StatusNotFound)
+		handler.WriteNotFound(w, r, e.wLogg, msg.H7005, err)
 
 		return
 	}
 
-	handler.WriteJSON(writer, employee, e.wLogg)
+	handler.WriteJSON(w, employee, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) JSONAdd(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
+func (e *EmployeeHandlerJSON) JSONAdd(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, e.wLogg) {
 		return
 	}
 
 	var employee entity.Employee
-	if err := json.NewDecoder(request.Body).Decode(&employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&employee); err != nil {
+		handler.WriteBadRequest(w, r, e.wLogg, msg.H7004, err)
 
 		return
 	}
 
-	if err := e.employeeService.Add(request.Context(), &employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+	if err := e.employeeService.Add(r.Context(), &employee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
 
-	handler.WriteJSON(writer, employee, e.wLogg)
+	handler.WriteJSON(w, employee, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) JSONUpdate(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodPut, e.wLogg) {
+func (e *EmployeeHandlerJSON) JSONUpdate(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPut, e.wLogg) {
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.URL.Query().Get("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := convert.ParseStrToUUID(r.URL.Query().Get("idEmployee"), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
 	var employee entity.Employee
-	if err = json.NewDecoder(request.Body).Decode(&employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7004, err)
-		http.Error(writer, msg.H7004, http.StatusBadRequest)
+	if err = json.NewDecoder(r.Body).Decode(&employee); err != nil {
+		handler.WriteBadRequest(w, r, e.wLogg, msg.H7004, err)
 
 		return
 	}
 
-	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(r.Context(), idEmployee, w, r, e.wLogg, e.employeeService) {
 		return
 	}
 
-	if err = e.employeeService.Update(request.Context(), idEmployee, &employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+	if err = e.employeeService.Update(r.Context(), idEmployee, &employee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
-	handler.WriteJSON(writer, map[string]string{"message": msg.I2005}, e.wLogg)
+	handler.WriteJSON(w, map[string]string{"message": msg.I2005}, e.wLogg)
 }
 
-func (e *EmployeeHandlerJSON) JSONDelete(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodDelete, e.wLogg) {
+func (e *EmployeeHandlerJSON) JSONDelete(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodDelete, e.wLogg) {
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.URL.Query().Get("idEmployee"), writer, request, e.wLogg)
+	idEmployee, err := convert.ParseStrToUUID(r.URL.Query().Get("idEmployee"), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(r.Context(), idEmployee, w, r, e.wLogg, e.employeeService) {
 		return
 	}
 
-	if err = e.employeeService.Delete(request.Context(), idEmployee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7003, err)
-		http.Error(writer, msg.H7003, http.StatusInternalServerError)
+	if err = e.employeeService.Delete(r.Context(), idEmployee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
 
-	handler.WriteJSON(writer, map[string]string{"message": msg.I2004}, e.wLogg)
+	handler.WriteJSON(w, map[string]string{"message": msg.I2004}, e.wLogg)
 }

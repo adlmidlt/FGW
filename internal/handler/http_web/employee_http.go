@@ -43,8 +43,7 @@ func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	employees, err := e.employeeService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -55,8 +54,7 @@ func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := e.roleService.All(r.Context())
 	if err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, r.Method, r.URL.Path, msg.H7003, err)
-		http.Error(w, msg.H7003, http.StatusInternalServerError)
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
 
 		return
 	}
@@ -77,112 +75,108 @@ func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (e *EmployeeHandlerHTTP) Update(writer http.ResponseWriter, request *http.Request) {
-	switch request.Method {
+func (e *EmployeeHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
 	case http.MethodPost:
-		e.processUpdateFormEmployee(writer, request)
+		e.processUpdateFormEmployee(w, r)
 	case http.MethodGet:
-		e.renderUpdateFormEmployee(writer, request)
+		e.renderUpdateFormEmployee(w, r)
 	default:
-		http.Error(writer, msg.H7002, http.StatusMethodNotAllowed)
+		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
 	}
 }
 
-func (e *EmployeeHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
+func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, e.wLogg) {
 		return
 	}
 
-	roleId, err := handler.ParseStrToUUID(request.FormValue(paramRoleId), writer, request, e.wLogg)
+	roleId, err := convert.ParseStrToUUID(r.FormValue(paramRoleId), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
 	employee := &entity.Employee{
-		ServiceNumber: convert.ConvStrToInt(request.FormValue("serviceNumber")),
-		FirstName:     request.FormValue("firstName"),
-		LastName:      request.FormValue("lastName"),
-		Patronymic:    request.FormValue("patronymic"),
-		Passwd:        request.FormValue("passwd"),
+		ServiceNumber: convert.ConvStrToInt(r.FormValue("serviceNumber")),
+		FirstName:     r.FormValue("firstName"),
+		LastName:      r.FormValue("lastName"),
+		Patronymic:    r.FormValue("patronymic"),
+		Passwd:        r.FormValue("passwd"),
 		RoleId:        roleId,
 	}
 
-	if err = e.employeeService.Add(request.Context(), employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7012, err)
-		http.Error(writer, msg.H7012, http.StatusInternalServerError)
+	if err = e.employeeService.Add(r.Context(), employee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7012, err)
 
 		return
 	}
-	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
-func (e *EmployeeHandlerHTTP) Delete(writer http.ResponseWriter, request *http.Request) {
-	if handler.MethodNotAllowed(writer, request, http.MethodPost, e.wLogg) {
+func (e *EmployeeHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, e.wLogg) {
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.FormValue(paramIdEmployee), writer, request, e.wLogg)
+	idEmployee, err := convert.ParseStrToUUID(r.FormValue(paramIdEmployee), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(r.Context(), idEmployee, w, r, e.wLogg, e.employeeService) {
 		return
 	}
 
-	if err = e.employeeService.Delete(request.Context(), idEmployee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7011, err)
-		http.Error(writer, msg.H7011, http.StatusInternalServerError)
+	if err = e.employeeService.Delete(r.Context(), idEmployee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7011, err)
 
 		return
 	}
-	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
-func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
-	idEmployeeStr := request.URL.Query().Get(paramIdEmployee)
-	http.Redirect(writer, request, fmt.Sprintf("%s?%s=%s", fgwEmployeesStartUrl, paramIdEmployee, idEmployeeStr), http.StatusSeeOther)
+func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
+	idEmployeeStr := r.URL.Query().Get(paramIdEmployee)
+	http.Redirect(w, r, fmt.Sprintf("%s?%s=%s", fgwEmployeesStartUrl, paramIdEmployee, idEmployeeStr), http.StatusSeeOther)
 }
 
-func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(writer http.ResponseWriter, request *http.Request) {
-	if err := request.ParseForm(); err != nil {
-		e.wLogg.LogHttpE(http.StatusBadRequest, request.Method, request.URL.Path, msg.H7008, err)
-		http.Error(writer, msg.H7008, http.StatusBadRequest)
+func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		handler.WriteBadRequest(w, r, e.wLogg, msg.H7008, err)
 
 		return
 	}
 
-	idEmployee, err := handler.ParseStrToUUID(request.FormValue(paramIdEmployee), writer, request, e.wLogg)
+	idEmployee, err := convert.ParseStrToUUID(r.FormValue(paramIdEmployee), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	roleId, err := handler.ParseStrToUUID(request.FormValue(paramRoleId), writer, request, e.wLogg)
+	roleId, err := convert.ParseStrToUUID(r.FormValue(paramRoleId), w, r, e.wLogg)
 	if err != nil {
 		return
 	}
 
-	if !handler.EntityExistsByUUID(request.Context(), idEmployee, writer, request, e.wLogg, e.employeeService) {
+	if !handler.EntityExistsByUUID(r.Context(), idEmployee, w, r, e.wLogg, e.employeeService) {
 		return
 	}
 
 	employee := &entity.Employee{
 		IdEmployee:    idEmployee,
-		ServiceNumber: convert.ConvStrToInt(request.FormValue("serviceNumber")),
-		FirstName:     request.FormValue("firstName"),
-		LastName:      request.FormValue("lastName"),
-		Patronymic:    request.FormValue("patronymic"),
-		Passwd:        request.FormValue("passwd"),
+		ServiceNumber: convert.ConvStrToInt(r.FormValue("serviceNumber")),
+		FirstName:     r.FormValue("firstName"),
+		LastName:      r.FormValue("lastName"),
+		Patronymic:    r.FormValue("patronymic"),
+		Passwd:        r.FormValue("passwd"),
 		RoleId:        roleId,
 	}
 
-	if err = e.employeeService.Update(request.Context(), idEmployee, employee); err != nil {
-		e.wLogg.LogHttpE(http.StatusInternalServerError, request.Method, request.URL.Path, msg.H7009, err)
-		http.Error(writer, msg.H7009, http.StatusInternalServerError)
+	if err = e.employeeService.Update(r.Context(), idEmployee, employee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7009, err)
 
 		return
 	}
-	http.Redirect(writer, request, fgwEmployeesStartUrl, http.StatusSeeOther)
+	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
 // markEditingRole помечает сотрудника как редактируемую по её UUID в строковом формате.
