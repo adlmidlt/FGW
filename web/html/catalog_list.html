@@ -150,15 +150,17 @@
                         </label>
                     </td>
                     <td><label>
-                            <input type="checkbox" name="handbookValueBool1" value="{{ .HandbookValueBool1}}">
+                            <input type="checkbox" name="handbookValueBool1" value="true"
+                                   {{ if .HandbookValueBool1 }}checked{{ end }}>
+                        </label></td>
+                    <td><label>
+                            <input type="checkbox" name="handbookValueBool2" value="true"
+                                   {{ if .HandbookValueBool2 }}checked{{ end }}>
                         </label>
                     </td>
                     <td><label>
-                            <input type="checkbox" name="handbookValueBool2" value="{{ .HandbookValueBool2}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="checkbox" name="isArchive" value="{{ .IsArchive}}">
+                            <input type="checkbox" name="isArchive" value="true"
+                                   {{ if .IsArchive }}checked{{ end }}>
                         </label>
                     </td>
                     <td class="border-table">{{ .OwnerUser}}</td>

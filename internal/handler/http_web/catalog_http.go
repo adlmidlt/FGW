@@ -223,6 +223,10 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		return
 	}
 
+	handbookValueBool1 := r.PostForm.Get("handbookValueBool1") != ""
+	handbookValueBool2 := r.PostForm.Get("handbookValueBool2") != ""
+	isArchive := r.PostForm.Get("isArchive") != ""
+
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
 	lastUser := uuid.MustParse("10000000-0000-0000-0000-000000000000")
 
@@ -238,15 +242,15 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		HandbookValueInt2:     convert.ConvStrToInt(r.FormValue("handbookValueInt2")),
 		HandbookValueDecimal1: convert.ConvStrToFloat(r.FormValue("handbookValueDecimal1")),
 		HandbookValueDecimal2: convert.ConvStrToFloat(r.FormValue("handbookValueDecimal2")),
-		HandbookValueBool1:    convert.ConvStrToBool(r.FormValue("handbookValueBool1")),
-		HandbookValueBool2:    convert.ConvStrToBool(r.FormValue("handbookValueBool2")),
-		IsArchive:             convert.ConvStrToBool(r.FormValue("isArchive")),
+		HandbookValueBool1:    handbookValueBool1,
+		HandbookValueBool2:    handbookValueBool2,
+		IsArchive:             isArchive,
 		OwnerUser:             convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
 		OwnerUserDateTime:     r.FormValue("ownerUserDateTime"),
 		LastUser:              lastUser,
 		LastUserDateTime:      lastUserDateTime,
 	}
-
+	fmt.Println(catalog)
 	if err := c.catalogService.Update(r.Context(), idCatalog, catalog); err != nil {
 		handler.WriteServerError(w, r, c.wLogg, msg.H7012, err)
 
