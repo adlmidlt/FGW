@@ -112,7 +112,7 @@ CREATE TABLE dbo.packVariant
     is_accounting_batch BIT          DEFAULT 0    NOT NULL, -- учет партии 0-нет/1-да
     method_ship         BIT          DEFAULT 0    NOT NULL, -- способ отгрузки 0-АТ/1-ЖД
     shelf_life_months   INT          DEFAULT 0    NOT NULL, -- срок годности в месяцах
-    bath_furnace        INT          DEFAULT 0    NOT NULL, -- норме ванной печи
+    bath_furnace        INT          DEFAULT 0    NOT NULL, -- номер ванной печи
     machine_line        INT          DEFAULT 0    NOT NULL, -- номер машинной линии
     is_manufactured     BIT          DEFAULT 0    NOT NULL, -- изготавливается (производится)
     current_date_batch  DATETIME                  NOT NULL, -- текущая дата партии

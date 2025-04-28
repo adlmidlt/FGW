@@ -61,19 +61,20 @@ func main() {
 	handlerEmployeeJSON := json_api.NewEmployeeHandlerJSON(serviceRole, serviceEmployee, logger)
 	handlerEmployeeHTTP := http_web.NewEmployeeHandlerHTTP(serviceRole, serviceEmployee, logger)
 
-	repoPackVariant := repo.NewPackVariant(mssqlDBConn, logger)
-	servicePackVariant := service.NewPackVariantService(repoPackVariant, logger, validateStruct)
-	handlerPackVariantJSON := json_api.NewPackVariantHandlerJSON(servicePackVariant, logger)
-
 	repoHandbook := repo.NewHandbookRepo(mssqlDBConn, logger)
 	serviceHandbook := service.NewHandbookService(repoHandbook, logger, validateStruct)
-	handlerHandbookHTTP := http_web.NewHandbookHandlerHTTP(serviceHandbook, logger)
 	handlerHandbookJSON := json_api.NewHandbookHandlerJSON(serviceHandbook, logger)
+	handlerHandbookHTTP := http_web.NewHandbookHandlerHTTP(serviceHandbook, logger)
 
 	repoCatalog := repo.NewCatalogRepo(mssqlDBConn, logger)
 	serviceCatalog := service.NewCatalogService(repoCatalog, logger, validateStruct)
 	handlerCatalogJSON := json_api.NewCatalogHandlerJSON(serviceCatalog, logger)
 	handlerCatalogHTTP := http_web.NewCatalogHandlerHTTP(serviceCatalog, serviceHandbook, logger)
+
+	repoPackVariant := repo.NewPackVariant(mssqlDBConn, logger)
+	servicePackVariant := service.NewPackVariantService(repoPackVariant, logger, validateStruct)
+	handlerPackVariantJSON := json_api.NewPackVariantHandlerJSON(servicePackVariant, logger)
+	handlerPackVariantHTTP := http_web.NewPackVariantHandlerHTTP(servicePackVariant, serviceCatalog, logger)
 
 	mux := http.NewServeMux()
 
@@ -83,13 +84,14 @@ func main() {
 	handlerEmployeeJSON.ServeJSONRouters(mux)
 	handlerEmployeeHTTP.ServeHTTPRouters(mux)
 
-	handlerPackVariantJSON.ServeJSONRouters(mux)
-
-	handlerHandbookHTTP.ServeHTTPRouters(mux)
 	handlerHandbookJSON.ServeJSONRouters(mux)
+	handlerHandbookHTTP.ServeHTTPRouters(mux)
 
 	handlerCatalogJSON.ServeJSONRouters(mux)
 	handlerCatalogHTTP.ServeHTTPRouters(mux)
+
+	handlerPackVariantJSON.ServeJSONRouters(mux)
+	handlerPackVariantHTTP.ServeHTTPRouters(mux)
 
 	// Подключение static (*.html, *.png/jpg *.css файлов, *.js)
 	mux.Handle("/web/",

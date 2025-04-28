@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <title>Список вариантов упаковки</title>
+</head>
+<body>
+
+<h1>Добавить информацию в вариант упаковки</h1>
+<form method="POST" action="/fgw/pack_variants/add">
+
+    <br>
+    <label>
+        Артикул:
+        <input type="number" name="article" placeholder="12345">
+    </label>
+    <br>
+    <label>
+        Наименование продукции:
+        <select name="packName">
+            <option value="">
+                Выберите продукцию
+            </option>
+            {{ range $.Catalogs}}
+                {{ if eq .HandbookId 0 }} {{/* 0 - справочник конструкторское наименование*/}}
+                <option value="{{ .Name }}">
+                    {{ .HandbookId }} - {{ .Name }}
+                </option>
+                {{ end }}
+            {{ end}}
+        </select>
+    </label>
+    <br>
+    <label>
+        Цвет продукции:
+        <select name="color">
+            <option value="">
+                Выберите цвет продукции
+            </option>
+            {{ range $.Catalogs}}
+                {{ if eq .HandbookId 3 }} {{/* 3 - справочник цветов*/}}
+                <option value="{{ .IdCatalog }}">
+                    {{ .HandbookId }} - {{ .Name }}
+                </option>
+                {{ end }}
+            {{ end}}
+        </select>
+    </label>
+    <br>
+
+    <br>
+    <input type="number" name="quantityRows">
+    <input type="number" name="quantityPerRows">
+    <input type="number" name="weight">
+    <input type="number" name="depth">
+    <input type="number" name="width">
+    <input type="number" name="height">
+    <input type="checkbox" name="isFood">
+    <input type="checkbox" name="isAfraidMoisture">
+    <input type="checkbox" name="isAfraidSun">
+    <input type="checkbox" name="isEAC">
+    <input type="checkbox" name="isAccountingBatch">
+    <input type="checkbox" name="methodShip">
+    <input type="number" name="shelfLifeMonths">
+    <input type="number" name="bathFurnace">
+    <input type="number" name="machineLine">
+    <input type="checkbox" name="isManufactured">
+    <input type="date" name="currentDateBatch">
+    <input type="number" name="numberingBatch">
+    <input type="checkbox" name="isArchive">
+
+
+    <input type="submit" value="Добавить">
+</form>
+<br>
+
+<table class="border-table">
+    <thead>
+    <tr>
+        <th class="border-table">ИД</th>
+        <th class="border-table">ИД справочника(конструкторское наим.)</th>
+        <th class="border-table">Артикул</th>
+        <th class="border-table">Наименование продукции</th>
+        <th class="border-table">Цвет продукции</th>
+        <th class="border-table">Петля Мёбиуса</th>
+        <th class="border-table">Кол-во рядов в п\п</th>
+        <th class="border-table">Кол-во в ряду в п\п</th>
+        <th class="border-table">Вес п\п</th>
+        <th class="border-table">Глубина в мм. п\п</th>
+        <th class="border-table">Ширина в мм. п\п</th>
+        <th class="border-table">Высота в мм. п\п</th>
+        <th class="border-table">Пищевая продукция</th>
+        <th class="border-table">Боится влаги</th>
+        <th class="border-table">Беречь от солнца</th>
+        <th class="border-table">Знак соответствия EAC</th>
+        <th class="border-table">Учет партии</th>
+        <th class="border-table">Способ отгрузки 0-АТ\1-ЖД</th>
+        <th class="border-table">Срок годности в месяцах</th>
+        <th class="border-table">Номер ванной печи</th>
+        <th class="border-table">Номер машинной линии</th>
+        <th class="border-table">Изготавливается</th>
+        <th class="border-table">Текущая дата партии</th>
+        <th class="border-table">Нумерация партии 0 - автомат. 1 - ручная, 2 - с указанной даты</th>
+        <th class="border-table">В архиве</th>
+        <th class="border-table">Код владельца записи</th>
+        <th class="border-table">Дата модификации</th>
+        <th class="border-table">Код пользователя</th>
+        <th class="border-table">Дата последней модификации</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ range .PackVariants}}
+        <tr>
+            <td class="border-table">{{ .IdPackVariant}}</td>
+            <td class="border-table">{{ .ProdId}}</td>
+            <td class="border-table">{{ .Article}}</td>
+            <td class="border-table">{{ .PackName}}</td>
+            <td class="border-table">{{ .Color}}</td>
+            <td class="border-table">{{ .GL}}</td>
+            <td class="border-table">{{ .QuantityRows}}</td>
+            <td class="border-table">{{ .QuantityPerRows}}</td>
+            <td class="border-table">{{ .Weight}}</td>
+            <td class="border-table">{{ .Depth}}</td>
+            <td class="border-table">{{ .Width}}</td>
+            <td class="border-table">{{ .Height}}</td>
+            <td class="border-table">{{ .IsFood}}</td>
+            <td class="border-table">{{ .IsAfraidMoisture}}</td>
+            <td class="border-table">{{ .IsAfraidSun}}</td>
+            <td class="border-table">{{ .IsEAC}}</td>
+            <td class="border-table">{{ .IsAccountingBatch}}</td>
+            <td class="border-table">{{ .MethodShip}}</td>
+            <td class="border-table">{{ .ShelfLifeMonths}}</td>
+            <td class="border-table">{{ .BathFurnace}}</td>
+            <td class="border-table">{{ .MachineLine}}</td>
+            <td class="border-table">{{ .IsManufactured}}</td>
+            <td class="border-table">{{ .CurrentDateBatch}}</td>
+            <td class="border-table">{{ .NumberingBatch}}</td>
+            <td class="border-table">{{ .IsArchive}}</td>
+            <td class="border-table">{{ .OwnerUser}}</td>
+            <td class="border-table">{{ .OwnerUserDateTime}}</td>
+            <td class="border-table">{{ .LastUser}}</td>
+            <td class="border-table">{{ .LastUserDateTime}}</td>
+        </tr>
+    {{ end}}
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -38,7 +38,7 @@ func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error
 	defer db.CloseRows(rows)
 
 	var packVariants []*entity.PackVariant
-	if rows.Next() {
+	for rows.Next() {
 		var packVariant entity.PackVariant
 		if err = rows.Scan(
 			&packVariant.IdPackVariant,
@@ -66,8 +66,8 @@ func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error
 			&packVariant.CurrentDateBatch,
 			&packVariant.NumberingBatch,
 			&packVariant.IsArchive,
-			&packVariant.OwnerUserId,
-			&packVariant.OwnerUserDataTime,
+			&packVariant.OwnerUser,
+			&packVariant.OwnerUserDateTime,
 			&packVariant.LastUser,
 			&packVariant.LastUserDateTime,
 		); err != nil {
@@ -122,8 +122,8 @@ func (p *PackVariantRepo) FindById(ctx context.Context, idPackVariant int) (*ent
 		&packVariant.CurrentDateBatch,
 		&packVariant.NumberingBatch,
 		&packVariant.IsArchive,
-		&packVariant.OwnerUserId,
-		&packVariant.OwnerUserDataTime,
+		&packVariant.OwnerUser,
+		&packVariant.OwnerUserDateTime,
 		&packVariant.LastUser,
 		&packVariant.LastUserDateTime,
 	); err != nil {
@@ -163,8 +163,8 @@ func (p *PackVariantRepo) Add(ctx context.Context, packVariant *entity.PackVaria
 		packVariant.CurrentDateBatch,
 		packVariant.NumberingBatch,
 		packVariant.IsArchive,
-		packVariant.OwnerUserId,
-		packVariant.OwnerUserDataTime,
+		packVariant.OwnerUser,
+		packVariant.OwnerUserDateTime,
 		packVariant.LastUser,
 		packVariant.LastUserDateTime,
 	); err != nil {
@@ -202,8 +202,8 @@ func (p *PackVariantRepo) Update(ctx context.Context, idPackVariant int, packVar
 		packVariant.CurrentDateBatch,
 		packVariant.NumberingBatch,
 		packVariant.IsArchive,
-		packVariant.OwnerUserId,
-		packVariant.OwnerUserDataTime,
+		packVariant.OwnerUser,
+		packVariant.OwnerUserDateTime,
 		packVariant.LastUser,
 		packVariant.LastUserDateTime,
 	); err != nil {
