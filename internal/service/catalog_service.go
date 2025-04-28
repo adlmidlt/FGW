@@ -26,6 +26,7 @@ type CatalogUseCase interface {
 	Update(ctx context.Context, idCatalog int, catalog *entity.Catalog) error
 	Delete(ctx context.Context, idCatalog int) error
 	ExistsByID(ctx context.Context, idCatalog int) (bool, error)
+	AllFindByNumber(ctx context.Context, number int) ([]*entity.Catalog, error)
 }
 
 func (c *CatalogService) All(ctx context.Context) ([]*entity.Catalog, error) {
@@ -94,4 +95,15 @@ func (c *CatalogService) Delete(ctx context.Context, idCatalog int) error {
 
 func (c *CatalogService) ExistsByID(ctx context.Context, idCatalog int) (bool, error) {
 	return c.catalogRepo.ExistsByID(ctx, idCatalog)
+}
+
+func (c *CatalogService) AllFindByNumber(ctx context.Context, number int) ([]*entity.Catalog, error) {
+	catalogs, err := c.catalogRepo.AllFindByNumber(ctx, number)
+	if err != nil {
+		c.wLogg.LogE(msg.E3004, err)
+
+		return nil, err
+	}
+
+	return catalogs, nil
 }

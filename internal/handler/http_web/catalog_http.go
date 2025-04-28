@@ -41,7 +41,22 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	catalogs, err := c.catalogService.All(r.Context())
+	var filteredIdParamId int
+	handbookIdParam := r.URL.Query().Get("handbookId")
+	if handbookIdParam != "" && handbookIdParam != "-1" {
+		filteredIdParamId = convert.ConvStrToInt(handbookIdParam)
+	} else {
+		filteredIdParamId = -1
+	}
+
+	var err error
+	var catalogs []*entity.Catalog
+	if filteredIdParamId >= 0 {
+		catalogs, err = c.catalogService.AllFindByNumber(r.Context(), filteredIdParamId)
+	} else {
+		catalogs, err = c.catalogService.All(r.Context())
+	}
+
 	if err != nil {
 		handler.WriteServerError(w, r, c.wLogg, msg.H7003, err)
 
@@ -59,7 +74,7 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := entity.CatalogList{Catalogs: catalogs, Handbooks: handbooks}
+	data := entity.CatalogList{Catalogs: catalogs, Handbooks: handbooks, SelectedHandbookId: filteredIdParamId}
 
 	if idStr := r.URL.Query().Get("idCatalog"); idStr != "" {
 		id := convert.ConvStrToInt(idStr)

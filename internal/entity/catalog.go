@@ -3,8 +3,9 @@ package entity
 import "github.com/google/uuid"
 
 type CatalogList struct {
-	Catalogs  []*Catalog
-	Handbooks []*Handbook
+	Catalogs           []*Catalog
+	Handbooks          []*Handbook
+	SelectedHandbookId int
 }
 
 type Catalog struct {

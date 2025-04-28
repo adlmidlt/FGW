@@ -35,12 +35,12 @@
     </label>
     <br>
     <label>
-        Поле справочника (0, 1, 3, 4, 9, 10):
+        Поле справочника (0, 1, 3, 4, 5, 9, 10):
         <input type="number" name="handbookValueInt1" placeholder="0">
     </label>
     <br>
     <label>
-        Доп. поле справочника (0, 1, 3, 4, 9, 10):
+        Доп. поле справочника (0, 1, 3, 4, 5, 9, 10):
         <input type="number" name="handbookValueInt2" placeholder="0">
     </label>
     <br>
@@ -72,6 +72,26 @@
     <input type="submit" value="Добавить">
 </form>
 <br>
+
+<form method="GET" action="/fgw/catalogs">
+    <label for="handbook-filter">Фильтр по справочнику:</label>
+    <label>
+        <select name="handbookId">
+            <option value=""
+                    {{ if ne .SelectedHandbookId -1 }}selected{{ end }}>
+                Показать всё
+            </option>
+            {{ $filteredIdParamId := .SelectedHandbookId }}
+            {{ range $.Handbooks }}
+                <option value="{{ .IdHandbook }}"
+                        {{ if eq .IdHandbook $filteredIdParamId }}selected{{ end }}>
+                    {{ .IdHandbook }} - {{ .Name }}
+                </option>
+            {{ end }}
+        </select>
+    </label>
+    <button type="submit">Применить фильтр</button>
+</form>
 
 <table class="border-table">
     <thead>

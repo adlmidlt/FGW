@@ -24,12 +24,13 @@ var (
 )
 
 var (
-	FGWCatalogAllQuery      = "exec dbo.fgw_catalog_all;"
-	FGWCatalogFindByIdQuery = "exec dbo.fgw_catalog_find_by_id ?;"
-	FGWCatalogAddQuery      = "exec dbo.fgw_catalog_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWCatalogUpdateQuery   = "exec dbo.fgw_catalog_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWCatalogDeleteQuery   = "exec dbo.fgw_catalog_delete ?;"
-	FGWCatalogExistQuery    = "exec dbo.fgw_catalog_exist ?;"
+	FGWCatalogAllQuery             = "exec dbo.fgw_catalog_all;"
+	FGWCatalogFindByIdQuery        = "exec dbo.fgw_catalog_find_by_id ?;"
+	FGWCatalogAddQuery             = "exec dbo.fgw_catalog_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWCatalogUpdateQuery          = "exec dbo.fgw_catalog_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWCatalogDeleteQuery          = "exec dbo.fgw_catalog_delete ?;"
+	FGWCatalogExistQuery           = "exec dbo.fgw_catalog_exist ?;"
+	FGWCatalogAllFindByNumberQuery = "exec dbo.fgw_catalog_all_find_by_number ?;"
 )
 
 var (

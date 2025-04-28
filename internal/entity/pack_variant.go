@@ -12,7 +12,7 @@ type PackVariant struct {
 	Article           string    `json:"article" validate:"required,max=5"`
 	PackName          string    `json:"packName" validate:"required,max=255"`
 	Color             int       `json:"color" validate:"required"`
-	GL                int       `json:"gl" validate:"required"` // GL петля мёбиуса (переработка)
+	GL                int       `json:"gl" validate:"required"` // GL петля мёбиуса (переработка) 70-79
 	QuantityRows      int       `json:"quantityRows" validate:"required"`
 	QuantityPerRows   int       `json:"quantityPerRows" validate:"required"`
 	Weight            int       `json:"weight" validate:"required"`

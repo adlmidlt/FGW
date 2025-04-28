@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const fgwPackVariantStartUrl = "/api/fgw/pack_variants"
+const fgwPackVariantStartUrl = "/api/fgw/packVariants"
 
 type PackVariantHandlerJSON struct {
 	packVariantService service.PackVariantUseCase
