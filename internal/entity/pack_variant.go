@@ -17,6 +17,7 @@ type PackVariant struct {
 	QuantityPerRows   int       `json:"quantityPerRows" validate:"required"`
 	Weight            int       `json:"weight" validate:"required"`
 	Depth             int       `json:"depth" validate:"required"`
+	Width             int       `json:"width" validate:"required"`
 	Height            int       `json:"height" validate:"required"`
 	IsFood            bool      `json:"isFood" validate:"required"`
 	IsAfraidMoisture  bool      `json:"isAfraidMoisture" validate:"required"`

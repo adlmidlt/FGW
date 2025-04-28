@@ -15,12 +15,8 @@ var (
 	FGWEmployeeFindByIdQuery = "exec dbo.fgw_employee_find_by_id ?;"
 	FGWEmployeeAddQuery      = "exec dbo.fgw_employee_add ?, ?, ?, ?, ?, ?, ?;"
 	FGWEmployeeUpdateQuery   = "exec dbo.fgw_employee_update ?, ?, ?, ?, ?, ?, ?;"
-	FGWEmployeeDeleteQuery   = "exec fgw_employee_delete_by_id ?;"
-	FGWEmployeeExistQuery    = "exec fgw_employee_exist ?;"
-)
-
-var (
-	FGWPackVariantAllQuery = "exec dbo.fgw_pack_variant_all;"
+	FGWEmployeeDeleteQuery   = "exec dbo.fgw_employee_delete_by_id ?;"
+	FGWEmployeeExistQuery    = "exec dbo.fgw_employee_exist ?;"
 )
 
 var (
@@ -28,7 +24,7 @@ var (
 	FGWCatalogFindByIdQuery        = "exec dbo.fgw_catalog_find_by_id ?;"
 	FGWCatalogAddQuery             = "exec dbo.fgw_catalog_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
 	FGWCatalogUpdateQuery          = "exec dbo.fgw_catalog_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWCatalogDeleteQuery          = "exec dbo.fgw_catalog_delete ?;"
+	FGWCatalogDeleteQuery          = "exec dbo.fgw_catalog_delete_by_id ?;"
 	FGWCatalogExistQuery           = "exec dbo.fgw_catalog_exist ?;"
 	FGWCatalogAllFindByNumberQuery = "exec dbo.fgw_catalog_all_find_by_number ?;"
 )
@@ -40,4 +36,13 @@ var (
 	FGWHandbookUpdateQuery   = "exec dbo.fgw_handbook_update ?, ?;"
 	FGWHandbookDeleteQuery   = "exec dbo.fgw_handbook_delete_by_id ?;"
 	FGWHandbookExistsQuery   = "exec dbo.fgw_handbook_exist ?;"
+)
+
+var (
+	FGWPackVariantAllQuery      = "exec dbo.fgw_pack_variant_all;"
+	FGWPackVariantFindByIdQuery = "exec dbo.fgw_pack_variant_find_by_id ?;"
+	FGWPackVariantAddQuery      = "exec dbo.fgw_pack_variant_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWPackVariantUpdateQuery   = "exec dbo.fgw_pack_variant_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWPackVariantDeleteQuery   = "exec dbo.fgw_pack_variant_delete_by_id ?;"
+	FGWPackVariantExistQuery    = "exec dbo.fgw_pack_variant_exist ?;"
 )
