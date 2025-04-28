@@ -21,6 +21,11 @@ func NewPackVariant(mssql *sql.DB, wLogg *wlogger.CustomWLogg) *PackVariantRepo 
 
 type PackVariantRepository interface {
 	All(ctx context.Context) ([]*entity.PackVariant, error)
+	FindById(ctx context.Context, idPackVariant int) (*entity.PackVariant, error)
+	Add(ctx context.Context, packVariant *entity.PackVariant) error
+	Update(ctx context.Context, idPackVariant int, packVariant *entity.PackVariant) error
+	Delete(ctx context.Context, idPackVariant int) error
+	ExistByID(ctx context.Context, idPackVariant int) (*entity.PackVariant, error)
 }
 
 func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error) {
@@ -46,6 +51,7 @@ func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error
 			&packVariant.QuantityPerRows,
 			&packVariant.Weight,
 			&packVariant.Depth,
+			&packVariant.Width,
 			&packVariant.Height,
 			&packVariant.IsFood,
 			&packVariant.IsAfraidMoisture,
@@ -86,4 +92,146 @@ func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error
 	}
 
 	return packVariants, nil
+}
+
+func (p *PackVariantRepo) FindById(ctx context.Context, idPackVariant int) (*entity.PackVariant, error) {
+	var packVariant entity.PackVariant
+	if err := p.mssql.QueryRowContext(ctx, FGWPackVariantFindByIdQuery, idPackVariant).Scan(
+		&packVariant.IdPackVariant,
+		&packVariant.ProdId,
+		&packVariant.Article,
+		&packVariant.PackName,
+		&packVariant.Color,
+		&packVariant.GL,
+		&packVariant.QuantityRows,
+		&packVariant.QuantityPerRows,
+		&packVariant.Weight,
+		&packVariant.Depth,
+		&packVariant.Width,
+		&packVariant.Height,
+		&packVariant.IsFood,
+		&packVariant.IsAfraidMoisture,
+		&packVariant.IsAfraidSun,
+		&packVariant.IsEAC,
+		&packVariant.IsAccountingBatch,
+		&packVariant.MethodShip,
+		&packVariant.ShelfLifeMonths,
+		&packVariant.BathFurnace,
+		&packVariant.MachineLine,
+		&packVariant.IsManufactured,
+		&packVariant.CurrentDateBatch,
+		&packVariant.NumberingBatch,
+		&packVariant.IsArchive,
+		&packVariant.OwnerUserId,
+		&packVariant.OwnerUserDataTime,
+		&packVariant.LastUser,
+		&packVariant.LastUserDateTime,
+	); err != nil {
+		p.wLogg.LogE(msg.E3000, err)
+
+		return nil, err
+	}
+
+	packVariant.PackName, _ = convert.Win1251ToUTF8(packVariant.PackName)
+
+	return &packVariant, nil
+}
+
+func (p *PackVariantRepo) Add(ctx context.Context, packVariant *entity.PackVariant) error {
+	if _, err := p.mssql.ExecContext(ctx, FGWPackVariantAddQuery,
+		packVariant.ProdId,
+		packVariant.Article,
+		packVariant.PackName,
+		packVariant.Color,
+		packVariant.GL,
+		packVariant.QuantityRows,
+		packVariant.QuantityPerRows,
+		packVariant.Weight,
+		packVariant.Depth,
+		packVariant.Width,
+		packVariant.Height,
+		packVariant.IsFood,
+		packVariant.IsAfraidMoisture,
+		packVariant.IsAfraidSun,
+		packVariant.IsEAC,
+		packVariant.IsAccountingBatch,
+		packVariant.MethodShip,
+		packVariant.ShelfLifeMonths,
+		packVariant.BathFurnace,
+		packVariant.MachineLine,
+		packVariant.IsManufactured,
+		packVariant.CurrentDateBatch,
+		packVariant.NumberingBatch,
+		packVariant.IsArchive,
+		packVariant.OwnerUserId,
+		packVariant.OwnerUserDataTime,
+		packVariant.LastUser,
+		packVariant.LastUserDateTime,
+	); err != nil {
+		p.wLogg.LogE(msg.E3000, err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (p *PackVariantRepo) Update(ctx context.Context, idPackVariant int, packVariant *entity.PackVariant) error {
+	if _, err := p.mssql.ExecContext(ctx, FGWPackVariantUpdateQuery, idPackVariant,
+		packVariant.ProdId,
+		packVariant.Article,
+		packVariant.PackName,
+		packVariant.Color,
+		packVariant.GL,
+		packVariant.QuantityRows,
+		packVariant.QuantityPerRows,
+		packVariant.Weight,
+		packVariant.Depth,
+		packVariant.Width,
+		packVariant.Height,
+		packVariant.IsFood,
+		packVariant.IsAfraidMoisture,
+		packVariant.IsAfraidSun,
+		packVariant.IsEAC,
+		packVariant.IsAccountingBatch,
+		packVariant.MethodShip,
+		packVariant.ShelfLifeMonths,
+		packVariant.BathFurnace,
+		packVariant.MachineLine,
+		packVariant.IsManufactured,
+		packVariant.CurrentDateBatch,
+		packVariant.NumberingBatch,
+		packVariant.IsArchive,
+		packVariant.OwnerUserId,
+		packVariant.OwnerUserDataTime,
+		packVariant.LastUser,
+		packVariant.LastUserDateTime,
+	); err != nil {
+		p.wLogg.LogE(msg.E3000, err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (p *PackVariantRepo) Delete(ctx context.Context, idPackVariant int) error {
+	if _, err := p.mssql.ExecContext(ctx, FGWPackVariantDeleteQuery, idPackVariant); err != nil {
+		p.wLogg.LogE(msg.E3000, err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (p *PackVariantRepo) ExistByID(ctx context.Context, idPackVariant int) (bool, error) {
+	var exists bool
+	row := p.mssql.QueryRowContext(ctx, FGWPackVariantExistQuery, idPackVariant)
+	err := row.Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
