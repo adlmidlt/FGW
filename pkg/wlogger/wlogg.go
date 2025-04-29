@@ -2,6 +2,7 @@ package wlogger
 
 import (
 	"FGW/pkg"
+	"FGW/pkg/wlogger/msg"
 	"errors"
 	"fmt"
 	"log"
@@ -18,6 +19,11 @@ var (
 )
 
 const (
+	// skipNumOfStackFrame Количество кадров стека, которые необходимо пропустить перед записью на ПК, где 0 идентифицирует
+	// кадр для самих вызывающих абонентов, а 1 идентифицирует вызывающего абонента. Возвращает количество записей,
+	// записанных на компьютер.
+	skipNumOfStackFrame = 3
+
 	infoInConsoleInJSON = "\u001B[1;32m{\n" +
 		"\u001B[1;32m  \"dataTime\":\u001B[1;38m \"%s\",\n" +
 		"\u001B[1;32m  \"info\":{\n" +
@@ -218,8 +224,8 @@ func NewCustomWLogger() (*CustomWLogg, error) {
 // Параметры:
 //   - msg (string): Сообщение, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 func (l *CustomWLogg) LogI(msg string) {
-	fmt.Printf(infoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:])
-	l.logI.Printf(infoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:])
+	fmt.Printf(infoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:])
+	l.logI.Printf(infoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:])
 }
 
 // LogW выводит предупреждающие сообщение в консоль и записывает его в файл в формате JSON.
@@ -228,8 +234,8 @@ func (l *CustomWLogg) LogI(msg string) {
 //   - msg (string): Сообщение о предупреждении, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - warn (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogW(msg string, warn error) {
-	fmt.Printf(warningInConsoleInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], warn)
-	l.logI.Printf(warningInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], warn)
+	fmt.Printf(warningInConsoleInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:], warn)
+	l.logI.Printf(warningInJson, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:], warn)
 }
 
 // LogE выводит сообщение об ошибке в консоль и записывает его в файл в формате JSON.
@@ -238,8 +244,8 @@ func (l *CustomWLogg) LogW(msg string, warn error) {
 //   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - err (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogE(msg string, err error) {
-	fmt.Printf(errorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], err)
-	l.logI.Printf(errorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), msg[:6], msg[7:], err)
+	fmt.Printf(errorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:], err)
+	l.logI.Printf(errorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), msg[:6], msg[7:], err)
 }
 
 // LogHttpI выводит информационное сообщение HTTP в консоль и записывает его в файл в формате JSON.
@@ -250,8 +256,8 @@ func (l *CustomWLogg) LogE(msg string, err error) {
 //   - url (string): Ссылка на HTTP.
 //   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 func (l *CustomWLogg) LogHttpI(statusCode int, methodHttp, url, msg string) {
-	fmt.Printf(httpInfoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:])
-	l.logI.Printf(httpInfoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:])
+	fmt.Printf(httpInfoInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:])
+	l.logI.Printf(httpInfoInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:])
 }
 
 // LogHttpW выводит предупреждающие сообщение HTTP в консоль и записывает его в файл в формате JSON.
@@ -263,8 +269,8 @@ func (l *CustomWLogg) LogHttpI(statusCode int, methodHttp, url, msg string) {
 //   - msg (string): Сообщение об ошибке, которое нужно залогировать. В сообщении содержится код msg[:6] и описание msg[7:].
 //   - warn (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogHttpW(statusCode int, methodHttp, url, msg string, warn error) {
-	fmt.Printf(httpWarningInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
-	l.logI.Printf(httpWarningInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
+	fmt.Printf(httpWarningInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
+	l.logI.Printf(httpWarningInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:], warn)
 }
 
 // LogHttpE выводит сообщение об ошибке HTTP в консоль и записывает его в файл в формате JSON.
@@ -276,8 +282,8 @@ func (l *CustomWLogg) LogHttpW(statusCode int, methodHttp, url, msg string, warn
 //   - url (string): Ссылка на HTTP.
 //   - err (error): Объект ошибки, содержащий дополнительную информацию об ошибке.
 func (l *CustomWLogg) LogHttpE(statusCode int, methodHttp, url, msg string, err error) {
-	fmt.Printf(httpErrorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], err)
-	l.logI.Printf(httpErrorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(), statusCode, methodHttp, url, msg[:6], msg[7:], err)
+	fmt.Printf(httpErrorInConsoleInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:], err)
+	l.logI.Printf(httpErrorInJSON, systemDateTime, l.infoPC.HostName(), l.infoPC.IPAddr(), fileWithFuncAndLineNum(), fileWithLineNum(skipNumOfStackFrame), statusCode, methodHttp, url, msg[:6], msg[7:], err)
 }
 
 // Close закрывает файл логирования.
@@ -289,9 +295,9 @@ func (l *CustomWLogg) Close() {
 	}
 
 	if l.logFile != nil {
-		l.LogI("Ресурсы освобождены")
+		l.LogI(msg.I2006)
 	} else {
-		l.LogI("Лог файл уже закрыт, запись не возможна")
+		l.LogI(msg.I2007)
 	}
 }
 
@@ -333,17 +339,18 @@ func openLoggFile(pathToLoggFile string) (*os.File, error) {
 	return file, nil
 }
 
-// skipNumOfStackFrame Количество кадров стека, которые необходимо пропустить перед записью на ПК, где 0 идентифицирует
-// кадр для самих вызывающих абонентов, а 1 идентифицирует вызывающего абонента. Возвращает количество записей,
-// записанных на компьютер.
-const skipNumOfStackFrame = 3
+// FileWithLineNum возвращает имя файла и номер строки текущего места вызова.
+func FileWithLineNum() string {
+	return fileWithLineNum(skipNumOfStackFrame + 1) // Учитываем внешний вызов.
+}
 
 // fileWithLineNum возвращает имя файла и строку номера текущего файла.
-func fileWithLineNum() string {
+func fileWithLineNum(skipNumOfStackFrame int) string {
 	pc := make([]uintptr, 15)
 	n := runtime.Callers(skipNumOfStackFrame, pc)
 	frame, _ := runtime.CallersFrames(pc[:n]).Next()
 	idxFile := strings.LastIndexByte(frame.File, '/')
+
 	return frame.File[idxFile+1:] + ":" + strconv.FormatInt(int64(frame.Line), 10)
 }
 
