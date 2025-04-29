@@ -55,10 +55,10 @@ func (c *CatalogRepo) All(ctx context.Context) ([]*entity.Catalog, error) {
 			&catalog.HandbookValueBool1,
 			&catalog.HandbookValueBool2,
 			&catalog.IsArchive,
-			&catalog.OwnerUser,
-			&catalog.OwnerUserDateTime,
-			&catalog.LastUser,
-			&catalog.LastUserDateTime,
+			&catalog.AuditRecord.OwnerUser,
+			&catalog.AuditRecord.OwnerUserDateTime,
+			&catalog.AuditRecord.LastUser,
+			&catalog.AuditRecord.LastUserDateTime,
 		); err != nil {
 			c.wLogg.LogE(msg.E3001, err)
 
@@ -100,10 +100,10 @@ func (c *CatalogRepo) FindById(ctx context.Context, idCatalog int) (*entity.Cata
 		&catalog.HandbookValueBool1,
 		&catalog.HandbookValueBool2,
 		&catalog.IsArchive,
-		&catalog.OwnerUser,
-		&catalog.OwnerUserDateTime,
-		&catalog.LastUser,
-		&catalog.LastUserDateTime,
+		&catalog.AuditRecord.OwnerUser,
+		&catalog.AuditRecord.OwnerUserDateTime,
+		&catalog.AuditRecord.LastUser,
+		&catalog.AuditRecord.LastUserDateTime,
 	); err != nil {
 		c.wLogg.LogE(msg.E3000, err)
 
@@ -130,10 +130,10 @@ func (c *CatalogRepo) Add(ctx context.Context, catalog *entity.Catalog) error {
 		catalog.HandbookValueBool1,
 		catalog.HandbookValueBool2,
 		catalog.IsArchive,
-		catalog.OwnerUser,
-		catalog.OwnerUserDateTime,
-		catalog.LastUser,
-		catalog.LastUserDateTime,
+		catalog.AuditRecord.OwnerUser,
+		catalog.AuditRecord.OwnerUserDateTime,
+		catalog.AuditRecord.LastUser,
+		catalog.AuditRecord.LastUserDateTime,
 	); err != nil {
 		c.wLogg.LogE(msg.E3000, err)
 
@@ -157,10 +157,10 @@ func (c *CatalogRepo) Update(ctx context.Context, idCatalog int, catalog *entity
 		catalog.HandbookValueBool1,
 		catalog.HandbookValueBool2,
 		catalog.IsArchive,
-		catalog.OwnerUser,
-		catalog.OwnerUserDateTime,
-		catalog.LastUser,
-		catalog.LastUserDateTime,
+		catalog.AuditRecord.OwnerUser,
+		catalog.AuditRecord.OwnerUserDateTime,
+		catalog.AuditRecord.LastUser,
+		catalog.AuditRecord.LastUserDateTime,
 	); err != nil {
 		c.wLogg.LogE(msg.E3000, err)
 
@@ -217,10 +217,10 @@ func (c *CatalogRepo) AllFindByNumber(ctx context.Context, number int) ([]*entit
 			&catalog.HandbookValueBool1,
 			&catalog.HandbookValueBool2,
 			&catalog.IsArchive,
-			&catalog.OwnerUser,
-			&catalog.OwnerUserDateTime,
-			&catalog.LastUser,
-			&catalog.LastUserDateTime,
+			&catalog.AuditRecord.OwnerUser,
+			&catalog.AuditRecord.OwnerUserDateTime,
+			&catalog.AuditRecord.LastUser,
+			&catalog.AuditRecord.LastUserDateTime,
 		); err != nil {
 			c.wLogg.LogE(msg.E3001, err)
 

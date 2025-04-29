@@ -183,10 +183,10 @@
                                    {{ if .IsArchive }}checked{{ end }}>
                         </label>
                     </td>
-                    <td class="border-table">{{ .OwnerUser}}</td>
-                    <td class="border-table">{{ .OwnerUserDateTime}}</td>
-                    <td class="border-table">{{ .LastUser}}</td>
-                    <td class="border-table">{{ .LastUserDateTime}}</td>
+                    <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
+                    <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
+                    <td class="border-table">{{ .AuditRecord.LastUser}}</td>
+                    <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
                     <td>
                         <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
                         <input type="submit" value="Сохранить">
@@ -206,10 +206,10 @@
                 <td class="border-table">{{ .HandbookValueBool1}}</td>
                 <td class="border-table">{{ .HandbookValueBool2}}</td>
                 <td class="border-table">{{ .IsArchive}}</td>
-                <td class="border-table">{{ .OwnerUser}}</td>
-                <td class="border-table">{{ .OwnerUserDateTime}}</td>
-                <td class="border-table">{{ .LastUser}}</td>
-                <td class="border-table">{{ .LastUserDateTime}}</td>
+                <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
+                <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
+                <td class="border-table">{{ .AuditRecord.LastUser}}</td>
+                <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
                 <td>
                     <a href="/fgw/catalogs/update?idCatalog={{ .IdCatalog}}">Изменить</a>
                     <form method="POST" action="/fgw/catalogs/delete" style="display:inline;">

@@ -161,10 +161,12 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		HandbookValueBool1:    convert.ParseHTTPFormFieldBool(r, "handbookValueBool1"),
 		HandbookValueBool2:    convert.ParseHTTPFormFieldBool(r, "handbookValueBool2"),
 		IsArchive:             convert.ParseHTTPFormFieldBool(r, "isArchive"),
-		OwnerUser:             ownerUser,
-		OwnerUserDateTime:     ownerUserDateTime,
-		LastUser:              lastUser,
-		LastUserDateTime:      lastUserDateTime,
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         ownerUser,
+			OwnerUserDateTime: ownerUserDateTime,
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 	if err = c.catalogService.Add(r.Context(), catalog); err != nil {
 		handler.WriteServerError(w, r, c.wLogg, msg.H7012, err)
@@ -225,10 +227,12 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		HandbookValueBool1:    handbookValueBool1,
 		HandbookValueBool2:    handbookValueBool2,
 		IsArchive:             isArchive,
-		OwnerUser:             convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
-		OwnerUserDateTime:     r.FormValue("ownerUserDateTime"),
-		LastUser:              lastUser,
-		LastUserDateTime:      lastUserDateTime,
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
+			OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 
 	if err := c.catalogService.Update(r.Context(), idCatalog, catalog); err != nil {

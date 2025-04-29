@@ -66,10 +66,10 @@ func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error
 			&packVariant.CurrentDateBatch,
 			&packVariant.NumberingBatch,
 			&packVariant.IsArchive,
-			&packVariant.OwnerUser,
-			&packVariant.OwnerUserDateTime,
-			&packVariant.LastUser,
-			&packVariant.LastUserDateTime,
+			&packVariant.AuditRecord.OwnerUser,
+			&packVariant.AuditRecord.OwnerUserDateTime,
+			&packVariant.AuditRecord.LastUser,
+			&packVariant.AuditRecord.LastUserDateTime,
 		); err != nil {
 			p.wLogg.LogE(msg.E3001, err)
 
@@ -122,10 +122,10 @@ func (p *PackVariantRepo) FindById(ctx context.Context, idPackVariant int) (*ent
 		&packVariant.CurrentDateBatch,
 		&packVariant.NumberingBatch,
 		&packVariant.IsArchive,
-		&packVariant.OwnerUser,
-		&packVariant.OwnerUserDateTime,
-		&packVariant.LastUser,
-		&packVariant.LastUserDateTime,
+		&packVariant.AuditRecord.OwnerUser,
+		&packVariant.AuditRecord.OwnerUserDateTime,
+		&packVariant.AuditRecord.LastUser,
+		&packVariant.AuditRecord.LastUserDateTime,
 	); err != nil {
 		p.wLogg.LogE(msg.E3000, err)
 
@@ -163,10 +163,10 @@ func (p *PackVariantRepo) Add(ctx context.Context, packVariant *entity.PackVaria
 		packVariant.CurrentDateBatch,
 		packVariant.NumberingBatch,
 		packVariant.IsArchive,
-		packVariant.OwnerUser,
-		packVariant.OwnerUserDateTime,
-		packVariant.LastUser,
-		packVariant.LastUserDateTime,
+		packVariant.AuditRecord.OwnerUser,
+		packVariant.AuditRecord.OwnerUserDateTime,
+		packVariant.AuditRecord.LastUser,
+		packVariant.AuditRecord.LastUserDateTime,
 	); err != nil {
 		p.wLogg.LogE(msg.E3000, err)
 
@@ -202,10 +202,10 @@ func (p *PackVariantRepo) Update(ctx context.Context, idPackVariant int, packVar
 		packVariant.CurrentDateBatch,
 		packVariant.NumberingBatch,
 		packVariant.IsArchive,
-		packVariant.OwnerUser,
-		packVariant.OwnerUserDateTime,
-		packVariant.LastUser,
-		packVariant.LastUserDateTime,
+		packVariant.AuditRecord.OwnerUser,
+		packVariant.AuditRecord.OwnerUserDateTime,
+		packVariant.AuditRecord.LastUser,
+		packVariant.AuditRecord.LastUserDateTime,
 	); err != nil {
 		p.wLogg.LogE(msg.E3000, err)
 

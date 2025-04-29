@@ -160,10 +160,12 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		CurrentDateBatch:  r.FormValue("currentDateBatch"),
 		NumberingBatch:    convert.ParseHTTPFormFieldInt(r, "numberingBatch"),
 		IsArchive:         convert.ParseHTTPFormFieldBool(r, "isArchive"),
-		OwnerUser:         ownerUser,
-		OwnerUserDateTime: ownerUserDateTime,
-		LastUser:          lastUser,
-		LastUserDateTime:  lastUserDateTime,
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         ownerUser,
+			OwnerUserDateTime: ownerUserDateTime,
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 
 	if err = p.packVariantService.Add(r.Context(), packVariant); err != nil {
@@ -269,10 +271,12 @@ func (p *PackVariantHandlerHTTP) processUpdateFormPackVariant(w http.ResponseWri
 		CurrentDateBatch:  r.FormValue("currentDateBatch"),
 		NumberingBatch:    convert.ParseHTTPFormFieldInt(r, "numberingBatch"),
 		IsArchive:         isArchive,
-		OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
-		OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
-		LastUser:          lastUser,
-		LastUserDateTime:  lastUserDateTime,
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
+			OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 
 	if err = p.packVariantService.Update(r.Context(), idPackVariant, packVariant); err != nil {

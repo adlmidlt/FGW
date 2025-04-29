@@ -172,10 +172,10 @@
                     <td><input type="date" name="currentDateBatch" value="{{.CurrentDateBatch}}"></td>
                     <td><input type="number" name="numberingBatch" value="{{.NumberingBatch}}"></td>
                     <td><input type="checkbox" name="isArchive" {{if .IsArchive}}checked{{end}}></td>
-                    <td class="border-table">{{ .OwnerUser}}</td>
-                    <td class="border-table">{{ .OwnerUserDateTime}}</td>
-                    <td class="border-table">{{ .LastUser}}</td>
-                    <td class="border-table">{{ .LastUserDateTime}}</td>
+                    <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
+                    <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
+                    <td class="border-table">{{ .AuditRecord.LastUser}}</td>
+                    <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
                     <td>
                         <input type="hidden" name="idPackVariant" value="{{ .IdPackVariant}}">
                         <input type="submit" value="Сохранить">
@@ -207,10 +207,10 @@
                 <td class="border-table">{{ .CurrentDateBatch}}</td>
                 <td class="border-table">{{ .NumberingBatch}}</td>
                 <td class="border-table">{{ .IsArchive}}</td>
-                <td class="border-table">{{ .OwnerUser}}</td>
-                <td class="border-table">{{ .OwnerUserDateTime}}</td>
-                <td class="border-table">{{ .LastUser}}</td>
-                <td class="border-table">{{ .LastUserDateTime}}</td>
+                <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
+                <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
+                <td class="border-table">{{ .AuditRecord.LastUser}}</td>
+                <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
                 <td>
                     <a href="/fgw/pack_variants/update?idPackVariant={{ .IdPackVariant}}">Изменить</a>
                     <form method="POST" action="/fgw/pack_variants/delete" style="display:inline;">
