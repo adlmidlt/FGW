@@ -32,6 +32,8 @@ func NewPackVariantHandlerHTTP(packVariantService service.PackVariantUseCase, ca
 func (p *PackVariantHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc(fgwPackVariantsStartUrl, p.All)
 	mux.HandleFunc(fgwPackVariantsStartUrl+"/add", p.Add)
+	mux.HandleFunc(fgwPackVariantsStartUrl+"/update", p.Update)
+	mux.HandleFunc(fgwPackVariantsStartUrl+"/delete", p.Delete)
 }
 
 func (p *PackVariantHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
@@ -108,45 +110,8 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	for _, catalog := range catalogs {
 		if catalog.IdCatalog == color {
 			gl = catalog.HandbookValueInt1
+			break
 		}
-	}
-	isFood := convert.ConvStrToBool(r.FormValue("isFood"))
-	if isFood == false {
-		isFood = false
-	}
-	isAfraidMoisture := convert.ConvStrToBool(r.FormValue("isAfraidMoisture"))
-	if isAfraidMoisture == false {
-		isAfraidMoisture = false
-	}
-	isAfraidSun := convert.ConvStrToBool(r.FormValue("isAfraidSun"))
-	if isAfraidSun == false {
-		isAfraidSun = false
-	}
-	isEAC := convert.ConvStrToBool(r.FormValue("isEAC"))
-	if isEAC == false {
-		isEAC = false
-	}
-	isAccountingBatch := convert.ConvStrToBool(r.FormValue("isAccountingBatch"))
-	if isAccountingBatch == false {
-		isAccountingBatch = false
-	}
-	methodShip := convert.ConvStrToBool(r.FormValue("methodShip"))
-	if methodShip == false {
-		methodShip = false
-	}
-
-	isManufactured := convert.ConvStrToBool(r.FormValue("isManufactured"))
-	if isManufactured == false {
-		isManufactured = false
-	}
-	isArchive := convert.ConvStrToBool(r.FormValue("isArchive"))
-	if isArchive == false {
-		isArchive = false
-	}
-
-	currentDateBatch := r.FormValue("currentDateBatch")
-	if currentDateBatch == "" {
-		currentDateBatch = time.Now().Format("2006-01-02 15:04:05")
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
@@ -176,25 +141,25 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		PackName:          packName,
 		Color:             color,
 		GL:                gl,
-		QuantityRows:      convert.ConvStrToInt(r.FormValue("quantityRows")),
-		QuantityPerRows:   convert.ConvStrToInt(r.FormValue("quantityPerRows")),
-		Weight:            convert.ConvStrToInt(r.FormValue("weight")),
-		Depth:             convert.ConvStrToInt(r.FormValue("depth")),
-		Width:             convert.ConvStrToInt(r.FormValue("width")),
-		Height:            convert.ConvStrToInt(r.FormValue("height")),
-		IsFood:            isFood,
-		IsAfraidMoisture:  isAfraidMoisture,
-		IsAfraidSun:       isAfraidSun,
-		IsEAC:             isEAC,
-		IsAccountingBatch: isAccountingBatch,
-		MethodShip:        methodShip,
-		ShelfLifeMonths:   convert.ConvStrToInt(r.FormValue("shelfLifeMonths")),
-		BathFurnace:       convert.ConvStrToInt(r.FormValue("bathFurnace")),
-		MachineLine:       convert.ConvStrToInt(r.FormValue("machineLine")),
-		IsManufactured:    isManufactured,
-		CurrentDateBatch:  currentDateBatch,
-		NumberingBatch:    convert.ConvStrToInt(r.FormValue("numberingBatch")),
-		IsArchive:         isArchive,
+		QuantityRows:      convert.ParseHTTPFormFieldInt(r, "quantityRows"),
+		QuantityPerRows:   convert.ParseHTTPFormFieldInt(r, "quantityPerRows"),
+		Weight:            convert.ParseHTTPFormFieldInt(r, "weight"),
+		Depth:             convert.ParseHTTPFormFieldInt(r, "depth"),
+		Width:             convert.ParseHTTPFormFieldInt(r, "width"),
+		Height:            convert.ParseHTTPFormFieldInt(r, "height"),
+		IsFood:            convert.ParseHTTPFormFieldBool(r, "isFood"),
+		IsAfraidMoisture:  convert.ParseHTTPFormFieldBool(r, "isAfraidMoisture"),
+		IsAfraidSun:       convert.ParseHTTPFormFieldBool(r, "isAfraidSun"),
+		IsEAC:             convert.ParseHTTPFormFieldBool(r, "isEAC"),
+		IsAccountingBatch: convert.ParseHTTPFormFieldBool(r, "isAccountingBatch"),
+		MethodShip:        convert.ParseHTTPFormFieldBool(r, "methodShip"),
+		ShelfLifeMonths:   convert.ParseHTTPFormFieldInt(r, "shelfLifeMonths"),
+		BathFurnace:       convert.ParseHTTPFormFieldInt(r, "bathFurnace"),
+		MachineLine:       convert.ParseHTTPFormFieldInt(r, "machineLine"),
+		IsManufactured:    convert.ParseHTTPFormFieldBool(r, "isManufactured"),
+		CurrentDateBatch:  r.FormValue("currentDateBatch"),
+		NumberingBatch:    convert.ParseHTTPFormFieldInt(r, "numberingBatch"),
+		IsArchive:         convert.ParseHTTPFormFieldBool(r, "isArchive"),
 		OwnerUser:         ownerUser,
 		OwnerUserDateTime: ownerUserDateTime,
 		LastUser:          lastUser,
@@ -203,6 +168,134 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 
 	if err = p.packVariantService.Add(r.Context(), packVariant); err != nil {
 		handler.WriteServerError(w, r, p.wLogg, msg.H7012, err)
+
+		return
+	}
+	http.Redirect(w, r, fgwPackVariantsStartUrl, http.StatusSeeOther)
+}
+
+func (p *PackVariantHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		p.processUpdateFormPackVariant(w, r)
+	case http.MethodGet:
+		p.renderUpdateFormPackVariant(w, r)
+	default:
+		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+	}
+}
+
+func (p *PackVariantHandlerHTTP) renderUpdateFormPackVariant(w http.ResponseWriter, r *http.Request) {
+	idPackVariantStr := r.URL.Query().Get(paramIdPackVariant)
+	http.Redirect(w, r, fmt.Sprintf("%s?%s=%s", fgwPackVariantsStartUrl, paramIdPackVariant, idPackVariantStr), http.StatusSeeOther)
+}
+
+func (p *PackVariantHandlerHTTP) processUpdateFormPackVariant(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		handler.WriteBadRequest(w, r, p.wLogg, msg.H7008, err)
+
+		return
+	}
+
+	idPackVariant := convert.ConvStrToInt(r.FormValue(paramIdPackVariant))
+
+	if !handler.EntityExistsByID(r.Context(), idPackVariant, w, r, p.wLogg, p.packVariantService) {
+		return
+	}
+
+	catalogs, err := p.catalogService.All(r.Context())
+	if err != nil {
+		handler.WriteServerError(w, r, p.wLogg, msg.H7003, err)
+
+		return
+	}
+
+	prodId := convert.ConvStrToInt(r.FormValue("prodId"))
+
+	packName := r.FormValue("packName")
+	for _, catalog := range catalogs {
+		if catalog.Name == packName {
+			prodId = catalog.IdCatalog
+			break
+		}
+	}
+
+	gl := convert.ConvStrToInt(r.FormValue("gl"))
+
+	color := convert.ConvStrToInt(r.FormValue("color"))
+	for _, catalog := range catalogs {
+		if catalog.IdCatalog == color {
+			gl = catalog.HandbookValueInt1
+			break
+		}
+	}
+
+	isFood := r.PostForm.Get("isFood") != ""
+	isAfraidMoisture := r.PostForm.Get("isAfraidMoisture") != ""
+	isAfraidSun := r.PostForm.Get("isAfraidSun") != ""
+	isEAC := r.PostForm.Get("isEAC") != ""
+	isAccountingBatch := r.PostForm.Get("isAccountingBatch") != ""
+	methodShip := r.PostForm.Get("methodShip") != ""
+	isManufactured := r.PostForm.Get("isManufactured") != ""
+	isArchive := r.PostForm.Get("isArchive") != ""
+
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
+	lastUser := uuid.MustParse("10000000-0000-0000-0000-000000000000")
+
+	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
+	packVariant := &entity.PackVariant{
+		ProdId:            prodId,
+		Article:           r.FormValue("article"),
+		PackName:          r.FormValue("packName"),
+		Color:             convert.ParseHTTPFormFieldInt(r, "color"),
+		GL:                gl,
+		QuantityRows:      convert.ParseHTTPFormFieldInt(r, "quantityRows"),
+		QuantityPerRows:   convert.ParseHTTPFormFieldInt(r, "quantityPerRows"),
+		Weight:            convert.ParseHTTPFormFieldInt(r, "weight"),
+		Depth:             convert.ParseHTTPFormFieldInt(r, "depth"),
+		Width:             convert.ParseHTTPFormFieldInt(r, "width"),
+		Height:            convert.ParseHTTPFormFieldInt(r, "height"),
+		IsFood:            isFood,
+		IsAfraidMoisture:  isAfraidMoisture,
+		IsAfraidSun:       isAfraidSun,
+		IsEAC:             isEAC,
+		IsAccountingBatch: isAccountingBatch,
+		MethodShip:        methodShip,
+		ShelfLifeMonths:   convert.ParseHTTPFormFieldInt(r, "shelfLifeMonths"),
+		BathFurnace:       convert.ParseHTTPFormFieldInt(r, "bathFurnace"),
+		MachineLine:       convert.ParseHTTPFormFieldInt(r, "machineLine"),
+		IsManufactured:    isManufactured,
+		CurrentDateBatch:  r.FormValue("currentDateBatch"),
+		NumberingBatch:    convert.ParseHTTPFormFieldInt(r, "numberingBatch"),
+		IsArchive:         isArchive,
+		OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
+		OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
+		LastUser:          lastUser,
+		LastUserDateTime:  lastUserDateTime,
+	}
+
+	if err = p.packVariantService.Update(r.Context(), idPackVariant, packVariant); err != nil {
+		handler.WriteServerError(w, r, p.wLogg, msg.H7012, err)
+
+		return
+	}
+	http.Redirect(w, r, fgwPackVariantsStartUrl, http.StatusSeeOther)
+}
+
+func (p *PackVariantHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, p.wLogg) {
+		return
+	}
+
+	idPackVariant := convert.ConvStrToInt(r.FormValue(paramIdPackVariant))
+
+	if !handler.EntityExistsByID(r.Context(), idPackVariant, w, r, p.wLogg, p.packVariantService) {
+		return
+	}
+
+	if err := p.packVariantService.Delete(r.Context(), idPackVariant); err != nil {
+		handler.WriteServerError(w, r, p.wLogg, msg.H7011, err)
 
 		return
 	}

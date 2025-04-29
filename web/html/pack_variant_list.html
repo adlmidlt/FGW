@@ -112,35 +112,113 @@
     <tbody>
     {{ range .PackVariants}}
         <tr>
-            <td class="border-table">{{ .IdPackVariant}}</td>
-            <td class="border-table">{{ .ProdId}}</td>
-            <td class="border-table">{{ .Article}}</td>
-            <td class="border-table">{{ .PackName}}</td>
-            <td class="border-table">{{ .Color}}</td>
-            <td class="border-table">{{ .GL}}</td>
-            <td class="border-table">{{ .QuantityRows}}</td>
-            <td class="border-table">{{ .QuantityPerRows}}</td>
-            <td class="border-table">{{ .Weight}}</td>
-            <td class="border-table">{{ .Depth}}</td>
-            <td class="border-table">{{ .Width}}</td>
-            <td class="border-table">{{ .Height}}</td>
-            <td class="border-table">{{ .IsFood}}</td>
-            <td class="border-table">{{ .IsAfraidMoisture}}</td>
-            <td class="border-table">{{ .IsAfraidSun}}</td>
-            <td class="border-table">{{ .IsEAC}}</td>
-            <td class="border-table">{{ .IsAccountingBatch}}</td>
-            <td class="border-table">{{ .MethodShip}}</td>
-            <td class="border-table">{{ .ShelfLifeMonths}}</td>
-            <td class="border-table">{{ .BathFurnace}}</td>
-            <td class="border-table">{{ .MachineLine}}</td>
-            <td class="border-table">{{ .IsManufactured}}</td>
-            <td class="border-table">{{ .CurrentDateBatch}}</td>
-            <td class="border-table">{{ .NumberingBatch}}</td>
-            <td class="border-table">{{ .IsArchive}}</td>
-            <td class="border-table">{{ .OwnerUser}}</td>
-            <td class="border-table">{{ .OwnerUserDateTime}}</td>
-            <td class="border-table">{{ .LastUser}}</td>
-            <td class="border-table">{{ .LastUserDateTime}}</td>
+            {{ if .IsEditing }}
+                <form method="POST" action="/fgw/pack_variants/update">
+                    <td class="border-table">{{ .IdPackVariant}}</td>
+                    <td class="border-table">{{ .ProdId}}</td>
+
+                    <td><label>
+                            <input type="text" name="article" value="{{ .Article}}">
+                        </label>
+                    </td>
+
+                    <td>
+                        <label>
+                            <select name="packName">
+                                {{ $packVariantName := .}}
+                                {{range $.Catalogs}}
+                                    {{if eq .HandbookId 0}}
+                                        <option value="{{.Name}}" {{if eq $packVariantName.PackName .Name}}selected{{end}}>
+                                            {{.HandbookId}} - {{.Name}}
+                                        </option>
+                                    {{end}}
+                                {{end}}
+                            </select>
+                        </label>
+                    </td>
+
+
+                    <td>
+                        <label>
+                            <select name="color">
+                                {{ $packVariantColor := .}}
+                                {{range $.Catalogs}}
+                                    {{if eq .HandbookId 3}}
+                                        <option value="{{.IdCatalog}}" {{if eq $packVariantColor.Color .IdCatalog}}selected{{end}}>
+                                            {{.HandbookId}} - {{.Name}}
+                                        </option>
+                                    {{end}}
+                                {{end}}
+                            </select>
+                        </label>
+                    </td>
+                    <td class="border-table">{{ .GL}}</td>
+                    <td><input type="number" name="quantityRows" value="{{.QuantityRows}}"></td>
+                    <td><input type="number" name="quantityPerRows" value="{{.QuantityPerRows}}"></td>
+                    <td><input type="number" name="weight" value="{{.Weight}}"></td>
+                    <td><input type="number" name="depth" value="{{.Depth}}"></td>
+                    <td><input type="number" name="width" value="{{.Width}}"></td>
+                    <td><input type="number" name="height" value="{{.Height}}"></td>
+                    <td><input type="checkbox" name="isFood" {{if .IsFood}}checked{{end}}></td>
+                    <td><input type="checkbox" name="isAfraidMoisture" {{if .IsAfraidMoisture}}checked{{end}}></td>
+                    <td><input type="checkbox" name="isAfraidSun" {{if .IsAfraidSun}}checked{{end}}></td>
+                    <td><input type="checkbox" name="isEAC" {{if .IsEAC}}checked{{end}}></td>
+                    <td><input type="checkbox" name="isAccountingBatch" {{if .IsAccountingBatch}}checked{{end}}></td>
+                    <td><input type="checkbox" name="methodShip" {{if .MethodShip}}checked{{end}}></td>
+                    <td><input type="number" name="shelfLifeMonths" value="{{.ShelfLifeMonths}}"></td>
+                    <td><input type="number" name="bathFurnace" value="{{.BathFurnace}}"></td>
+                    <td><input type="number" name="machineLine" value="{{.MachineLine}}"></td>
+                    <td><input type="checkbox" name="isManufactured" {{if .IsManufactured}}checked{{end}}></td>
+                    <td><input type="date" name="currentDateBatch" value="{{.CurrentDateBatch}}"></td>
+                    <td><input type="number" name="numberingBatch" value="{{.NumberingBatch}}"></td>
+                    <td><input type="checkbox" name="isArchive" {{if .IsArchive}}checked{{end}}></td>
+                    <td class="border-table">{{ .OwnerUser}}</td>
+                    <td class="border-table">{{ .OwnerUserDateTime}}</td>
+                    <td class="border-table">{{ .LastUser}}</td>
+                    <td class="border-table">{{ .LastUserDateTime}}</td>
+                    <td>
+                        <input type="hidden" name="idPackVariant" value="{{ .IdPackVariant}}">
+                        <input type="submit" value="Сохранить">
+                    </td>
+                </form>
+            {{ else }}
+                <td class="border-table">{{ .IdPackVariant}}</td>
+                <td class="border-table">{{ .ProdId}}</td>
+                <td class="border-table">{{ .Article}}</td>
+                <td class="border-table">{{ .PackName}}</td>
+                <td class="border-table">{{ .Color}}</td>
+                <td class="border-table">{{ .GL}}</td>
+                <td class="border-table">{{ .QuantityRows}}</td>
+                <td class="border-table">{{ .QuantityPerRows}}</td>
+                <td class="border-table">{{ .Weight}}</td>
+                <td class="border-table">{{ .Depth}}</td>
+                <td class="border-table">{{ .Width}}</td>
+                <td class="border-table">{{ .Height}}</td>
+                <td class="border-table">{{ .IsFood}}</td>
+                <td class="border-table">{{ .IsAfraidMoisture}}</td>
+                <td class="border-table">{{ .IsAfraidSun}}</td>
+                <td class="border-table">{{ .IsEAC}}</td>
+                <td class="border-table">{{ .IsAccountingBatch}}</td>
+                <td class="border-table">{{ .MethodShip}}</td>
+                <td class="border-table">{{ .ShelfLifeMonths}}</td>
+                <td class="border-table">{{ .BathFurnace}}</td>
+                <td class="border-table">{{ .MachineLine}}</td>
+                <td class="border-table">{{ .IsManufactured}}</td>
+                <td class="border-table">{{ .CurrentDateBatch}}</td>
+                <td class="border-table">{{ .NumberingBatch}}</td>
+                <td class="border-table">{{ .IsArchive}}</td>
+                <td class="border-table">{{ .OwnerUser}}</td>
+                <td class="border-table">{{ .OwnerUserDateTime}}</td>
+                <td class="border-table">{{ .LastUser}}</td>
+                <td class="border-table">{{ .LastUserDateTime}}</td>
+                <td>
+                    <a href="/fgw/pack_variants/update?idPackVariant={{ .IdPackVariant}}">Изменить</a>
+                    <form method="POST" action="/fgw/pack_variants/delete" style="display:inline;">
+                        <input type="hidden" name="idPackVariant" value="{{ .IdPackVariant}}">
+                        <input type="submit" value="Удалить">
+                    </form>
+                </td>
+            {{ end }}
         </tr>
     {{ end}}
     </tbody>

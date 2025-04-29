@@ -25,7 +25,7 @@ type PackVariantUseCase interface {
 	Add(ctx context.Context, packVariant *entity.PackVariant) error
 	Update(ctx context.Context, idPackVariant int, packVariant *entity.PackVariant) error
 	Delete(ctx context.Context, idPackVariant int) error
-	ExistByID(ctx context.Context, idPackVariant int) (bool, error)
+	ExistsByID(ctx context.Context, idPackVariant int) (bool, error)
 }
 
 func (p *PackVariantService) All(ctx context.Context) ([]*entity.PackVariant, error) {
@@ -92,6 +92,6 @@ func (p *PackVariantService) Delete(ctx context.Context, idPackVariant int) erro
 	return nil
 }
 
-func (p *PackVariantService) ExistByID(ctx context.Context, idPackVariant int) (bool, error) {
-	return p.packVariantRepo.ExistByID(ctx, idPackVariant)
+func (p *PackVariantService) ExistsByID(ctx context.Context, idPackVariant int) (bool, error) {
+	return p.packVariantRepo.ExistsByID(ctx, idPackVariant)
 }

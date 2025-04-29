@@ -127,41 +127,6 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	handbookValueInt1 := convert.ConvStrToInt(r.FormValue("handbookValueInt1"))
-	if handbookValueInt1 == 0 {
-		handbookValueInt1 = 0
-	}
-
-	handbookValueInt2 := convert.ConvStrToInt(r.FormValue("handbookValueInt2"))
-	if handbookValueInt2 == 0 {
-		handbookValueInt2 = 0
-	}
-
-	handbookValueDecimal1 := convert.ConvStrToFloat(r.FormValue("handbookValueDecimal1"))
-	if handbookValueDecimal1 == 0 {
-		handbookValueDecimal1 = 0.0
-	}
-
-	handbookValueDecimal2 := convert.ConvStrToFloat(r.FormValue("handbookValueDecimal2"))
-	if handbookValueDecimal2 == 0 {
-		handbookValueDecimal2 = 0.0
-	}
-
-	handbookValueBool1 := convert.ConvStrToBool(r.FormValue("handbookValueBool1"))
-	if handbookValueBool1 == false {
-		handbookValueBool1 = false
-	}
-
-	handbookValueBool2 := convert.ConvStrToBool(r.FormValue("handbookValueBool2"))
-	if handbookValueBool2 == false {
-		handbookValueBool2 = false
-	}
-
-	isArchive := convert.ConvStrToBool(r.FormValue("isArchive"))
-	if isArchive == false {
-		isArchive = false
-	}
-
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
 	ownerUser := convert.ParseUUIDUnsafe(r.FormValue("ownerUser"))
 	if ownerUser == uuid.Nil {
@@ -189,13 +154,13 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		RecordIndex:           recordIndex,
 		Name:                  r.FormValue("name"),
 		Comment:               r.FormValue("comment"),
-		HandbookValueInt1:     handbookValueInt1,
-		HandbookValueInt2:     handbookValueInt2,
-		HandbookValueDecimal1: handbookValueDecimal1,
-		HandbookValueDecimal2: handbookValueDecimal2,
-		HandbookValueBool1:    handbookValueBool1,
-		HandbookValueBool2:    handbookValueBool2,
-		IsArchive:             isArchive,
+		HandbookValueInt1:     convert.ParseHTTPFormFieldInt(r, "handbookValueInt1"),
+		HandbookValueInt2:     convert.ParseHTTPFormFieldInt(r, "handbookValueInt2"),
+		HandbookValueDecimal1: convert.ParseHTTPFormFieldFloat(r, "handbookValueDecimal1"),
+		HandbookValueDecimal2: convert.ParseHTTPFormFieldFloat(r, "handbookValueDecimal2"),
+		HandbookValueBool1:    convert.ParseHTTPFormFieldBool(r, "handbookValueBool1"),
+		HandbookValueBool2:    convert.ParseHTTPFormFieldBool(r, "handbookValueBool2"),
+		IsArchive:             convert.ParseHTTPFormFieldBool(r, "isArchive"),
 		OwnerUser:             ownerUser,
 		OwnerUserDateTime:     ownerUserDateTime,
 		LastUser:              lastUser,
@@ -265,7 +230,7 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		LastUser:              lastUser,
 		LastUserDateTime:      lastUserDateTime,
 	}
-	fmt.Println(catalog)
+
 	if err := c.catalogService.Update(r.Context(), idCatalog, catalog); err != nil {
 		handler.WriteServerError(w, r, c.wLogg, msg.H7012, err)
 

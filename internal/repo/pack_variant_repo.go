@@ -25,7 +25,7 @@ type PackVariantRepository interface {
 	Add(ctx context.Context, packVariant *entity.PackVariant) error
 	Update(ctx context.Context, idPackVariant int, packVariant *entity.PackVariant) error
 	Delete(ctx context.Context, idPackVariant int) error
-	ExistByID(ctx context.Context, idPackVariant int) (bool, error)
+	ExistsByID(ctx context.Context, idPackVariant int) (bool, error)
 }
 
 func (p *PackVariantRepo) All(ctx context.Context) ([]*entity.PackVariant, error) {
@@ -225,7 +225,7 @@ func (p *PackVariantRepo) Delete(ctx context.Context, idPackVariant int) error {
 	return nil
 }
 
-func (p *PackVariantRepo) ExistByID(ctx context.Context, idPackVariant int) (bool, error) {
+func (p *PackVariantRepo) ExistsByID(ctx context.Context, idPackVariant int) (bool, error) {
 	var exists bool
 	row := p.mssql.QueryRowContext(ctx, FGWPackVariantExistQuery, idPackVariant)
 	err := row.Scan(&exists)

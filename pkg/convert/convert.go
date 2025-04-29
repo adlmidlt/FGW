@@ -54,6 +54,28 @@ func ConvStrToBool(str string) bool {
 	return str == "true" || str == "on" || str == "1"
 }
 
+func ParseHTTPFormFieldInt(r *http.Request, fieldName string) int {
+	value := ConvStrToInt(r.FormValue(fieldName))
+	if value == 0 {
+		return 0
+	}
+
+	return value
+}
+
+func ParseHTTPFormFieldBool(r *http.Request, fieldName string) bool {
+	return ConvStrToBool(r.FormValue(fieldName))
+}
+
+func ParseHTTPFormFieldFloat(r *http.Request, fieldName string) float64 {
+	value := ConvStrToFloat(r.FormValue(fieldName))
+	if value == 0 {
+		return 0
+	}
+
+	return value
+}
+
 func ParseUUIDUnsafe(str string) uuid.UUID {
 	UUID, err := uuid.Parse(str)
 	if err != nil {
