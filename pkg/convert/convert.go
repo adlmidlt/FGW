@@ -61,8 +61,8 @@ func ParseFormFieldInt(r *http.Request, fieldName string) int {
 	return value
 }
 
-// ParseHTTPFormFieldFloat преобразует поле в вещественное число, полученное из HTTP запроса.
-func ParseHTTPFormFieldFloat(r *http.Request, fieldName string) float64 {
+// ParseFormFieldFloat преобразует поле в вещественное число, полученное из HTTP запроса.
+func ParseFormFieldFloat(r *http.Request, fieldName string) float64 {
 	value, err := strconv.ParseFloat(r.FormValue(fieldName), 64)
 	if err != nil {
 		log.Printf("Ошибка: [%s] --- ссылка на код: [ %s ] --- поле: [%s] --- значение: [%v]", err.Error(), wlogger.FileWithLineNum(), fieldName, value)
@@ -73,9 +73,15 @@ func ParseHTTPFormFieldFloat(r *http.Request, fieldName string) float64 {
 	return value
 }
 
-// ParseHTTPFormFieldBool преобразует поле в булево значение, полученное из HTTP запроса.
-func ParseHTTPFormFieldBool(r *http.Request, fieldName string) bool {
-	value, err := strconv.ParseBool(r.FormValue(fieldName))
+// ParseFormFieldBool преобразует поле в булево значение, полученное из HTTP запроса.
+func ParseFormFieldBool(r *http.Request, fieldName string) bool {
+	formValue := r.FormValue(fieldName)
+	if formValue == "on" {
+		return true
+	}
+
+	value, err := strconv.ParseBool(formValue)
+
 	if err != nil {
 		log.Printf("Ошибка: [%s] --- ссылка на код: [ %s ] --- поле: [%s] --- значение: [%v]", err.Error(), wlogger.FileWithLineNum(), fieldName, value)
 

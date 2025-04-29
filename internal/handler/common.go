@@ -24,27 +24,20 @@ type EntityExistByIDChecker interface {
 // Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByUUID.
 func EntityExistsByUUID(ctx context.Context, idEntity uuid.UUID, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByUUIDChecker) bool {
 	exist, err := entityChecker.ExistsByUUID(ctx, idEntity)
-	if err != nil {
-		WriteServerError(w, r, wLogg, msg.H7003, err)
-		WriteJSON(w, map[string]string{"message": msg.H7003}, wLogg)
 
-		return false
-	}
-
-	if !exist {
-		WriteNotFound(w, r, wLogg, msg.H7005, err)
-		WriteJSON(w, map[string]string{"message": msg.W1002}, wLogg)
-
-		return false
-	}
-
-	return true
+	return checkEntityExistence(err, w, r, wLogg, exist)
 }
 
 // EntityExistsByID проверяет на существование сущности по её ID.
-// Использует интерфейс EntityExistByUUIDChecker, реализующий метод ExistsByID.
+// Использует интерфейс EntityExistByIDChecker, реализующий метод ExistsByID.
 func EntityExistsByID(ctx context.Context, idEntity int, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, entityChecker EntityExistByIDChecker) bool {
 	exist, err := entityChecker.ExistsByID(ctx, idEntity)
+
+	return checkEntityExistence(err, w, r, wLogg, exist)
+}
+
+// checkEntityExistence проверяет, существует ли сущность.
+func checkEntityExistence(err error, w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, exist bool) bool {
 	if err != nil {
 		WriteServerError(w, r, wLogg, msg.H7003, err)
 		WriteJSON(w, map[string]string{"message": msg.H7003}, wLogg)
@@ -77,8 +70,7 @@ func MethodNotAllowed(w http.ResponseWriter, r *http.Request, expected string, w
 func WriteJSON(w http.ResponseWriter, entity interface{}, wLogg *wlogger.CustomWLogg) {
 	w.Header().Set("Content-Type", "application/json_api; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(entity); err != nil {
-		wLogg.LogE(msg.E3105, err)
-		http.Error(w, msg.E3105, http.StatusInternalServerError)
+		WriteServerError(w, nil, wLogg, msg.E3105, err)
 
 		return
 	}

@@ -26,7 +26,11 @@ type PackVariantHandlerHTTP struct {
 }
 
 func NewPackVariantHandlerHTTP(packVariantService service.PackVariantUseCase, catalogService service.CatalogUseCase, wLogg *wlogger.CustomWLogg) *PackVariantHandlerHTTP {
-	return &PackVariantHandlerHTTP{packVariantService: packVariantService, catalogService: catalogService, wLogg: wLogg}
+	return &PackVariantHandlerHTTP{
+		packVariantService: packVariantService,
+		catalogService:     catalogService,
+		wLogg:              wLogg,
+	}
 }
 
 func (p *PackVariantHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
@@ -51,8 +55,6 @@ func (p *PackVariantHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 	if packVariants == nil {
 		packVariants = []*entity.PackVariant{}
 	}
-
-	fmt.Println(packVariants)
 
 	catalogs, err := p.catalogService.All(r.Context())
 	if err != nil {
@@ -94,7 +96,7 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prodId := convert.ConvStrToInt(r.FormValue("prodId"))
+	prodId := convert.ParseFormFieldInt(r, "prodId")
 
 	packName := r.FormValue("packName")
 	for _, catalog := range catalogs {
@@ -104,9 +106,9 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	gl := convert.ConvStrToInt(r.FormValue("gl"))
+	gl := convert.ParseFormFieldInt(r, "gl")
 
-	color := convert.ConvStrToInt(r.FormValue("color"))
+	color := convert.ParseFormFieldInt(r, "color")
 	for _, catalog := range catalogs {
 		if catalog.IdCatalog == color {
 			gl = catalog.HandbookValueInt1
@@ -147,19 +149,19 @@ func (p *PackVariantHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		Depth:             convert.ParseFormFieldInt(r, "depth"),
 		Width:             convert.ParseFormFieldInt(r, "width"),
 		Height:            convert.ParseFormFieldInt(r, "height"),
-		IsFood:            convert.ParseHTTPFormFieldBool(r, "isFood"),
-		IsAfraidMoisture:  convert.ParseHTTPFormFieldBool(r, "isAfraidMoisture"),
-		IsAfraidSun:       convert.ParseHTTPFormFieldBool(r, "isAfraidSun"),
-		IsEAC:             convert.ParseHTTPFormFieldBool(r, "isEAC"),
-		IsAccountingBatch: convert.ParseHTTPFormFieldBool(r, "isAccountingBatch"),
-		MethodShip:        convert.ParseHTTPFormFieldBool(r, "methodShip"),
+		IsFood:            convert.ParseFormFieldBool(r, "isFood"),
+		IsAfraidMoisture:  convert.ParseFormFieldBool(r, "isAfraidMoisture"),
+		IsAfraidSun:       convert.ParseFormFieldBool(r, "isAfraidSun"),
+		IsEAC:             convert.ParseFormFieldBool(r, "isEAC"),
+		IsAccountingBatch: convert.ParseFormFieldBool(r, "isAccountingBatch"),
+		MethodShip:        convert.ParseFormFieldBool(r, "methodShip"),
 		ShelfLifeMonths:   convert.ParseFormFieldInt(r, "shelfLifeMonths"),
 		BathFurnace:       convert.ParseFormFieldInt(r, "bathFurnace"),
 		MachineLine:       convert.ParseFormFieldInt(r, "machineLine"),
-		IsManufactured:    convert.ParseHTTPFormFieldBool(r, "isManufactured"),
+		IsManufactured:    convert.ParseFormFieldBool(r, "isManufactured"),
 		CurrentDateBatch:  r.FormValue("currentDateBatch"),
 		NumberingBatch:    convert.ParseFormFieldInt(r, "numberingBatch"),
-		IsArchive:         convert.ParseHTTPFormFieldBool(r, "isArchive"),
+		IsArchive:         convert.ParseFormFieldBool(r, "isArchive"),
 		AuditRecord: entity.AuditRecord{
 			OwnerUser:         ownerUser,
 			OwnerUserDateTime: ownerUserDateTime,
@@ -183,7 +185,7 @@ func (p *PackVariantHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) 
 	case http.MethodGet:
 		p.renderUpdateFormPackVariant(w, r)
 	default:
-		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+		handler.WriteMethodNotAllowed(w, r, p.wLogg, msg.H7002, nil)
 	}
 }
 
@@ -212,8 +214,7 @@ func (p *PackVariantHandlerHTTP) processUpdateFormPackVariant(w http.ResponseWri
 		return
 	}
 
-	prodId := convert.ConvStrToInt(r.FormValue("prodId"))
-
+	prodId := convert.ParseFormFieldInt(r, "prodId")
 	packName := r.FormValue("packName")
 	for _, catalog := range catalogs {
 		if catalog.Name == packName {
@@ -222,9 +223,8 @@ func (p *PackVariantHandlerHTTP) processUpdateFormPackVariant(w http.ResponseWri
 		}
 	}
 
-	gl := convert.ConvStrToInt(r.FormValue("gl"))
-
-	color := convert.ConvStrToInt(r.FormValue("color"))
+	gl := convert.ParseFormFieldInt(r, "gl")
+	color := convert.ParseFormFieldInt(r, "color")
 	for _, catalog := range catalogs {
 		if catalog.IdCatalog == color {
 			gl = catalog.HandbookValueInt1
