@@ -82,7 +82,7 @@ func (e *EmployeeHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		e.renderUpdateFormEmployee(w, r)
 	default:
-		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+		handler.WriteMethodNotAllowed(w, r, e.wLogg, msg.H7002, nil)
 	}
 }
 

@@ -77,7 +77,7 @@ func (h *HandbookHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		h.renderUpdateFormHandbook(w, r)
 	default:
-		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+		handler.WriteMethodNotAllowed(w, r, h.wLogg, msg.H7002, nil)
 	}
 }
 

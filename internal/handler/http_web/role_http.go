@@ -73,7 +73,7 @@ func (r *RoleHandlerHTTP) Update(writer http.ResponseWriter, request *http.Reque
 	case http.MethodGet:
 		r.renderUpdateFormRole(writer, request)
 	default:
-		http.Error(writer, msg.H7002, http.StatusMethodNotAllowed)
+		handler.WriteMethodNotAllowed(writer, request, r.wLogg, msg.H7002, nil)
 	}
 }
 

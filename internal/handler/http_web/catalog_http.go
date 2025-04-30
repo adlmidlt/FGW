@@ -41,13 +41,8 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var filteredIdParamId int
-	handbookIdParam := r.URL.Query().Get("handbookId")
-	if handbookIdParam != "" && handbookIdParam != "-1" {
-		filteredIdParamId = convert.ConvStrToInt(handbookIdParam)
-	} else {
-		filteredIdParamId = -1
-	}
+	// TODO: как фильтр в отдельный метод
+	filteredIdParamId := c.filterByHandbook(r)
 
 	var err error
 	var catalogs []*entity.Catalog
@@ -183,7 +178,7 @@ func (c *CatalogHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		c.renderUpdateFormEmployee(w, r)
 	default:
-		http.Error(w, msg.H7002, http.StatusMethodNotAllowed)
+		handler.WriteMethodNotAllowed(w, r, c.wLogg, msg.H7002, nil)
 	}
 }
 
@@ -260,4 +255,17 @@ func (c *CatalogHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, fgwCatalogStartUrl, http.StatusSeeOther)
+}
+
+// filterByHandbook фильтр по справочнику.
+func (c *CatalogHandlerHTTP) filterByHandbook(r *http.Request) int {
+	var filteredIdParamId int
+	handbookIdParam := r.URL.Query().Get("handbookId")
+	if handbookIdParam != "" && handbookIdParam != "-1" {
+		filteredIdParamId = convert.ConvStrToInt(handbookIdParam)
+	} else {
+		filteredIdParamId = -1
+	}
+
+	return filteredIdParamId
 }
