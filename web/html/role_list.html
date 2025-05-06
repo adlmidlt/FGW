@@ -2,64 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/web/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
     <title>Список ролей сотрудника</title>
 </head>
 <body>
-<h1>Добавить роль сотрудника</h1>
+
+<h2>Добавить роль сотрудника</h2>
 <form action="/fgw/roles/add" method="POST">
     <label>
         Номер роли:
-        <input type="text" name="number" placeholder="Введите номер роли">
+        <input type="number" name="number" placeholder="Введите номер роли" >
     </label>
+
     <label>
         Название роли:
-        <input type="text" name="name" placeholder="Введите название роли">
+        <input type="text" name="name" placeholder="Введите название роли" >
     </label>
     <input type="submit" value="Добавить">
 </form>
-<br>
-<table class="border-table">
-    <thead>
-    <tr>
-        <th class="border-table">ИД</th>
-        <th class="border-table">Номер</th>
-        <th class="border-table">Название</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range .Roles}}
+
+
+<div class="table-container">
+    <table class="table">
+        <thead>
         <tr>
-            <td class="border-table">{{ .IdRole}}</td>
-            {{ if .IsEditing}}
-                <form method="POST" action="/fgw/roles/update">
-                    <td><label>
-                            <input type="text" name="number" value="{{ .Number}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="text" name="name" value="{{ .Name}}">
-                        </label>
-                    </td>
-                    <td>
-                        <input type="hidden" name="idRole" value="{{ .IdRole}}">
-                        <input type="submit" value="Сохранить">
-                    </td>
-                </form>
-            {{ else}}
-                <td class="border-table">{{ .Number}}</td>
-                <td class="border-table">{{ .Name}}</td>
-                <td>
-                    <a href="/fgw/roles/update?idRole={{ .IdRole}}">Изменить</a>
-                    <form method="POST" action="/fgw/roles/delete" style="display:inline;">
-                        <input type="hidden" name="idRole" value="{{ .IdRole}}">
-                        <input type="submit" value="Удалить">
-                    </form>
-                </td>
-            {{ end}}
+            <th>ИД</th>
+            <th>Номер</th>
+            <th>Название</th>
+            <th>Код владельца записи</th>
+            <th>Дата модификации</th>
+            <th>Код пользователя</th>
+            <th>Дата последней модификации</th>
+            <th>Панель управления операциями</th>
         </tr>
-    {{end}}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {{range .Roles}}
+            <tr id="role_{{ .IdRole }}">
+                <td>{{ .IdRole}}</td>
+                {{ if .IsEditing}}
+                    <form method="POST" action="/fgw/roles/update">
+                        <td><label>
+                                <input type="text" name="number" value="{{ .Number}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="text" name="name" value="{{ .Name}}">
+                            </label>
+                        </td>
+                        <td>{{ .AuditRecord.OwnerUser}}</td>
+                        <td>{{ .AuditRecord.OwnerUserDateTime}}</td>
+                        <td>{{ .AuditRecord.LastUser}}</td>
+                        <td>{{ .AuditRecord.LastUserDateTime}}</td>
+                        <td>
+                            <input type="hidden" name="idRole" value="{{ .IdRole}}">
+                            <input type="submit" value="Сохранить">
+                        </td>
+                    </form>
+                {{ else}}
+                    <td>{{ .Number}}</td>
+                    <td>{{ .Name}}</td>
+                    <td>{{ .AuditRecord.OwnerUser}}</td>
+                    <td>{{ .AuditRecord.OwnerUserDateTime}}</td>
+                    <td>{{ .AuditRecord.LastUser}}</td>
+                    <td>{{ .AuditRecord.LastUserDateTime}}</td>
+                    <td>
+                        <a href="/fgw/roles?idRole={{ .IdRole }}#role_{{ .IdRole }}">Изменить</a>
+                        <form method="POST" action="/fgw/roles/delete" style="display:inline;">
+                            <input type="hidden" name="idRole" value="{{ .IdRole}}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                {{ end}}
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

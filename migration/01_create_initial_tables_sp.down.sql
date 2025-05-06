@@ -7,3 +7,4 @@ DROP TABLE IF EXISTS dbo.orderOperation;
 DROP TABLE IF EXISTS dbo.packVariant;
 DROP TABLE IF EXISTS dbo.role;
 DROP TABLE IF EXISTS dbo.ticket;
+DROP TABLE IF EXISTS dbo.handbook;

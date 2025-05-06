@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 )
 
 const (
@@ -104,9 +105,36 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
+	ownerUser := convert.ParseUUIDUnsafe(request.FormValue("ownerUser"))
+	if ownerUser == uuid.Nil {
+		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	}
+	ownerUserDateTime := request.FormValue("ownerUserDateTime")
+	if ownerUserDateTime == "" {
+		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
+	lastUser := convert.ParseUUIDUnsafe(request.FormValue("lastUser"))
+	if lastUser == uuid.Nil {
+		lastUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	}
+
+	lastUserDateTime := request.FormValue("lastUserDateTime")
+	if lastUserDateTime == "" {
+		lastUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
 	role := &entity.Role{
 		Number: convert.ConvStrToInt(request.FormValue("number")),
 		Name:   request.FormValue("name"),
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         ownerUser,
+			OwnerUserDateTime: ownerUserDateTime,
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 
 	if err := r.roleService.Add(request.Context(), role); err != nil {
@@ -138,10 +166,19 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
+	lastUser := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+
+	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
 	role := &entity.Role{
 		IdRole: idRole,
 		Number: convert.ConvStrToInt(request.FormValue("number")),
 		Name:   request.FormValue("name"),
+		AuditRecord: entity.AuditRecord{
+			LastUser:         lastUser,
+			LastUserDateTime: lastUserDateTime,
+		},
 	}
 
 	if err = r.roleService.Update(request.Context(), idRole, role); err != nil {

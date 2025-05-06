@@ -1,0 +1,36 @@
+.table{
+    border: 1px solid #eee;
+    table-layout: fixed;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.table th {
+    font-weight: bold;
+    padding: 5px;
+    background: #efefef;
+    border: 1px solid #dddddd;
+}
+.table td{
+    padding: 5px 10px;
+    border: 1px solid #eee;
+    text-align: left;
+}
+.table tbody tr:nth-child(odd){
+    background: #fff;
+}
+.table tbody tr:nth-child(even){
+    background: #F7F7F7;
+}
+
+.table-container {
+    max-height: 600px; /* Установите максимальную высоту для прокручиваемой области */
+    overflow-y: auto;
+    display: inline-block;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Цвет фона для шапки */
+    z-index: 1; /* Чтобы шапка была поверх содержимого */
+}

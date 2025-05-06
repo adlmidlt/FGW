@@ -46,7 +46,8 @@ CREATE TABLE dbo.handbook
 CREATE PROCEDURE fgw_insert_handbook
     AS
 BEGIN
-    SET IDENTITY_INSERT handbook ON;
+    SET
+IDENTITY_INSERT handbook ON;
 INSERT INTO handbook (id_handbook, name)
 VALUES (0, N'Конструкторское наименование'),
        (1, N'Действия над объектами учета'),
@@ -64,7 +65,8 @@ VALUES (0, N'Конструкторское наименование'),
        (13, N'Комментарии к пакет-поддонам'),
        (14, N'Размеры этикеток'),
        (15, N'Типы документов');
-SET IDENTITY_INSERT handbook OFF;
+SET
+IDENTITY_INSERT handbook OFF;
 END
 GO
 
@@ -73,21 +75,29 @@ exec dbo.fgw_insert_handbook;
 -- Таблица сотрудники.
 CREATE TABLE dbo.employee
 (
-    id_employee    UNIQUEIDENTIFIER PRIMARY KEY,     -- автоматическая генерация uuid
-    service_number INT                     NOT NULL, -- табельный номер сотрудника, в дальнейшем логин для входа
-    first_name     VARCHAR(50)             NOT NULL, -- имя сотрудника
-    last_name      VARCHAR(50)             NOT NULL, -- фамилия сотрудника
-    patronymic     VARCHAR(50)             NOT NULL, -- отчество сотрудника
-    passwd         VARCHAR(255) DEFAULT '' NOT NULL, -- пароль сотрудника
-    role_id        UNIQUEIDENTIFIER        NOT NULL  -- роль сотрудника
+    id_employee         UNIQUEIDENTIFIER PRIMARY KEY,     -- автоматическая генерация uuid
+    service_number      INT                     NOT NULL, -- табельный номер сотрудника, в дальнейшем логин для входа
+    first_name          VARCHAR(50)             NOT NULL, -- имя сотрудника
+    last_name           VARCHAR(50)             NOT NULL, -- фамилия сотрудника
+    patronymic          VARCHAR(50)             NOT NULL, -- отчество сотрудника
+    passwd              VARCHAR(255) DEFAULT '' NOT NULL, -- пароль сотрудника
+    role_id             UNIQUEIDENTIFIER        NOT NULL, -- роль сотрудника
+    owner_user          UNIQUEIDENTIFIER        NOT NULL, -- uuid владельца записи
+    owner_user_datetime DATETIME                NOT NULL, -- дата и время записи владельца
+    last_user           UNIQUEIDENTIFIER        NOT NULL, -- uuid последнего
+    last_user_datetime  DATETIME                NOT NULL  -- дата и время последней модификации
 );
 
 -- Таблица роли.
 CREATE TABLE dbo.role
 (
-    id_role UNIQUEIDENTIFIER PRIMARY KEY, -- генерирует uuid
-    number  INT         NOT NULL,         -- номер роли
-    name    VARCHAR(55) NOT NULL          -- название роли
+    id_role             UNIQUEIDENTIFIER PRIMARY KEY, -- генерирует uuid
+    number              INT              NOT NULL,    -- номер роли
+    name                VARCHAR(55)      NOT NULL,    -- название роли
+    owner_user          UNIQUEIDENTIFIER NOT NULL,    -- uuid владельца записи
+    owner_user_datetime DATETIME         NOT NULL,    -- дата и время записи владельца
+    last_user           UNIQUEIDENTIFIER NOT NULL,    -- uuid последнего
+    last_user_datetime  DATETIME         NOT NULL     -- дата и время последней модификации
 );
 
 -- Таблица вариантов упаковки.

@@ -2,7 +2,7 @@ CREATE PROCEDURE dbo.fgw_role_all -- ХП возвращает список ро
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id_role, number, name FROM role;
+    SELECT id_role, number, name, owner_user, owner_user_datetime, last_user, last_user_datetime FROM role;
 END
 GO
 
@@ -11,31 +11,47 @@ CREATE PROCEDURE dbo.fgw_role_find_by_id -- ХП ищет роль по ИД
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id_role, number, name FROM role WHERE id_role = @idRole;
+    SELECT id_role, number, name, owner_user, owner_user_datetime, last_user, last_user_datetime
+    FROM role
+    WHERE id_role = @idRole;
 END
 GO
 
 CREATE PROCEDURE dbo.fgw_role_add -- ХП добавляет роль
     @idRole UNIQUEIDENTIFIER, -- ид роль
     @number INT, -- номер роли
-    @name VARCHAR(55) -- наименование роли
+    @name VARCHAR(55), -- наименование роли
+    @ownerUser UNIQUEIDENTIFIER, -- uuid владельца записи
+    @ownerUserDateTime DATETIME, -- дата и время записи владельца
+    @lastUser UNIQUEIDENTIFIER, -- uuid последнего
+    @lastUserDateTime DATETIME -- дата и время последней модификации
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO role(id_role, number, name) VALUES (@idRole, @number, @name);
+    INSERT INTO role(id_role, number, name, owner_user, owner_user_datetime, last_user, last_user_datetime)
+    VALUES (@idRole, @number, @name, @ownerUser, @ownerUserDateTime,
+            @lastUser, @lastUserDateTime);
 END
 GO
 
 CREATE PROCEDURE dbo.fgw_role_update -- ХП обновляет роль
     @idRole UNIQUEIDENTIFIER, -- ид роль
     @number INT, -- номер роли
-    @name VARCHAR(55) -- наименование роли
+    @name VARCHAR(55), -- наименование роли
+    @ownerUser UNIQUEIDENTIFIER, -- uuid владельца записи
+    @ownerUserDateTime DATETIME, -- дата и время записи владельца
+    @lastUser UNIQUEIDENTIFIER, -- uuid последнего
+    @lastUserDateTime DATETIME -- дата и время последней модификации
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE role
-    SET number = @number,
-        name   = @name
+    SET number              = @number,
+        name                = @name,
+        owner_user          = @ownerUser,
+        owner_user_datetime = @ownerUserDateTime,
+        last_user           = @lastUser,
+        last_user_datetime  = @lastUserDateTime
     WHERE id_role = @idRole;
 END
 GO
