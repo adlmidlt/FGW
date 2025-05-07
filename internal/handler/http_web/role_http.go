@@ -7,9 +7,11 @@ import (
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -105,6 +107,21 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
+	// Формируем мапу для хранения ошибок
+	errors := make(map[string]string)
+
+	// Проверка номера роли
+	number := convert.ConvStrToInt(request.FormValue("number"))
+	if number <= 0 {
+		errors["number"] = "Номер роли должен быть больше нуля."
+	}
+
+	// Проверка названия роли
+	name := strings.TrimSpace(request.FormValue("name"))
+	if name == "" {
+		errors["name"] = "Название роли обязательно."
+	}
+
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
 	ownerUser := convert.ParseUUIDUnsafe(request.FormValue("ownerUser"))
 	if ownerUser == uuid.Nil {
@@ -125,10 +142,15 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 	if lastUserDateTime == "" {
 		lastUserDateTime = time.Now().Format("2006-01-02 15:04:05")
 	}
-
+	if len(errors) > 0 {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusUnprocessableEntity) // 422 Unprocessable Entity
+		json.NewEncoder(writer).Encode(map[string]interface{}{"errors": errors})
+		return
+	}
 	role := &entity.Role{
-		Number: convert.ConvStrToInt(request.FormValue("number")),
-		Name:   request.FormValue("name"),
+		Number: number,
+		Name:   name,
 		AuditRecord: entity.AuditRecord{
 			OwnerUser:         ownerUser,
 			OwnerUserDateTime: ownerUserDateTime,

@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
     <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
+    <script src="/web/js/validator.js"></script>
     <title>Список ролей сотрудника</title>
 </head>
 <body>
 
 <h2>Добавить роль сотрудника</h2>
-<form action="/fgw/roles/add" method="POST">
+<form id="addRoleForm" action="/fgw/roles/add" method="POST">
     <label>
         Номер роли:
         <input type="number" name="number" placeholder="Введите номер роли" >
+        <span class="error" id="number-error"></span>
     </label>
 
     <label>
         Название роли:
-        <input type="text" name="name" placeholder="Введите название роли" >
+        <input type="text" name="name" placeholder="Введите название роли">
+        <span class="error" id="name-error"></span>
     </label>
     <input type="submit" value="Добавить">
 </form>
