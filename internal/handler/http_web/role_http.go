@@ -7,7 +7,6 @@ import (
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
-	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -107,7 +106,6 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	// Формируем мапу для хранения ошибок
 	errors := make(map[string]string)
 
 	// Проверка номера роли
@@ -118,8 +116,8 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 
 	// Проверка названия роли
 	name := strings.TrimSpace(request.FormValue("name"))
-	if name == "" {
-		errors["name"] = "Название роли обязательно."
+	if len(name) > 55 {
+		errors["name"] = "Название роли не должно превышать 55 символов."
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
@@ -142,12 +140,11 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 	if lastUserDateTime == "" {
 		lastUserDateTime = time.Now().Format("2006-01-02 15:04:05")
 	}
-	if len(errors) > 0 {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusUnprocessableEntity) // 422 Unprocessable Entity
-		json.NewEncoder(writer).Encode(map[string]interface{}{"errors": errors})
+
+	if handler.SendErrorsJSON(writer, errors, r.wLogg) {
 		return
 	}
+
 	role := &entity.Role{
 		Number: number,
 		Name:   name,

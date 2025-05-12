@@ -13,13 +13,13 @@
 <form id="addRoleForm" action="/fgw/roles/add" method="POST">
     <label>
         Номер роли:
-        <input type="number" name="number" placeholder="Введите номер роли" >
+        <input type="number" name="number" placeholder="Введите номер роли" required>
         <span class="error" id="number-error"></span>
     </label>
 
     <label>
         Название роли:
-        <input type="text" name="name" placeholder="Введите название роли">
+        <input type="text" name="name" placeholder="Введите название роли" required>
         <span class="error" id="name-error"></span>
     </label>
     <input type="submit" value="Добавить">

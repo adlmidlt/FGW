@@ -12,7 +12,7 @@ document.getElementById('addRoleForm').addEventListener('submit', async (event) 
     if (rawResponse.status === 422 && contentType.includes('application/json')) {
         const result = await rawResponse.json();
         Object.entries(result.errors).forEach(([field, message]) => {
-            document.getElementById(`${field}-error`).innerText = message;
+            document.getElementById(`${field}-error`).alert(message);
         });
     } else if (rawResponse.ok) {
         alert('Роль успешно добавлена!');
