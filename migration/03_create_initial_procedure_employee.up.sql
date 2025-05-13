@@ -2,7 +2,18 @@ CREATE PROCEDURE dbo.fgw_employee_all -- ХП возвращает список 
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id FROM employee;
+    SELECT id_employee,
+           service_number,
+           first_name,
+           last_name,
+           patronymic,
+           passwd,
+           role_id,
+           owner_user,
+           owner_user_datetime,
+           last_user,
+           last_user_datetime
+    FROM employee;
 END
 GO
 
@@ -11,7 +22,17 @@ CREATE PROCEDURE dbo.fgw_employee_find_by_id -- ХП ищет сотрудник
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id_employee, service_number, first_name, last_name, patronymic, passwd, role_id
+    SELECT id_employee,
+           service_number,
+           first_name,
+           last_name,
+           patronymic,
+           passwd,
+           role_id,
+           owner_user,
+           owner_user_datetime,
+           last_user,
+           last_user_datetime
     FROM employee
     WHERE id_employee = @idEmployee;
 END
@@ -24,18 +45,26 @@ CREATE PROCEDURE dbo.fgw_employee_add -- ХП добавляет сотрудн�
     @lastName VARCHAR(50), -- фамилия сотрудника
     @patronymic VARCHAR(50),-- отчество сотрудника
     @passwd VARCHAR(255), -- пароль сотрудника
-    @roleId UNIQUEIDENTIFIER -- роль сотрудника
+    @roleId UNIQUEIDENTIFIER, -- роль сотрудника
+    @ownerUser UNIQUEIDENTIFIER, -- uuid владельца записи
+    @ownerUserDateTime DATETIME, -- дата и время записи владельца
+    @lastUser UNIQUEIDENTIFIER, -- uuid последнего
+    @lastUserDateTime DATETIME -- дата и время последней модификации
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO employee(id_employee, service_number, first_name, last_name, patronymic, passwd, role_id)
+    INSERT INTO employee(id_employee, service_number, first_name, last_name, patronymic, passwd, role_id, owner_user,
+                         owner_user_datetime, last_user, last_user_datetime)
     VALUES (@idEmployee,
             @serviceNumber,
             @firstName,
             @lastName,
             @patronymic,
             @passwd,
-            @roleId);
+            @roleId, @ownerUser,
+            @ownerUserDateTime,
+            @lastUser,
+            @lastUserDateTime);
 END
 GO
 
@@ -46,17 +75,25 @@ CREATE PROCEDURE dbo.fgw_employee_update -- ХП обновляет сотруд
     @lastName VARCHAR(50), -- фамилия сотрудника
     @patronymic VARCHAR(50),-- отчество сотрудника
     @passwd VARCHAR(255), -- пароль сотрудника
-    @roleId UNIQUEIDENTIFIER -- роль сотрудника
+    @roleId UNIQUEIDENTIFIER, -- роль сотрудника
+    @ownerUser UNIQUEIDENTIFIER, -- uuid владельца записи
+    @ownerUserDateTime DATETIME, -- дата и время записи владельца
+    @lastUser UNIQUEIDENTIFIER, -- uuid последнего
+    @lastUserDateTime DATETIME -- дата и время последней модификации
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE employee
-    SET service_number = @serviceNumber,
-        first_name     = @firstName,
-        last_name      = @lastName,
-        patronymic     = @patronymic,
-        passwd         = @passwd,
-        role_id        = @roleId
+    SET service_number      = @serviceNumber,
+        first_name          = @firstName,
+        last_name           = @lastName,
+        patronymic          = @patronymic,
+        passwd              = @passwd,
+        role_id             = @roleId,
+        owner_user          = @ownerUser,
+        owner_user_datetime = @ownerUserDateTime,
+        last_user           = @lastUser,
+        last_user_datetime  = @lastUserDateTime
     WHERE id_employee = @idEmployee;
 END
 GO

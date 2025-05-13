@@ -108,16 +108,14 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 
 	errors := make(map[string]string)
 
-	// Проверка номера роли
 	number := convert.ConvStrToInt(request.FormValue("number"))
 	if number <= 0 {
-		errors["number"] = "Номер роли должен быть больше нуля."
+		errors["number"] = msg.J1001
 	}
 
-	// Проверка названия роли
 	name := strings.TrimSpace(request.FormValue("name"))
 	if len(name) > 55 {
-		errors["name"] = "Название роли не должно превышать 55 символов."
+		errors["name"] = msg.J1002
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
@@ -125,6 +123,7 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 	if ownerUser == uuid.Nil {
 		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	}
+
 	ownerUserDateTime := request.FormValue("ownerUserDateTime")
 	if ownerUserDateTime == "" {
 		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
@@ -176,6 +175,18 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
+	errors := make(map[string]string)
+
+	number := convert.ConvStrToInt(request.FormValue("number"))
+	if number <= 0 {
+		errors["number"] = msg.J1001
+	}
+
+	name := strings.TrimSpace(request.FormValue("name"))
+	if len(name) > 55 {
+		errors["name"] = msg.J1002
+	}
+
 	idRole, err := convert.ParseStrToUUID(request.FormValue(paramIdRole), writer, request, r.wLogg)
 	if err != nil {
 		return
@@ -187,13 +198,16 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
 	lastUser := uuid.MustParse("00000000-0000-0000-0000-000000000000")
-
 	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
+	if handler.SendErrorsJSON(writer, errors, r.wLogg) {
+		return
+	}
 
 	role := &entity.Role{
 		IdRole: idRole,
-		Number: convert.ConvStrToInt(request.FormValue("number")),
-		Name:   request.FormValue("name"),
+		Number: number,
+		Name:   name,
 		AuditRecord: entity.AuditRecord{
 			LastUser:         lastUser,
 			LastUserDateTime: lastUserDateTime,

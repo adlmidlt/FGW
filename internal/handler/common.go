@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"html/template"
 	"net/http"
+	"unicode"
 )
 
 // EntityExistByUUIDChecker — универсальный интерфейс для проверки существования сущности по её UUID.
@@ -79,15 +80,12 @@ func WriteJSON(w http.ResponseWriter, entity interface{}, wLogg *wlogger.CustomW
 // SendErrorsJSON отправляет клиенту ответ в формате JSON с перечисленными ошибками
 func SendErrorsJSON(w http.ResponseWriter, errors map[string]string, wLogg *wlogger.CustomWLogg) bool {
 	if len(errors) > 0 {
-		w.Header().Set("Content-Type", "application/json_api; charset=UTF-8")
-		w.WriteHeader(http.StatusUnprocessableEntity)
 		if err := json.NewEncoder(w).Encode(map[string]interface{}{"errors": errors}); err != nil {
 			WriteServerError(w, nil, wLogg, msg.E3105, err)
-
 			return true
 		}
+		return true
 	}
-
 	return false
 }
 
@@ -112,4 +110,18 @@ func ExecuteTemplate(tmpl *template.Template, data interface{}, w http.ResponseW
 	}
 
 	return true
+}
+
+func IsTextOnly(str string) bool {
+	return !containsNumbers(str)
+}
+
+func containsNumbers(str string) bool {
+	for _, char := range str {
+		if unicode.IsNumber(char) {
+			return true
+		}
+	}
+
+	return false
 }

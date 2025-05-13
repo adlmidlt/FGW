@@ -10,7 +10,7 @@
 <body>
 
 <h2>Добавить роль сотрудника</h2>
-<form id="addRoleForm" action="/fgw/roles/add" method="POST">
+<form id="roleForm" action="/fgw/roles/add" method="POST">
     <label>
         Номер роли:
         <input type="number" name="number" placeholder="Введите номер роли" required>
@@ -45,13 +45,15 @@
             <tr id="role_{{ .IdRole }}">
                 <td>{{ .IdRole}}</td>
                 {{ if .IsEditing}}
-                    <form method="POST" action="/fgw/roles/update">
+                    <form id="roleForm" method="POST" action="/fgw/roles/update">
                         <td><label>
-                                <input type="text" name="number" value="{{ .Number}}">
+                                <input type="number" name="number" value="{{ .Number}}" required>
+                                <span class="error" id="number-error"></span>
                             </label>
                         </td>
                         <td><label>
-                                <input type="text" name="name" value="{{ .Name}}">
+                                <input type="text" name="name" value="{{ .Name}}" required>
+                                <span class="error" id="name-error"></span>
                             </label>
                         </td>
                         <td>{{ .AuditRecord.OwnerUser}}</td>

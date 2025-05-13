@@ -72,12 +72,6 @@ func (e *EmployeeService) Add(ctx context.Context, employee *entity.Employee) er
 }
 
 func (e *EmployeeService) Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error {
-	if err := e.validateStruct.Struct(employee); err != nil {
-		e.wLogg.LogW(msg.W1001, err)
-
-		return err
-	}
-
 	if err := e.employeeRepo.Update(ctx, idEmployee, employee); err != nil {
 		e.wLogg.LogE(msg.E3007, err)
 

@@ -49,6 +49,10 @@ func (e *EmployeeRepo) All(ctx context.Context) ([]*entity.Employee, error) {
 			&employee.Patronymic,
 			&employee.Passwd,
 			&employee.RoleId,
+			&employee.AuditRecord.OwnerUser,
+			&employee.AuditRecord.OwnerUserDateTime,
+			&employee.AuditRecord.LastUser,
+			&employee.AuditRecord.LastUserDateTime,
 		); err != nil {
 			e.wLogg.LogE(msg.E3001, err)
 
@@ -84,6 +88,10 @@ func (e *EmployeeRepo) FindById(ctx context.Context, idEmployee uuid.UUID) (*ent
 		&employee.Patronymic,
 		&employee.Passwd,
 		&employee.RoleId,
+		&employee.AuditRecord.OwnerUser,
+		&employee.AuditRecord.OwnerUserDateTime,
+		&employee.AuditRecord.LastUser,
+		&employee.AuditRecord.LastUserDateTime,
 	); err != nil {
 		e.wLogg.LogE(msg.E3000, err)
 
@@ -105,6 +113,10 @@ func (e *EmployeeRepo) Add(ctx context.Context, employee *entity.Employee) error
 		employee.Patronymic,
 		employee.Passwd,
 		employee.RoleId,
+		employee.AuditRecord.OwnerUser,
+		employee.AuditRecord.OwnerUserDateTime,
+		employee.AuditRecord.LastUser,
+		employee.AuditRecord.LastUserDateTime,
 	); err != nil {
 		e.wLogg.LogE(msg.E3000, err)
 
@@ -115,12 +127,15 @@ func (e *EmployeeRepo) Add(ctx context.Context, employee *entity.Employee) error
 }
 
 func (e *EmployeeRepo) Update(ctx context.Context, idEmployee uuid.UUID, employee *entity.Employee) error {
-	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeUpdateQuery, idEmployee, employee.ServiceNumber,
+	if _, err := e.mssql.ExecContext(ctx, FGWEmployeeUpdateQuery, idEmployee,
+		employee.ServiceNumber,
 		employee.FirstName,
 		employee.LastName,
 		employee.Patronymic,
 		employee.Passwd,
 		employee.RoleId,
+		employee.AuditRecord.LastUser,
+		employee.AuditRecord.LastUserDateTime,
 	); err != nil {
 		e.wLogg.LogE(msg.E3000, err)
 

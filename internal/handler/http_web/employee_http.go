@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 )
 
 const (
@@ -61,8 +62,8 @@ func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	data := entity.EmployeeList{Employees: employees, Roles: roles}
 
-	if idEmployeeStr := r.URL.Query().Get(paramIdEmployee); idEmployeeStr != "" {
-		e.markEditingEmployee(idEmployeeStr, employees)
+	if idStr := r.URL.Query().Get(paramIdEmployee); idStr != "" {
+		e.markEditingEmployee(idStr, employees)
 	}
 
 	tmpl, ok := handler.ParseTemplateHTML(templateHtmlEmployeeList, w, r, e.wLogg)
@@ -84,33 +85,6 @@ func (e *EmployeeHandlerHTTP) Update(w http.ResponseWriter, r *http.Request) {
 	default:
 		handler.WriteMethodNotAllowed(w, r, e.wLogg, msg.H7002, nil)
 	}
-}
-
-func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
-	if handler.MethodNotAllowed(w, r, http.MethodPost, e.wLogg) {
-		return
-	}
-
-	roleId, err := convert.ParseStrToUUID(r.FormValue(paramRoleId), w, r, e.wLogg)
-	if err != nil {
-		return
-	}
-
-	employee := &entity.Employee{
-		ServiceNumber: convert.ConvStrToInt(r.FormValue("serviceNumber")),
-		FirstName:     r.FormValue("firstName"),
-		LastName:      r.FormValue("lastName"),
-		Patronymic:    r.FormValue("patronymic"),
-		Passwd:        r.FormValue("passwd"),
-		RoleId:        roleId,
-	}
-
-	if err = e.employeeService.Add(r.Context(), employee); err != nil {
-		handler.WriteServerError(w, r, e.wLogg, msg.H7012, err)
-
-		return
-	}
-	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
 func (e *EmployeeHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
@@ -135,6 +109,107 @@ func (e *EmployeeHandlerHTTP) Delete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
+func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
+	if handler.MethodNotAllowed(w, r, http.MethodPost, e.wLogg) {
+		return
+	}
+
+	errors := make(map[string]string)
+
+	employees, err := e.employeeService.All(r.Context())
+	if err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7003, err)
+
+		return
+	}
+
+	maxServiceNumber := 0
+	for _, employee := range employees {
+		if employee.ServiceNumber > maxServiceNumber {
+			maxServiceNumber = employee.ServiceNumber
+		}
+	}
+	serviceNumber := maxServiceNumber + 1
+
+	firstName := r.FormValue("firstName")
+	lastName := r.FormValue("lastName")
+	patronymic := r.FormValue("patronymic")
+	passwd := r.FormValue("passwd")
+
+	switch {
+	case len(firstName) > 25:
+		errors["firstName"] = msg.J1003
+	case len(lastName) > 25:
+		errors["lastName"] = msg.J1005
+	case len(patronymic) > 25:
+		errors["patronymic"] = msg.J1006
+	case len(passwd) < 6:
+		errors["passwd"] = msg.J1007
+	}
+
+	switch {
+	case !handler.IsTextOnly(firstName):
+		errors["firstName"] = msg.J1004
+	case !handler.IsTextOnly(lastName):
+		errors["lastName"] = msg.J1008
+	case !handler.IsTextOnly(patronymic):
+		errors["patronymic"] = msg.J1008
+	}
+
+	roleId, err := convert.ParseStrToUUID(r.FormValue(paramRoleId), w, r, e.wLogg)
+	if err != nil {
+		return
+	}
+
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
+	ownerUser := convert.ParseUUIDUnsafe(r.FormValue("ownerUser"))
+	if ownerUser == uuid.Nil {
+		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	}
+
+	ownerUserDateTime := r.FormValue("ownerUserDateTime")
+	if ownerUserDateTime == "" {
+		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
+	lastUser := convert.ParseUUIDUnsafe(r.FormValue("lastUser"))
+	if lastUser == uuid.Nil {
+		lastUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	}
+
+	lastUserDateTime := r.FormValue("lastUserDateTime")
+	if lastUserDateTime == "" {
+		lastUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
+	if handler.SendErrorsJSON(w, errors, e.wLogg) {
+		return
+	}
+
+	employee := &entity.Employee{
+		ServiceNumber: serviceNumber,
+		FirstName:     firstName,
+		LastName:      lastName,
+		Patronymic:    patronymic,
+		Passwd:        passwd,
+		RoleId:        roleId,
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         ownerUser,
+			OwnerUserDateTime: ownerUserDateTime,
+			LastUser:          lastUser,
+			LastUserDateTime:  lastUserDateTime,
+		},
+	}
+
+	if err = e.employeeService.Add(r.Context(), employee); err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7012, err)
+
+		return
+	}
+	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
+}
+
 func (e *EmployeeHandlerHTTP) renderUpdateFormEmployee(w http.ResponseWriter, r *http.Request) {
 	idEmployeeStr := r.URL.Query().Get(paramIdEmployee)
 	http.Redirect(w, r, fmt.Sprintf("%s?%s=%s", fgwEmployeesStartUrl, paramIdEmployee, idEmployeeStr), http.StatusSeeOther)
@@ -145,6 +220,33 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 		handler.WriteBadRequest(w, r, e.wLogg, msg.H7008, err)
 
 		return
+	}
+
+	errors := make(map[string]string)
+
+	firstName := r.FormValue("firstName")
+	lastName := r.FormValue("lastName")
+	patronymic := r.FormValue("patronymic")
+	passwd := r.FormValue("passwd")
+
+	switch {
+	case len(firstName) > 25:
+		errors["firstName"] = msg.J1003
+	case len(lastName) > 25:
+		errors["lastName"] = msg.J1005
+	case len(patronymic) > 25:
+		errors["patronymic"] = msg.J1006
+	case len(passwd) > 6:
+		errors["passwd"] = msg.J1007
+	}
+
+	switch {
+	case !handler.IsTextOnly(firstName):
+		errors["firstName"] = msg.J1004
+	case !handler.IsTextOnly(lastName):
+		errors["lastName"] = msg.J1008
+	case !handler.IsTextOnly(patronymic):
+		errors["patronymic"] = msg.J1008
 	}
 
 	idEmployee, err := convert.ParseStrToUUID(r.FormValue(paramIdEmployee), w, r, e.wLogg)
@@ -161,14 +263,26 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 		return
 	}
 
+	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
+	lastUser := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
+	if handler.SendErrorsJSON(w, errors, e.wLogg) {
+		return
+	}
+
 	employee := &entity.Employee{
 		IdEmployee:    idEmployee,
 		ServiceNumber: convert.ConvStrToInt(r.FormValue("serviceNumber")),
-		FirstName:     r.FormValue("firstName"),
-		LastName:      r.FormValue("lastName"),
-		Patronymic:    r.FormValue("patronymic"),
-		Passwd:        r.FormValue("passwd"),
+		FirstName:     firstName,
+		LastName:      lastName,
+		Patronymic:    patronymic,
+		Passwd:        passwd,
 		RoleId:        roleId,
+		AuditRecord: entity.AuditRecord{
+			LastUser:         lastUser,
+			LastUserDateTime: lastUserDateTime,
+		},
 	}
 
 	if err = e.employeeService.Update(r.Context(), idEmployee, employee); err != nil {
@@ -176,6 +290,8 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 
 		return
 	}
+
+	fmt.Println(employee)
 	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 
