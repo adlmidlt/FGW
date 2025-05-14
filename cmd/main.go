@@ -3,6 +3,7 @@ package main
 import (
 	"FGW/internal/config"
 	"FGW/internal/handler/http_web"
+	"FGW/internal/handler/http_web/auth"
 	"FGW/internal/handler/json_api"
 	"FGW/internal/repo"
 	"FGW/internal/service"
@@ -60,6 +61,7 @@ func main() {
 	serviceEmployee := service.NewEmployeeService(repoEmployee, logger, validateStruct)
 	handlerEmployeeJSON := json_api.NewEmployeeHandlerJSON(serviceRole, serviceEmployee, logger)
 	handlerEmployeeHTTP := http_web.NewEmployeeHandlerHTTP(serviceRole, serviceEmployee, logger)
+	handlerAuthorizationHTTP := auth.NewAuthorizationHandlerHTTP(serviceEmployee, logger)
 
 	repoHandbook := repo.NewHandbookRepo(mssqlDBConn, logger)
 	serviceHandbook := service.NewHandbookService(repoHandbook, logger, validateStruct)
@@ -83,6 +85,7 @@ func main() {
 
 	handlerEmployeeJSON.ServeJSONRouters(mux)
 	handlerEmployeeHTTP.ServeHTTPRouters(mux)
+	handlerAuthorizationHTTP.ServeHTTPRouters(mux)
 
 	handlerHandbookJSON.ServeJSONRouters(mux)
 	handlerHandbookHTTP.ServeHTTPRouters(mux)

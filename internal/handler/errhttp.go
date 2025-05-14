@@ -24,3 +24,8 @@ func WriteMethodNotAllowed(w http.ResponseWriter, r *http.Request, wLogg *wlogge
 	wLogg.LogHttpE(http.StatusMethodNotAllowed, r.Method, r.URL.Path, message, err)
 	http.Error(w, message, http.StatusMethodNotAllowed)
 }
+
+func WriteUnauthorized(w http.ResponseWriter, r *http.Request, wLogg *wlogger.CustomWLogg, message string, err error) {
+	wLogg.LogHttpE(http.StatusUnauthorized, r.Method, r.URL.Path, message, err)
+	http.Error(w, message, http.StatusUnauthorized)
+}

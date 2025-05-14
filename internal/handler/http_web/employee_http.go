@@ -9,6 +9,7 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"fmt"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
 	"time"
@@ -142,6 +143,11 @@ func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	patronymic := r.FormValue("patronymic")
 	passwd := r.FormValue("passwd")
 
+	password, err := hashPassword(passwd)
+	if err != nil {
+		fmt.Println("Ошибка хеширования", err)
+	}
+
 	switch {
 	case len(firstName) > 25:
 		errors["firstName"] = msg.J1003
@@ -159,7 +165,7 @@ func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 	case !handler.IsTextOnly(lastName):
 		errors["lastName"] = msg.J1008
 	case !handler.IsTextOnly(patronymic):
-		errors["patronymic"] = msg.J1008
+		errors["patronymic"] = msg.J1009
 	}
 
 	roleId, err := convert.ParseStrToUUID(r.FormValue(paramRoleId), w, r, e.wLogg)
@@ -198,7 +204,7 @@ func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		FirstName:     firstName,
 		LastName:      lastName,
 		Patronymic:    patronymic,
-		Passwd:        passwd,
+		Passwd:        string(password),
 		RoleId:        roleId,
 		AuditRecord: entity.AuditRecord{
 			OwnerUser:         ownerUser,
@@ -310,4 +316,13 @@ func (e *EmployeeHandlerHTTP) markEditingEmployee(idEmployeeStr string, employee
 			}
 		}
 	}
+}
+
+func hashPassword(password string) ([]byte, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return hashedBytes, nil
 }
