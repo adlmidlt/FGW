@@ -9,6 +9,7 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"fmt"
 	"github.com/google/uuid"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -66,8 +67,13 @@ func (e *EmployeeHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		e.markEditingEmployee(idStr, employees)
 	}
 
-	tmpl, ok := handler.ParseTemplateHTML(templateHtmlEmployeeList, w, r, e.wLogg)
-	if !ok {
+	tmpl, err := template.New("employee_list.html").Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templateHtmlEmployeeList)
+	if err != nil {
+		handler.WriteServerError(w, r, e.wLogg, msg.H7006, err)
+
 		return
 	}
 
@@ -236,7 +242,7 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 		errors["lastName"] = msg.J1005
 	case len(patronymic) > 25:
 		errors["patronymic"] = msg.J1006
-	case len(passwd) > 6:
+	case len(passwd) < 6:
 		errors["passwd"] = msg.J1007
 	}
 

@@ -1,0 +1,24 @@
+
+.table .serviceName {
+    width: 90px;
+}
+
+.table .firstName  {
+    width: 150px;
+}
+
+.table .lastName {
+    width: 150px;
+}
+
+.table .patronymic {
+    width: 150px;
+}
+
+.table .passwd {
+    width: 150px;
+}
+
+.table .roleId {
+    width: 150px;
+}

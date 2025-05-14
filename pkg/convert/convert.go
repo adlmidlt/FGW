@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Win1251ToUTF8 конвертирует из win1251 в utf8.
@@ -127,4 +128,13 @@ func ParseStrToID(fieldName string, w http.ResponseWriter, r *http.Request, wLog
 	}
 
 	return value, nil
+}
+
+// FormatDateTime - функция форматирования даты в формате ДД.ММ.ГГГГ ЧЧ:ММ
+func FormatDateTime(dateTime string) string {
+	t, err := time.Parse(time.RFC3339, dateTime)
+	if err != nil {
+		return dateTime
+	}
+	return t.Format("02.01.2006 15:04:05")
 }

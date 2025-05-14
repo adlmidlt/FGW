@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
     <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/employee/column_style.css" type="text/css">
     <script src="/web/js/validator.js"></script>
     <title>Список сотрудников</title>
 </head>
@@ -48,12 +49,12 @@
         <thead>
         <tr>
             <th>ИД</th>
-            <th>Табельный номер</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Отчество</th>
-            <th>Пароль</th>
-            <th>Роль</th>
+            <th class="serviceName" >Табельный номер</th>
+            <th class="firstName">Имя</th>
+            <th class="lastName">Фамилия</th>
+            <th class="patronymic">Отчество</th>
+            <th class="passwd">Пароль</th>
+            <th class="roleId">Роль</th>
             <th>Код владельца записи</th>
             <th>Дата модификации</th>
             <th>Код пользователя</th>
@@ -67,27 +68,27 @@
                 <td>{{ .IdEmployee}}</td>
                 {{if .IsEditing}}
                     <form id="employeeForm" method="POST" action="/fgw/employees/update">
-                        <td id="serviceName1"><label>
-                                <input type="text" name="serviceNumber" value="{{ .ServiceNumber}}" required>
+                        <td><label>
+                                <input style="width: 40px;" type="text" name="serviceNumber" value="{{ .ServiceNumber}}" required>
                             </label>
                         </td>
                         <td><label>
-                                <input type="text" name="firstName" value="{{ .FirstName}}" required>
+                                <input style="width: 130px;" type="text" name="firstName" value="{{ .FirstName}}" required>
                                 <span class="error" id="firstName-error"></span>
                             </label>
                         </td>
                         <td><label>
-                                <input type="text" name="lastName" value="{{ .LastName}}" required>
+                                <input style="width: 130px;" type="text" name="lastName" value="{{ .LastName}}" required>
                                 <span class="error" id="lastName-error"></span>
                             </label>
                         </td>
                         <td><label>
-                                <input type="text" name="patronymic" value="{{ .Patronymic}}" required>
+                                <input style="width: 130px;" type="text" name="patronymic" value="{{ .Patronymic}}" required>
                                 <span class="error" id="patronymic-error"></span>
                             </label>
                         </td>
                         <td><label>
-                                <input type="text" name="passwd" value="{{ .Passwd}}" required>
+                                <input style="width: 130px;" type="text" name="passwd" value="{{ .Passwd}}" required>
                                 <span class="error" id="passwd-error"></span>
                             </label>
                         </td>
@@ -103,9 +104,9 @@
                             </label>
                         </td>
                         <td>{{ .AuditRecord.OwnerUser}}</td>
-                        <td>{{ .AuditRecord.OwnerUserDateTime}}</td>
+                        <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
                         <td>{{ .AuditRecord.LastUser}}</td>
-                        <td>{{ .AuditRecord.LastUserDateTime}}</td>
+                        <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
                         <td>
                             <input type="hidden" name="idEmployee" value="{{ .IdEmployee}}">
                             <input type="submit" value="Сохранить">
@@ -126,9 +127,9 @@
                         {{ end }}
                     </td>
                     <td>{{ .AuditRecord.OwnerUser}}</td>
-                    <td>{{ .AuditRecord.OwnerUserDateTime}}</td>
+                    <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
                     <td>{{ .AuditRecord.LastUser}}</td>
-                    <td>{{ .AuditRecord.LastUserDateTime}}</td>
+                    <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
                     <td>
                         <a href="/fgw/employees?idEmployee={{ .IdEmployee}}#employee_{{ .IdEmployee}}">Изменить</a>
                         <form method="POST" action="/fgw/employees/delete" style="display:inline;">

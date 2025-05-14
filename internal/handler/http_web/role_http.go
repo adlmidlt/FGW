@@ -9,6 +9,7 @@ import (
 	"FGW/pkg/wlogger/msg"
 	"fmt"
 	"github.com/google/uuid"
+	"html/template"
 	"net/http"
 	"strings"
 	"time"
@@ -58,8 +59,13 @@ func (r *RoleHandlerHTTP) All(writer http.ResponseWriter, request *http.Request)
 		r.markEditingRole(idStr, roles)
 	}
 
-	tmpl, ok := handler.ParseTemplateHTML(templateHtmlRoleList, writer, request, r.wLogg)
-	if !ok {
+	tmpl, err := template.New("role_list.html").Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templateHtmlRoleList)
+	if err != nil {
+		handler.WriteServerError(writer, request, r.wLogg, msg.H7006, err)
+
 		return
 	}
 
@@ -126,7 +132,7 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 
 	ownerUserDateTime := request.FormValue("ownerUserDateTime")
 	if ownerUserDateTime == "" {
-		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+		ownerUserDateTime = time.Now().Format(time.DateTime)
 	}
 
 	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
