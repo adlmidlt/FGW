@@ -3,6 +3,7 @@ package http_web
 import (
 	"FGW/internal/entity"
 	"FGW/internal/handler"
+	"FGW/internal/handler/http_web/auth"
 	"FGW/internal/service"
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
@@ -173,21 +174,9 @@ func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	ownerUser := convert.ParseUUIDUnsafe(r.FormValue("ownerUser"))
-	if ownerUser == uuid.Nil {
-		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
-	}
-
 	ownerUserDateTime := r.FormValue("ownerUserDateTime")
 	if ownerUserDateTime == "" {
 		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
-	}
-
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	lastUser := convert.ParseUUIDUnsafe(r.FormValue("lastUser"))
-	if lastUser == uuid.Nil {
-		lastUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	}
 
 	lastUserDateTime := r.FormValue("lastUserDateTime")
@@ -207,9 +196,9 @@ func (e *EmployeeHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		Passwd:        string(password),
 		RoleId:        roleId,
 		AuditRecord: entity.AuditRecord{
-			OwnerUser:         ownerUser,
+			OwnerUser:         auth.UUIDEmployee,
 			OwnerUserDateTime: ownerUserDateTime,
-			LastUser:          lastUser,
+			LastUser:          auth.UUIDEmployee,
 			LastUserDateTime:  lastUserDateTime,
 		},
 	}
@@ -275,8 +264,6 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 		return
 	}
 
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
-	lastUser := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
 
 	if handler.SendErrorsJSON(w, errors, e.wLogg) {
@@ -292,7 +279,7 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 		Passwd:        passwd,
 		RoleId:        roleId,
 		AuditRecord: entity.AuditRecord{
-			LastUser:         lastUser,
+			LastUser:         auth.UUIDEmployee,
 			LastUserDateTime: lastUserDateTime,
 		},
 	}
@@ -302,8 +289,6 @@ func (e *EmployeeHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r
 
 		return
 	}
-
-	fmt.Println(employee)
 	http.Redirect(w, r, fgwEmployeesStartUrl, http.StatusSeeOther)
 }
 

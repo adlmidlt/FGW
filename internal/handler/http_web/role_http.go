@@ -3,6 +3,7 @@ package http_web
 import (
 	"FGW/internal/entity"
 	"FGW/internal/handler"
+	"FGW/internal/handler/http_web/auth"
 	"FGW/internal/service"
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
@@ -124,21 +125,9 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 		errors["name"] = msg.J1002
 	}
 
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	ownerUser := convert.ParseUUIDUnsafe(request.FormValue("ownerUser"))
-	if ownerUser == uuid.Nil {
-		ownerUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
-	}
-
 	ownerUserDateTime := request.FormValue("ownerUserDateTime")
 	if ownerUserDateTime == "" {
 		ownerUserDateTime = time.Now().Format(time.DateTime)
-	}
-
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid.
-	lastUser := convert.ParseUUIDUnsafe(request.FormValue("lastUser"))
-	if lastUser == uuid.Nil {
-		lastUser = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	}
 
 	lastUserDateTime := request.FormValue("lastUserDateTime")
@@ -154,9 +143,9 @@ func (r *RoleHandlerHTTP) Add(writer http.ResponseWriter, request *http.Request)
 		Number: number,
 		Name:   name,
 		AuditRecord: entity.AuditRecord{
-			OwnerUser:         ownerUser,
+			OwnerUser:         auth.UUIDEmployee,
 			OwnerUserDateTime: ownerUserDateTime,
-			LastUser:          lastUser,
+			LastUser:          auth.UUIDEmployee,
 			LastUserDateTime:  lastUserDateTime,
 		},
 	}
@@ -202,8 +191,6 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		return
 	}
 
-	// TODO: временная заглушка, после написания авторизации, будет заполняться uuid при изменении записи.
-	lastUser := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
 
 	if handler.SendErrorsJSON(writer, errors, r.wLogg) {
@@ -215,7 +202,7 @@ func (r *RoleHandlerHTTP) processUpdateFormRole(writer http.ResponseWriter, requ
 		Number: number,
 		Name:   name,
 		AuditRecord: entity.AuditRecord{
-			LastUser:         lastUser,
+			LastUser:         auth.UUIDEmployee,
 			LastUserDateTime: lastUserDateTime,
 		},
 	}

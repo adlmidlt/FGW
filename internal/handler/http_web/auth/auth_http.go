@@ -7,10 +7,15 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"fmt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
 )
+
+const templateHTMLAuth = "../web/html/auth.html"
+
+var UUIDEmployee uuid.UUID
 
 type AuthorizationHandlerHTTP struct {
 	employeeService service.EmployeeUseCase
@@ -26,7 +31,7 @@ func (a *AuthorizationHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/login", a.LogIn)
 }
 func (a *AuthorizationHandlerHTTP) ShowAuthForm(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("../web/html/auth.html")
+	tmpl, err := template.ParseFiles(templateHTMLAuth)
 
 	if err != nil {
 		fmt.Println(err)
@@ -61,6 +66,7 @@ func (a *AuthorizationHandlerHTTP) LogIn(w http.ResponseWriter, r *http.Request)
 	for _, employee := range employees {
 		if employee.ServiceNumber == serviceNumber && checkPasswd(employee.Passwd, passwd) {
 			found = true
+			UUIDEmployee = employee.IdEmployee
 			break
 		}
 	}
