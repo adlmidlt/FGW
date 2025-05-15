@@ -3,12 +3,15 @@ package http_web
 import (
 	"FGW/internal/entity"
 	"FGW/internal/handler"
+	"FGW/internal/handler/http_web/auth"
 	"FGW/internal/service"
 	"FGW/pkg/convert"
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"fmt"
+	"html/template"
 	"net/http"
+	"time"
 )
 
 const (
@@ -47,6 +50,11 @@ func (h *HandbookHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 
 	if handbooks == nil {
 		handbooks = []*entity.Handbook{}
+		if err = h.handbookService.AddZeroObj(r.Context()); err != nil {
+			handler.WriteServerError(w, r, h.wLogg, msg.H7010, err)
+
+			return
+		}
 	}
 
 	data := entity.HandbookList{Handbooks: handbooks}
@@ -60,8 +68,13 @@ func (h *HandbookHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tmpl, ok := handler.ParseTemplateHTML(templateHtmlHandbookList, w, r, h.wLogg)
-	if !ok {
+	tmpl, err := template.New("handbook_list.html").Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templateHtmlHandbookList)
+	if err != nil {
+		handler.WriteServerError(w, r, h.wLogg, msg.H7006, err)
+
 		return
 	}
 
@@ -99,9 +112,15 @@ func (h *HandbookHandlerHTTP) processUpdateFormHandbook(w http.ResponseWriter, r
 		return
 	}
 
+	lastUserDateTime := time.Now().Format("2006-01-02 15:04:05")
+
 	handbook := &entity.Handbook{
 		IdHandbook: idHandbook,
 		Name:       r.FormValue("name"),
+		AuditRecord: entity.AuditRecord{
+			LastUser:         auth.UUIDEmployee,
+			LastUserDateTime: lastUserDateTime,
+		},
 	}
 
 	if err := h.handbookService.Update(r.Context(), idHandbook, handbook); err != nil {
@@ -117,8 +136,24 @@ func (h *HandbookHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ownerUserDateTime := r.FormValue("ownerUserDateTime")
+	if ownerUserDateTime == "" {
+		ownerUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
+	lastUserDateTime := r.FormValue("lastUserDateTime")
+	if lastUserDateTime == "" {
+		lastUserDateTime = time.Now().Format("2006-01-02 15:04:05")
+	}
+
 	handbook := &entity.Handbook{
 		Name: r.PostFormValue("name"),
+		AuditRecord: entity.AuditRecord{
+			OwnerUser:         auth.UUIDEmployee,
+			OwnerUserDateTime: ownerUserDateTime,
+			LastUser:          auth.UUIDEmployee,
+			LastUserDateTime:  lastUserDateTime,
+		},
 	}
 
 	if err := h.handbookService.Add(r.Context(), handbook); err != nil {

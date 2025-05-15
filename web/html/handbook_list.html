@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/employee/column_style.css" type="text/css">
     <title>Список справочников</title>
 </head>
 <body>
@@ -14,42 +16,58 @@
     </label>
     <input type="submit" value="Добавить">
 </form>
-<br>
-<table class="border-table">
-    <thead>
-    <tr>
-        <th class="border-table">ИД</th>
-        <th class="border-table">Название</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range .Handbooks}}
+
+<div class="table-container">
+    <table class="table">
+        <thead>
         <tr>
-            <td class="border-table">{{ .IdHandbook}}</td>
-            {{ if .IsEditing}}
-                <form method="POST" action="/fgw/handbooks/update">
-                    <td><label>
-                            <input type="text" name="name" value="{{ .Name}}">
-                        </label>
-                    </td>
-                    <td>
-                        <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
-                        <input type="submit" value="Сохранить">
-                    </td>
-                </form>
-            {{ else}}
-                <td class="border-table">{{ .Name}}</td>
-                <td>
-                    <a href="/fgw/handbooks/update?idHandbook={{ .IdHandbook}}">Изменить</a>
-                    <form method="POST" action="/fgw/handbooks/delete" style="display:inline;">
-                        <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
-                        <input type="submit" value="Удалить">
-                    </form>
-                </td>
-            {{ end}}
+            <th>ИД</th>
+            <th>Название</th>
+            <th>Код владельца записи</th>
+            <th>Дата модификации</th>
+            <th>Код пользователя</th>
+            <th>Дата последней модификации</th>
+            <th>Панель управления операциями</th>
         </tr>
-    {{end}}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {{range .Handbooks}}
+            <tr id="handbook_{{ .IdHandbook}}">
+                <td>{{ .IdHandbook}}</td>
+                {{ if .IsEditing}}
+                    <form method="POST" action="/fgw/handbooks/update">
+                        <td><label>
+                                <input type="text" name="name" value="{{ .Name}}">
+                            </label>
+                        </td>
+                        <td>{{ .AuditRecord.OwnerUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                        <td>{{ .AuditRecord.LastUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                        <td>
+                            <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
+                            <input type="submit" value="Сохранить">
+                        </td>
+
+                    </form>
+                {{ else}}
+                    <td>{{ .Name}}</td>
+                    <td>{{ .AuditRecord.OwnerUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                    <td>{{ .AuditRecord.LastUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                    <td>
+                        <a href="/fgw/handbooks?idHandbook={{ .IdHandbook}}#handbook_{{ .IdHandbook}}">Изменить</a>
+                        <form method="POST" action="/fgw/handbooks/delete" style="display:inline;">
+                            <input type="hidden" name="idHandbook" value="{{ .IdHandbook}}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                {{ end}}
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

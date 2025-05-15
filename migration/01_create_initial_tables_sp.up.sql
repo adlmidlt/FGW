@@ -39,36 +39,23 @@ CREATE TABLE dbo.catalog
 -- Таблица справочников.
 CREATE TABLE dbo.handbook
 (
-    id_handbook INT IDENTITY PRIMARY KEY, -- ИД справочника.
-    name        VARCHAR(150) NOT NULL     -- наименование справочника.
+    id_handbook         INT IDENTITY PRIMARY KEY,  -- ИД справочника.
+    name                VARCHAR(150)     NOT NULL, -- наименование справочника.
+    owner_user          UNIQUEIDENTIFIER NOT NULL, -- uuid владельца записи
+    owner_user_datetime DATETIME         NOT NULL, -- дата и время записи владельца
+    last_user           UNIQUEIDENTIFIER NOT NULL, -- uuid последнего
+    last_user_datetime  DATETIME         NOT NULL  -- дата и время последней модификации
 );
 
 CREATE PROCEDURE fgw_insert_handbook
-    AS
+AS
 BEGIN
-    SET
-IDENTITY_INSERT handbook ON;
-INSERT INTO handbook (id_handbook, name)
-VALUES (0, N'Конструкторское наименование'),
-       (1, N'Действия над объектами учета'),
-       (2, N'Действия над этикеткой'),
-       (3, N'Цвет продукции'),
-       (4, N'Принтеры'),
-       (5, N'Действия для заявок'),
-       (6, N'Приоритеты'),
-       (7, N'Статусы заявок'),
-       (8, N'Компьютеры'),
-       (9, N'Участки упаковки'),
-       (10, N'Участки хранения'),
-       (11, N'Объекты учёта'),
-       (12, N'Назначение при списании'),
-       (13, N'Комментарии к пакет-поддонам'),
-       (14, N'Размеры этикеток'),
-       (15, N'Типы документов');
-SET
-IDENTITY_INSERT handbook OFF;
+    SET IDENTITY_INSERT handbook ON;
+    INSERT INTO handbook (id_handbook, name, owner_user, owner_user_datetime, last_user, last_user_datetime)
+    VALUES (0, N'Конструкторское наименование', newid(), getdate(), newid(), getdate())
+    SET IDENTITY_INSERT handbook OFF;
 END
-GO
+go
 
 exec dbo.fgw_insert_handbook;
 

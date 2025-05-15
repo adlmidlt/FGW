@@ -26,6 +26,7 @@ type HandbookRepository interface {
 	Update(ctx context.Context, idHandbook int, handbook *entity.Handbook) error
 	Delete(ctx context.Context, idHandbook int) error
 	ExistsByID(ctx context.Context, idHandbook int) (bool, error)
+	AddZeroObj(ctx context.Context) error
 }
 
 func (h *HandbookRepo) All(ctx context.Context) ([]*entity.Handbook, error) {
@@ -43,6 +44,10 @@ func (h *HandbookRepo) All(ctx context.Context) ([]*entity.Handbook, error) {
 		if err = rows.Scan(
 			&handbook.IdHandbook,
 			&handbook.Name,
+			&handbook.AuditRecord.OwnerUser,
+			&handbook.AuditRecord.OwnerUserDateTime,
+			&handbook.AuditRecord.LastUser,
+			&handbook.AuditRecord.LastUserDateTime,
 		); err != nil {
 			h.wLogg.LogE(msg.E3001, err)
 
@@ -71,6 +76,10 @@ func (h *HandbookRepo) FindById(ctx context.Context, idHandbook int) (*entity.Ha
 	if err := h.mssql.QueryRowContext(ctx, FGWHandbookFindByIdQuery, idHandbook).Scan(
 		&handbook.IdHandbook,
 		&handbook.Name,
+		&handbook.AuditRecord.OwnerUser,
+		&handbook.AuditRecord.OwnerUserDateTime,
+		&handbook.AuditRecord.LastUser,
+		&handbook.AuditRecord.LastUserDateTime,
 	); err != nil {
 		h.wLogg.LogE(msg.E3000, err)
 
@@ -82,7 +91,13 @@ func (h *HandbookRepo) FindById(ctx context.Context, idHandbook int) (*entity.Ha
 }
 
 func (h *HandbookRepo) Add(ctx context.Context, handbook *entity.Handbook) error {
-	if _, err := h.mssql.ExecContext(ctx, FGWHandbookAddQuery, handbook.Name); err != nil {
+	if _, err := h.mssql.ExecContext(ctx, FGWHandbookAddQuery,
+		handbook.Name,
+		handbook.AuditRecord.OwnerUser,
+		handbook.AuditRecord.OwnerUserDateTime,
+		handbook.AuditRecord.LastUser,
+		handbook.AuditRecord.LastUserDateTime,
+	); err != nil {
 		h.wLogg.LogE(msg.E3000, err)
 
 		return err
@@ -92,7 +107,11 @@ func (h *HandbookRepo) Add(ctx context.Context, handbook *entity.Handbook) error
 }
 
 func (h *HandbookRepo) Update(ctx context.Context, idHandbook int, handbook *entity.Handbook) error {
-	if _, err := h.mssql.ExecContext(ctx, FGWHandbookUpdateQuery, idHandbook, handbook.Name); err != nil {
+	if _, err := h.mssql.ExecContext(ctx, FGWHandbookUpdateQuery, idHandbook,
+		handbook.Name,
+		handbook.AuditRecord.LastUser,
+		handbook.AuditRecord.LastUserDateTime,
+	); err != nil {
 		h.wLogg.LogE(msg.E3000, err)
 
 		return err
@@ -120,4 +139,14 @@ func (h *HandbookRepo) ExistsByID(ctx context.Context, idHandbook int) (bool, er
 	}
 
 	return exists, nil
+}
+
+func (h *HandbookRepo) AddZeroObj(ctx context.Context) error {
+	if _, err := h.mssql.ExecContext(ctx, FGWHandbookAddZeroObjQuery); err != nil {
+		h.wLogg.LogE(msg.E3000, err)
+
+		return err
+	}
+
+	return nil
 }

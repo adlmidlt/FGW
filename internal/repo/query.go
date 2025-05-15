@@ -30,12 +30,13 @@ var (
 )
 
 var (
-	FGWHandbookAllQuery      = "exec dbo.fgw_handbook_all;"
-	FGWHandbookFindByIdQuery = "exec dbo.fgw_handbook_find_by_id ?;"
-	FGWHandbookAddQuery      = "exec dbo.fgw_handbook_add ?;"
-	FGWHandbookUpdateQuery   = "exec dbo.fgw_handbook_update ?, ?;"
-	FGWHandbookDeleteQuery   = "exec dbo.fgw_handbook_delete_by_id ?;"
-	FGWHandbookExistsQuery   = "exec dbo.fgw_handbook_exist ?;"
+	FGWHandbookAllQuery        = "exec dbo.fgw_handbook_all;"
+	FGWHandbookFindByIdQuery   = "exec dbo.fgw_handbook_find_by_id ?;"
+	FGWHandbookAddQuery        = "exec dbo.fgw_handbook_add ?, ?, ?, ?, ?;"
+	FGWHandbookUpdateQuery     = "exec dbo.fgw_handbook_update ?, ?, ?, ?;"
+	FGWHandbookDeleteQuery     = "exec dbo.fgw_handbook_delete_by_id ?;"
+	FGWHandbookExistsQuery     = "exec dbo.fgw_handbook_exist ?;"
+	FGWHandbookAddZeroObjQuery = "exec dbo.fgw_handbook_add_zero_obj;"
 )
 
 var (
