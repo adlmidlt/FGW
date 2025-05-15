@@ -67,18 +67,22 @@ func (a *AuthorizationHandlerHTTP) LogIn(w http.ResponseWriter, r *http.Request)
 	}
 
 	found := false
+
 	for _, employee := range employees {
 		if employee.ServiceNumber == serviceNumber && checkPasswd(employee.Passwd, passwd) {
-			found = true
 			UUIDEmployee = employee.IdEmployee
 
+			if employee.RoleId.String() == "943c699f-8fd3-4707-9db2-944c26ee2afc" {
+				http.Redirect(w, r, "/fgw", http.StatusFound)
+			} else {
+				http.Redirect(w, r, "/покаещенепридумал", http.StatusFound)
+			}
+			found = true
 			break
 		}
 	}
 
-	if found {
-		http.Redirect(w, r, "/fgw", http.StatusSeeOther)
-	} else {
+	if !found {
 		a.NotFound(w, r)
 	}
 }
