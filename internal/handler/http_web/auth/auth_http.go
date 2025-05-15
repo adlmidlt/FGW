@@ -14,6 +14,8 @@ import (
 )
 
 const templateHTMLAuth = "../web/html/auth.html"
+const templateHTMLNotFound = "../web/html/404.html"
+const templateHTMLIndex = "../web/html/index.html"
 
 var UUIDEmployee uuid.UUID
 
@@ -29,6 +31,8 @@ func NewAuthorizationHandlerHTTP(employeeService service.EmployeeUseCase, wLogg 
 func (a *AuthorizationHandlerHTTP) ServeHTTPRouters(mux *http.ServeMux) {
 	mux.HandleFunc("/", a.ShowAuthForm)
 	mux.HandleFunc("/login", a.LogIn)
+	mux.HandleFunc("/404", a.NotFound)
+	mux.HandleFunc("/fgw", a.StartPage)
 }
 func (a *AuthorizationHandlerHTTP) ShowAuthForm(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(templateHTMLAuth)
@@ -67,14 +71,42 @@ func (a *AuthorizationHandlerHTTP) LogIn(w http.ResponseWriter, r *http.Request)
 		if employee.ServiceNumber == serviceNumber && checkPasswd(employee.Passwd, passwd) {
 			found = true
 			UUIDEmployee = employee.IdEmployee
+
 			break
 		}
 	}
 
 	if found {
-		http.Redirect(w, r, "/fgw/employees", http.StatusSeeOther)
+		http.Redirect(w, r, "/fgw", http.StatusSeeOther)
 	} else {
-		http.Redirect(w, r, "/", http.StatusUnauthorized)
+		a.NotFound(w, r)
+	}
+}
+
+func (a *AuthorizationHandlerHTTP) NotFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	tmpl, err := template.ParseFiles(templateHTMLNotFound)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if !handler.ExecuteTemplate(tmpl, nil, w, r, a.wLogg) {
+		return
+	}
+}
+
+func (a *AuthorizationHandlerHTTP) StartPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(templateHTMLIndex)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if !handler.ExecuteTemplate(tmpl, nil, w, r, a.wLogg) {
+		return
 	}
 }
 
