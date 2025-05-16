@@ -9,6 +9,7 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"fmt"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -74,8 +75,13 @@ func (p *PackVariantHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tmpl, ok := handler.ParseTemplateHTML(templateHtmlPackVariantList, w, r, p.wLogg)
-	if !ok {
+	tmpl, err := template.New("pack_variant_list.html").Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templateHtmlPackVariantList)
+	if err != nil {
+		handler.WriteServerError(w, r, p.wLogg, msg.H7006, err)
+
 		return
 	}
 
@@ -258,10 +264,8 @@ func (p *PackVariantHandlerHTTP) processUpdateFormPackVariant(w http.ResponseWri
 		NumberingBatch:    convert.ParseFormFieldInt(r, "numberingBatch"),
 		IsArchive:         isArchive,
 		AuditRecord: entity.AuditRecord{
-			OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
-			OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
-			LastUser:          auth.UUIDEmployee,
-			LastUserDateTime:  lastUserDateTime,
+			LastUser:         auth.UUIDEmployee,
+			LastUserDateTime: lastUserDateTime,
 		},
 	}
 

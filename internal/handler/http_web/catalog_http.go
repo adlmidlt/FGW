@@ -9,6 +9,7 @@ import (
 	"FGW/pkg/wlogger"
 	"FGW/pkg/wlogger/msg"
 	"fmt"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -80,8 +81,13 @@ func (c *CatalogHandlerHTTP) All(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tmpl, ok := handler.ParseTemplateHTML(templateHtmlCatalogList, w, r, c.wLogg)
-	if !ok {
+	tmpl, err := template.New("catalog_list.html").Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templateHtmlCatalogList)
+	if err != nil {
+		handler.WriteServerError(w, r, c.wLogg, msg.H7006, err)
+
 		return
 	}
 
@@ -95,6 +101,8 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//errors := make(map[string]string)
+
 	catalogs, err := c.catalogService.All(r.Context())
 	if err != nil {
 		handler.WriteServerError(w, r, c.wLogg, msg.H7003, err)
@@ -102,17 +110,22 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parentId := convert.ConvStrToInt(r.FormValue("parentId"))
-	if parentId == 0 {
-		parentId = 0
+	parentIdStr := r.FormValue("parentId")
+	if parentIdStr == "" {
+		parentIdStr = "0"
 	}
+	parentId := convert.ConvStrToInt(parentIdStr)
 
 	handbookId := convert.ConvStrToInt(r.FormValue("handbookId"))
 	if handbookId == 0 {
 		handbookId = 0
 	}
 
-	recordIndex := convert.ConvStrToInt(r.FormValue("recordIndex"))
+	recordIndexStr := r.FormValue("recordIndex")
+	if recordIndexStr == "" {
+		recordIndexStr = "0"
+	}
+	recordIndex := convert.ConvStrToInt(recordIndexStr)
 	for _, catalog := range catalogs {
 		if catalog.HandbookId == handbookId {
 			if recordIndex == 0 {
@@ -157,6 +170,7 @@ func (c *CatalogHandlerHTTP) Add(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 	http.Redirect(w, r, fgwCatalogStartUrl, http.StatusSeeOther)
 }
 
@@ -209,10 +223,8 @@ func (c *CatalogHandlerHTTP) processUpdateFormEmployee(w http.ResponseWriter, r 
 		HandbookValueBool2:    handbookValueBool2,
 		IsArchive:             isArchive,
 		AuditRecord: entity.AuditRecord{
-			OwnerUser:         convert.ParseUUIDUnsafe(r.FormValue("ownerUser")),
-			OwnerUserDateTime: r.FormValue("ownerUserDateTime"),
-			LastUser:          auth.UUIDEmployee,
-			LastUserDateTime:  lastUserDateTime,
+			LastUser:         auth.UUIDEmployee,
+			LastUserDateTime: lastUserDateTime,
 		},
 	}
 

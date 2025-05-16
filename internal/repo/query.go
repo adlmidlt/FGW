@@ -22,8 +22,8 @@ var (
 var (
 	FGWCatalogAllQuery             = "exec dbo.fgw_catalog_all;"
 	FGWCatalogFindByIdQuery        = "exec dbo.fgw_catalog_find_by_id ?;"
-	FGWCatalogAddQuery             = "exec dbo.fgw_catalog_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWCatalogUpdateQuery          = "exec dbo.fgw_catalog_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWCatalogAddQuery             = "exec dbo.fgw_catalog_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWCatalogUpdateQuery          = "exec dbo.fgw_catalog_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
 	FGWCatalogDeleteQuery          = "exec dbo.fgw_catalog_delete_by_id ?;"
 	FGWCatalogExistQuery           = "exec dbo.fgw_catalog_exist ?;"
 	FGWCatalogAllFindByNumberQuery = "exec dbo.fgw_catalog_all_find_by_number ?;"
@@ -43,7 +43,7 @@ var (
 	FGWPackVariantAllQuery      = "exec dbo.fgw_pack_variant_all;"
 	FGWPackVariantFindByIdQuery = "exec dbo.fgw_pack_variant_find_by_id ?;"
 	FGWPackVariantAddQuery      = "exec dbo.fgw_pack_variant_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWPackVariantUpdateQuery   = "exec dbo.fgw_pack_variant_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWPackVariantUpdateQuery   = "exec dbo.fgw_pack_variant_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
 	FGWPackVariantDeleteQuery   = "exec dbo.fgw_pack_variant_delete_by_id ?;"
 	FGWPackVariantExistQuery    = "exec dbo.fgw_pack_variant_exist ?;"
 )

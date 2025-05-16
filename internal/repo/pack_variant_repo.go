@@ -202,8 +202,6 @@ func (p *PackVariantRepo) Update(ctx context.Context, idPackVariant int, packVar
 		packVariant.CurrentDateBatch,
 		packVariant.NumberingBatch,
 		packVariant.IsArchive,
-		packVariant.AuditRecord.OwnerUser,
-		packVariant.AuditRecord.OwnerUserDateTime,
 		packVariant.AuditRecord.LastUser,
 		packVariant.AuditRecord.LastUserDateTime,
 	); err != nil {

@@ -52,7 +52,13 @@ func ConvStrToFloat(str string) float64 {
 
 // ParseFormFieldInt преобразует поле в целое число, полученное из HTTP запроса.
 func ParseFormFieldInt(r *http.Request, fieldName string) int {
-	value, err := strconv.Atoi(r.FormValue(fieldName))
+	formValue := r.FormValue(fieldName)
+	if formValue == "" {
+		formValue = "0"
+
+		return 0
+	}
+	value, err := strconv.Atoi(formValue)
 	if err != nil {
 		log.Printf("Ошибка: [%s] --- ссылка на код: [ %s ] --- поле: [%s] --- значение: [%v]", err.Error(), wlogger.FileWithLineNum(), fieldName, value)
 
@@ -64,7 +70,13 @@ func ParseFormFieldInt(r *http.Request, fieldName string) int {
 
 // ParseFormFieldFloat преобразует поле в вещественное число, полученное из HTTP запроса.
 func ParseFormFieldFloat(r *http.Request, fieldName string) float64 {
-	value, err := strconv.ParseFloat(r.FormValue(fieldName), 64)
+	formValue := r.FormValue(fieldName)
+	if formValue == "" {
+		formValue = "0"
+
+		return 0
+	}
+	value, err := strconv.ParseFloat(formValue, 64)
 	if err != nil {
 		log.Printf("Ошибка: [%s] --- ссылка на код: [ %s ] --- поле: [%s] --- значение: [%v]", err.Error(), wlogger.FileWithLineNum(), fieldName, value)
 
@@ -77,8 +89,10 @@ func ParseFormFieldFloat(r *http.Request, fieldName string) float64 {
 // ParseFormFieldBool преобразует поле в булево значение, полученное из HTTP запроса.
 func ParseFormFieldBool(r *http.Request, fieldName string) bool {
 	formValue := r.FormValue(fieldName)
-	if formValue == "on" {
-		return true
+	if formValue == "" {
+		formValue = "false"
+	} else {
+		formValue = "true"
 	}
 
 	value, err := strconv.ParseBool(formValue)

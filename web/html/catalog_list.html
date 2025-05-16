@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/employee/column_style.css" type="text/css">
     <title>Список каталогов</title>
 </head>
 <body>
@@ -93,135 +95,137 @@
     <button type="submit">Применить фильтр</button>
 </form>
 
-<table class="border-table">
-    <thead>
-    <tr>
-        <th class="border-table">ИД</th>
-        <th class="border-table">ИД родительской записи</th>
-        <th class="border-table">Номер справочника</th>
-        <th class="border-table">Индекс записи</th>
-        <th class="border-table">Название</th>
-        <th class="border-table">Комментарий</th>
-        <th class="border-table">Поле справочника (0, 1, 3, 4, 9, 10)</th>
-        <th class="border-table">Доп. поле справочника (0, 1, 3, 4, 9, 10)</th>
-        <th class="border-table">Поле справочника (10) возможный процент использования</th>
-        <th class="border-table">Доп. поле справочника (10) вместимость, S, V</th>
-        <th class="border-table">Поле справочника (9) переупаковка да/нет</th>
-        <th class="border-table">Доп. поле справочника (10) наличие ЖД путей да/нет</th>
-        <th class="border-table">Архивная запись</th>
-        <th class="border-table">Код владельца записи</th>
-        <th class="border-table">Дата модификации</th>
-        <th class="border-table">Код пользователя</th>
-        <th class="border-table">Дата последней модификации</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{ range .Catalogs}}
+<div class="table-container">
+    <table class="table">
+        <thead>
         <tr>
-            {{if .IsEditing}}
-                <form method="POST" action="/fgw/catalogs/update">
-                    <td class="border-table">{{ .IdCatalog}}</td>
-                    <td><label>
-                            <input type="number" name="parentId" value="{{ .ParentId}}">
-                        </label>
-                    </td>
-
-                    <td>
-                        <label>
-                            <select name="handbookId">
-                                {{ $catalog := . }}
-                                {{ range $.Handbooks }}
-                                    <option value="{{ .IdHandbook}}"
-                                            {{ if eq .IdHandbook $catalog.HandbookId }}selected{{ end}}>{{ .IdHandbook}}
-                                        - {{ .Name}}</option>
-                                {{ end}}
-                            </select>
-                        </label>
-                    </td>
-
-                    <td><label>
-                            <input type="number" name="recordIndex" value="{{ .RecordIndex}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="text" name="name" value="{{ .Name}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="text" name="comment" value="{{ .Comment}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="number" name="handbookValueInt1" value="{{ .HandbookValueInt1}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="number" name="handbookValueInt2" value="{{ .HandbookValueInt2}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="number" name="handbookValueDecimal1" step="0.01"
-                                   value="{{ .HandbookValueDecimal1}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="number" name="handbookValueDecimal2" step="0.01"
-                                   value="{{ .HandbookValueDecimal2}}">
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="checkbox" name="handbookValueBool1" value="true"
-                                   {{ if .HandbookValueBool1 }}checked{{ end }}>
-                        </label></td>
-                    <td><label>
-                            <input type="checkbox" name="handbookValueBool2" value="true"
-                                   {{ if .HandbookValueBool2 }}checked{{ end }}>
-                        </label>
-                    </td>
-                    <td><label>
-                            <input type="checkbox" name="isArchive" value="true"
-                                   {{ if .IsArchive }}checked{{ end }}>
-                        </label>
-                    </td>
-                    <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
-                    <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
-                    <td class="border-table">{{ .AuditRecord.LastUser}}</td>
-                    <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
-                    <td>
-                        <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
-                        <input type="submit" value="Сохранить">
-                    </td>
-                </form>
-            {{else}}
-                <td class="border-table">{{ .IdCatalog}}</td>
-                <td class="border-table">{{ .ParentId}}</td>
-                <td class="border-table">{{ .HandbookId}}</td>
-                <td class="border-table">{{ .RecordIndex}}</td>
-                <td class="border-table">{{ .Name}}</td>
-                <td class="border-table">{{ .Comment}}</td>
-                <td class="border-table">{{ .HandbookValueInt1}}</td>
-                <td class="border-table">{{ .HandbookValueInt2}}</td>
-                <td class="border-table">{{ .HandbookValueDecimal1}}</td>
-                <td class="border-table">{{ .HandbookValueDecimal2}}</td>
-                <td class="border-table">{{ .HandbookValueBool1}}</td>
-                <td class="border-table">{{ .HandbookValueBool2}}</td>
-                <td class="border-table">{{ .IsArchive}}</td>
-                <td class="border-table">{{ .AuditRecord.OwnerUser}}</td>
-                <td class="border-table">{{ .AuditRecord.OwnerUserDateTime}}</td>
-                <td class="border-table">{{ .AuditRecord.LastUser}}</td>
-                <td class="border-table">{{ .AuditRecord.LastUserDateTime}}</td>
-                <td>
-                    <a href="/fgw/catalogs/update?idCatalog={{ .IdCatalog}}">Изменить</a>
-                    <form method="POST" action="/fgw/catalogs/delete" style="display:inline;">
-                        <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
-                        <input type="submit" value="Удалить">
-                    </form>
-                </td>
-            {{end}}
+            <th>ИД</th>
+            <th>ИД родительской записи</th>
+            <th>Номер справочника</th>
+            <th>Индекс записи</th>
+            <th>Название</th>
+            <th>Комментарий</th>
+            <th>Поле справочника (0, 1, 3, 4, 9, 10)</th>
+            <th>Доп. поле справочника (0, 1, 3, 4, 9, 10)</th>
+            <th>Поле справочника (10) возможный процент использования</th>
+            <th>Доп. поле справочника (10) вместимость, S, V</th>
+            <th>Поле справочника (9) переупаковка да/нет</th>
+            <th>Доп. поле справочника (10) наличие ЖД путей да/нет</th>
+            <th>Архивная запись</th>
+            <th>Код владельца записи</th>
+            <th>Дата модификации</th>
+            <th>Код пользователя</th>
+            <th>Дата последней модификации</th>
+            <th>Панель управления операциями</th>
         </tr>
-    {{ end}}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {{ range .Catalogs}}
+            <tr>
+                {{if .IsEditing}}
+                    <form method="POST" action="/fgw/catalogs/update">
+                        <td>{{ .IdCatalog}}</td>
+                        <td><label>
+                                <input type="number" name="parentId" value="{{ .ParentId}}">
+                            </label>
+                        </td>
 
+                        <td>
+                            <label>
+                                <select name="handbookId">
+                                    {{ $catalog := . }}
+                                    {{ range $.Handbooks }}
+                                        <option value="{{ .IdHandbook}}"
+                                                {{ if eq .IdHandbook $catalog.HandbookId }}selected{{ end}}>{{ .IdHandbook}}
+                                            - {{ .Name}}</option>
+                                    {{ end}}
+                                </select>
+                            </label>
+                        </td>
+
+                        <td><label>
+                                <input type="number" name="recordIndex" value="{{ .RecordIndex}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="text" name="name" value="{{ .Name}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="text" name="comment" value="{{ .Comment}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="number" name="handbookValueInt1" value="{{ .HandbookValueInt1}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="number" name="handbookValueInt2" value="{{ .HandbookValueInt2}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="number" name="handbookValueDecimal1" step="0.01"
+                                       value="{{ .HandbookValueDecimal1}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="number" name="handbookValueDecimal2" step="0.01"
+                                       value="{{ .HandbookValueDecimal2}}">
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="checkbox" name="handbookValueBool1" value="true"
+                                       {{ if .HandbookValueBool1 }}checked{{ end }}>
+                            </label></td>
+                        <td><label>
+                                <input type="checkbox" name="handbookValueBool2" value="true"
+                                       {{ if .HandbookValueBool2 }}checked{{ end }}>
+                            </label>
+                        </td>
+                        <td><label>
+                                <input type="checkbox" name="isArchive" value="true"
+                                       {{ if .IsArchive }}checked{{ end }}>
+                            </label>
+                        </td>
+                        <td>{{ .AuditRecord.OwnerUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                        <td>{{ .AuditRecord.LastUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                        <td>
+                            <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
+                            <input type="submit" value="Сохранить">
+                        </td>
+                    </form>
+                {{else}}
+                    <td>{{ .IdCatalog}}</td>
+                    <td>{{ .ParentId}}</td>
+                    <td>{{ .HandbookId}}</td>
+                    <td>{{ .RecordIndex}}</td>
+                    <td>{{ .Name}}</td>
+                    <td>{{ .Comment}}</td>
+                    <td>{{ .HandbookValueInt1}}</td>
+                    <td>{{ .HandbookValueInt2}}</td>
+                    <td>{{ .HandbookValueDecimal1}}</td>
+                    <td>{{ .HandbookValueDecimal2}}</td>
+                    <td>{{ .HandbookValueBool1}}</td>
+                    <td>{{ .HandbookValueBool2}}</td>
+                    <td>{{ .IsArchive}}</td>
+                    <td>{{ .AuditRecord.OwnerUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                    <td>{{ .AuditRecord.LastUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                    <td>
+                        <a href="/fgw/catalogs/update?idCatalog={{ .IdCatalog}}">Изменить</a>
+                        <form method="POST" action="/fgw/catalogs/delete" style="display:inline;">
+                            <input type="hidden" name="idCatalog" value="{{ .IdCatalog}}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                {{end}}
+            </tr>
+        {{ end}}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

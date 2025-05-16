@@ -157,8 +157,6 @@ func (c *CatalogRepo) Update(ctx context.Context, idCatalog int, catalog *entity
 		catalog.HandbookValueBool1,
 		catalog.HandbookValueBool2,
 		catalog.IsArchive,
-		catalog.AuditRecord.OwnerUser,
-		catalog.AuditRecord.OwnerUserDateTime,
 		catalog.AuditRecord.LastUser,
 		catalog.AuditRecord.LastUserDateTime,
 	); err != nil {

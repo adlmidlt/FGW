@@ -6,7 +6,15 @@ BEGIN
 END
 go
 
-
+CREATE PROCEDURE fgw_handbook_add_zero_obj
+AS
+BEGIN
+    SET IDENTITY_INSERT handbook ON;
+    INSERT INTO handbook (id_handbook, name, owner_user, owner_user_datetime, last_user, last_user_datetime)
+    VALUES (0, N'Конструкторское наименование', newid(), getdate(), newid(), getdate())
+    SET IDENTITY_INSERT handbook OFF;
+END
+go
 
 CREATE PROCEDURE dbo.fgw_handbook_find_by_id -- ХП ищет справочник по ИД
     @idHandbook INT -- ид справочника
