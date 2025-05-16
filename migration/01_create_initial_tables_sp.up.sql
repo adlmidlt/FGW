@@ -126,10 +126,10 @@ CREATE TABLE dbo.operation
 (
     id_operation        INT IDENTITY PRIMARY KEY,  -- генерирует и итерирует serial
     type_operation      INT              NOT NULL, -- тип операции (0 - приход, 1 - перемещение, 2 - списание, 3 - продажа, 4 - инвентаризация)
-    date_operation      DATETIME         NOT NULL, -- дата создания операции
+    create_date         DATETIME         NOT NULL, -- дата создания операции
     created_by_employee INT              NOT NULL, -- табельный номер сотрудника, создавшего операцию
     date_order          DATETIME         NOT NULL, -- дата ордера
-    ordered_by_employee INT              NOT NULL, -- табельный номер сотрудника, сформировавшего ордера
+    closed_by_employee  INT              NOT NULL, -- табельный номер сотрудника, сформировавшего ордера
     code_accounting_obj INT DEFAULT 0    NOT NULL, -- код объекта учета (0 - паллет-поддон, 1 - форма-комплект)
     appoint             INT DEFAULT 0    NOT NULL, -- назначение при списании (0 - в бой, 1 - на переупаковку)
     owner_user          UNIQUEIDENTIFIER NOT NULL, -- uuid владельца записи
