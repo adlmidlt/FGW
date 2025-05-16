@@ -1,8 +1,8 @@
 package entity
 
 type OperationList struct {
-	Operations []Operation `json:"operations"`
-	Catalogs   []Catalog   `json:"catalogs"`
+	Operations []*Operation `json:"operations"`
+	Catalogs   []*Catalog   `json:"catalogs"`
 }
 
 type Operation struct {

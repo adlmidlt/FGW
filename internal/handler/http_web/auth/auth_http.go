@@ -18,6 +18,7 @@ const templateHTMLNotFound = "../web/html/404.html"
 const templateHTMLIndex = "../web/html/index.html"
 
 var UUIDEmployee uuid.UUID
+var ServiceNumber int
 
 type AuthorizationHandlerHTTP struct {
 	employeeService service.EmployeeUseCase
@@ -71,6 +72,7 @@ func (a *AuthorizationHandlerHTTP) LogIn(w http.ResponseWriter, r *http.Request)
 	for _, employee := range employees {
 		if employee.ServiceNumber == serviceNumber && checkPasswd(employee.Passwd, passwd) {
 			UUIDEmployee = employee.IdEmployee
+			ServiceNumber = employee.ServiceNumber
 
 			if employee.RoleId.String() == "943c699f-8fd3-4707-9db2-944c26ee2afc" {
 				http.Redirect(w, r, "/fgw", http.StatusFound)

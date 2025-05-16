@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/css/table_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/field_style.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/employee/column_style.css" type="text/css">
+    <title>Список операции</title>
+</head>
+<body>
+
+<h1>Добавить операцию</h1>
+<form method="POST" action="/fgw/operations/add">
+    <label>
+        Тип операции:
+        <select name="typeOperation">
+            {{ range $.Catalogs}}
+                {{ if eq .HandbookId 1 }} {{/* 1 - Действие над объектами учёта*/}}
+                <option value="{{ .RecordIndex }}">
+                    {{ .Name }}
+                </option>
+                {{ end }}
+            {{ end}}
+        </select>
+    </label>
+    <br>
+
+    <label>
+        Дата создания:
+        <input type="date" name="createDate">
+    </label>
+    <br>
+
+    <label>
+        Код объекта учета (0 - паллет-поддон, 1 - форма-комплект):
+        <input type="number" name="codeAccountingObj">
+    </label>
+    <br>
+
+    <label>
+        Назначение при списании (0 - в бой, 1 - на переупаковку)
+        <input type="number" name="appoint" >
+    </label>
+    <br>
+
+    <input type="submit" value="Добавить">
+</form>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ИД</th>
+            <th>Тип операции</th>
+            <th>Дата операции</th>
+            <th>Создан сотрудником</th>
+            <th>Дата ордера</th>
+            <th>Закрыт сотрудником</th>
+            <th>Код объекта учета 0-п\п, 1-ф\к</th>
+            <th>Назначение при списании 0-в бой, 1-переупаковка</th>
+            <th>Код владельца записи</th>
+            <th>Дата модификации</th>
+            <th>Код пользователя</th>
+            <th>Дата последней модификации</th>
+            <th>Панель управления операциями</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Operations}}
+            <tr>
+                {{if .IsEditing}}
+                    <form method="POST" action="/fgw/operations/update">
+                        <td>{{ .IdOperation}}</td>
+
+                        <td>
+                            <label>
+                                <select name="typeOperation">
+                                    {{ $typeOperationName := .}}
+                                    {{ range $.Catalogs}}
+                                        {{ if eq .HandbookId 1}}
+                                            <option value="{{ .Name}}"
+                                                    {{ if eq $typeOperationName.TypeOperation .Name}}selected{{end}}>
+                                                {{ .HandbookId}} - {{ .Name}}
+                                            </option>
+                                        {{ end }}
+                                    {{ end }}
+                                </select>
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="date" name="createDate" value="{{ .CreateDate}}">
+                            </label>
+                        </td>
+                        <td>{{ .CreateByEmployee}}</td>
+                        <td>{{ formatDateTime .DateOrder}}</td>
+                        <td>{{ .ClosedByEmployee}}</td>
+                        <td>
+                            <label>
+                                <input type="number" name="codeAccountingObj" value="{{ .CodeAccountingObj}}">
+                            </label>
+                        </td>
+
+                        <td>
+                            <label>
+                                <input type="number" name="appoint" value="{{ .Appoint}}">
+                            </label>
+                        </td>
+                        <td>{{ .AuditRecord.OwnerUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                        <td>{{ .AuditRecord.LastUser}}</td>
+                        <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                        <td>
+                            <input type="hidden" name="idOperation" value="{{ .IdOperation}}">
+                            <input type="submit" value="Сохранить">
+                        </td>
+                    </form>
+                {{ else }}
+                    <td>{{ .IdOperation}}</td>
+                    <td>{{ .TypeOperation}}</td>
+                    <td>{{ formatDateTime .CreateDate}}</td>
+                    <td>{{ .CreateByEmployee}}</td>
+                    <td>{{ formatDateTime .DateOrder}}</td>
+                    <td>{{ .ClosedByEmployee}}</td>
+                    <td>{{ .CodeAccountingObj}}</td>
+                    <td>{{ .Appoint}}</td>
+                    <td>{{ .AuditRecord.OwnerUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.OwnerUserDateTime}}</td>
+                    <td>{{ .AuditRecord.LastUser}}</td>
+                    <td>{{ formatDateTime .AuditRecord.LastUserDateTime}}</td>
+                    <td>
+                        <a href="/fgw/operations?idOperation={{ .IdOperation}}">Изменить</a>
+                        <form method="POST" action="/fgw/operations/delete" style="display:inline;">
+                            <input type="hidden" name="idOperation" value="{{ .IdOperation}}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                {{ end }}
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

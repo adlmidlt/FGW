@@ -40,6 +40,7 @@ func (o *OperationRepo) All(ctx context.Context) ([]*entity.Operation, error) {
 	for rows.Next() {
 		var operation entity.Operation
 		if err = rows.Scan(
+			&operation.IdOperation,
 			&operation.TypeOperation,
 			&operation.CreateDate,
 			&operation.CreateByEmployee,

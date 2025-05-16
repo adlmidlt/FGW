@@ -211,8 +211,8 @@
             <tr>
                 {{ if .IsEditing }}
                     <form method="POST" action="/fgw/pack_variants/update">
-                        <td class="border-table">{{ .IdPackVariant}}</td>
-                        <td class="border-table">{{ .ProdId}}</td>
+                        <td>{{ .IdPackVariant}}</td>
+                        <td>{{ .ProdId}}</td>
 
                         <td><label>
                                 <input type="text" name="article" value="{{ .Article}}">
