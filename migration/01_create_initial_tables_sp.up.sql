@@ -57,8 +57,6 @@ BEGIN
 END
 go
 
-exec dbo.fgw_insert_handbook;
-
 -- Таблица сотрудники.
 CREATE TABLE dbo.employee
 (

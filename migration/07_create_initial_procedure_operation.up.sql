@@ -5,10 +5,10 @@ BEGIN
 
     SELECT id_operation,
            type_operation,
-           date_operation,
-           created_operation_by_employee,
+           create_date,
+           created_by_employee,
            date_order,
-           closed_operation_by_employee,
+           closed_by_employee,
            code_accounting_obj,
            appoint,
            owner_user,
@@ -36,8 +36,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO operation(type_operation, date_operation, created_operation_by_employee, date_order,
-                          closed_operation_by_employee, code_accounting_obj, appoint, owner_user, owner_user_datetime,
+    INSERT INTO operation(type_operation, create_date, created_by_employee, date_order,
+                          closed_by_employee, code_accounting_obj, appoint, owner_user, owner_user_datetime,
                           last_user, last_user_datetime)
     VALUES (@typeOperation, @createDate, @createdByEmployee,
             @dateOrder, @closedByEmployee, @codeAccountingObj,
@@ -63,10 +63,10 @@ BEGIN
 
     UPDATE operation
     SET type_operation= @typeOperation,
-        date_operation= @createDate,
-        created_operation_by_employee= @createdByEmployee,
+        create_date= @createDate,
+        created_by_employee= @createdByEmployee,
         date_order= @dateOrder,
-        closed_operation_by_employee= @closedByEmployee,
+        closed_by_employee= @closedByEmployee,
         code_accounting_obj= @codeAccountingObj,
         appoint= @appoint,
         last_user= @lastUser,
@@ -83,10 +83,10 @@ BEGIN
 
     SELECT id_operation,
            type_operation,
-           date_operation,
-           created_operation_by_employee,
+           create_date,
+           created_by_employee,
            date_order,
-           closed_operation_by_employee,
+           closed_by_employee,
            code_accounting_obj,
            appoint,
            owner_user,
