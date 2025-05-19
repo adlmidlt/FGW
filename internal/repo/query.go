@@ -52,7 +52,7 @@ var (
 	FGWOperationAllQuery      = "exec dbo.fgw_operation_all;"
 	FGWOperationFindByIdQuery = "exec dbo.fgw_operation_find_by_id ?;"
 	FGWOperationAddQuery      = "exec dbo.fgw_operation_add ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
-	FGWOperationUpdateQuery   = "exec dbo.fgw_operation_update ?, ?, ?, ?, ?, ?, ?, ?, ?;"
+	FGWOperationUpdateQuery   = "exec dbo.fgw_operation_update ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"
 	FGWOperationDeleteQuery   = "exec dbo.fgw_operation_delete_by_id ?;"
 	FGWOperationExistQuery    = "exec dbo.fgw_operation_exist ?;"
 )

@@ -120,7 +120,7 @@ func (o *OperationRepo) Add(ctx context.Context, operation *entity.Operation) er
 }
 
 func (o *OperationRepo) Update(ctx context.Context, idOperation int, operation *entity.Operation) error {
-	if _, err := o.mssql.ExecContext(ctx, FGWOperationUpdateQuery,
+	if _, err := o.mssql.ExecContext(ctx, FGWOperationUpdateQuery, idOperation,
 		operation.TypeOperation,
 		operation.CreateDate,
 		operation.CreateByEmployee,

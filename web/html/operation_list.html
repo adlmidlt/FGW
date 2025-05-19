@@ -78,9 +78,9 @@
                                     {{ $typeOperationName := .}}
                                     {{ range $.Catalogs}}
                                         {{ if eq .HandbookId 1}}
-                                            <option value="{{ .Name}}"
-                                                    {{ if eq $typeOperationName.TypeOperation .Name}}selected{{end}}>
-                                                {{ .HandbookId}} - {{ .Name}}
+                                            <option value="{{ .RecordIndex}}"
+                                                    {{ if eq .RecordIndex $typeOperationName.TypeOperation}}selected{{end}}>
+                                                {{ .RecordIndex}}-{{ .Name}}
                                             </option>
                                         {{ end }}
                                     {{ end }}
@@ -93,7 +93,11 @@
                             </label>
                         </td>
                         <td>{{ .CreateByEmployee}}</td>
-                        <td>{{ formatDateTime .DateOrder}}</td>
+                        <td>
+                            <label>
+                                <input type="date" name="dateOrder" value="{{ .DateOrder}}">
+                            </label>
+                        </td>
                         <td>{{ .ClosedByEmployee}}</td>
                         <td>
                             <label>
